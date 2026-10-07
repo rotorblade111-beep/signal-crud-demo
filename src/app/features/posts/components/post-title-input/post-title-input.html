@@ -1,0 +1,7 @@
+<input
+  type="text"
+  class="input-field"
+  [ngModel]="title()"
+  (ngModelChange)="title.set($event)"
+  placeholder="Enter post title..."
+/>

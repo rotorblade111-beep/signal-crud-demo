@@ -15,3 +15,23 @@
 [  199217ms] [LOG] [Effect Triggered] Post count changed to: 5 @ http://localhost:4200/main.js:261
 [  199218ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
 [  970815ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:4200/@vite/client:1030
+[ 2905752ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
+[ 2905762ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
+[ 2905777ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:280
+[ 2905861ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:280
+[ 3076340ms] [LOG] Deleting post with ID: 4 @ http://localhost:4200/main.js:74
+[ 3077489ms] [LOG] [Effect Triggered] Post count changed to: 99 @ http://localhost:4200/main.js:280
+[ 3078227ms] [LOG] Deleting post with ID: 5 @ http://localhost:4200/main.js:74
+[ 3078843ms] [LOG] [Effect Triggered] Post count changed to: 98 @ http://localhost:4200/main.js:280
+[ 3265939ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
+[ 3265946ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
+[ 3265953ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:332
+[ 3266015ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:332
+[ 3514710ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
+[ 3514713ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
+[ 3514718ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:332
+[ 3514736ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:332
+[ 3539676ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
+[ 3539684ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=a6b1ac96:9372
+[ 3539689ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:330
+[ 3539730ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:330

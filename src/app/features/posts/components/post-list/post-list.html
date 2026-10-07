@@ -8,12 +8,7 @@
 
   <!-- Create Form -->
   <div class="form-group">
-    <input 
-      type="text" 
-      class="input-field"
-      [(ngModel)]="newTitle" 
-      placeholder="Enter post title..." 
-    />
+    <app-post-title-input [(title)]="newTitle" />
     <button class="btn btn-primary" (click)="addPost()">Add Post</button>
   </div>
   <h1 #hover>Post List</h1>
