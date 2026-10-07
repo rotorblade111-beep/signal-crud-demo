@@ -1,0 +1,52 @@
+<div class="container">
+  <h2>Posts (Signal CRUD Demo)</h2>
+
+  <!-- Stats Header -->
+ <div style="margin-bottom: 20px; background: #e2e8f0; padding: 12px; border-radius: 8px;">
+    <strong>Total Posts:</strong> {{ postCount() }}
+  </div> 
+
+  <!-- Create Form -->
+  <div class="form-group">
+    <input 
+      type="text" 
+      class="input-field"
+      [(ngModel)]="newTitle" 
+      placeholder="Enter post title..." 
+    />
+    <button class="btn btn-primary" (click)="addPost()">Add Post</button>
+  </div>
+  <h1 #hover>Post List</h1>
+@defer (on hover(hover)) {
+  <!-- Post List -->
+  <ul class="post-list">
+    @for (post of postList(); track post.id) {
+      @defer (on viewport) {
+        <app-post-item
+          [post]="post"
+          style="flex: 1;"
+          (edit)="editPost($event)"
+          (delete)="removePost($event)" />
+      } @placeholder {
+        <li class="post-card post-loading" role="status">
+          <span class="loader" aria-hidden="true"></span>
+          <span>Loading post...</span>
+        </li>
+      } @loading (after 100ms; minimum 300ms) {
+        <li class="post-card post-loading" role="status">
+          <span class="loader" aria-hidden="true"></span>
+          <span>Loading post...</span>
+        </li>
+      } @error {
+        <li class="post-card post-error" role="alert">Could not load this post.</li>
+      }
+    } @empty {
+      <li class="empty-state">No posts available.</li>
+    }
+  </ul>
+
+}
+@placeholder {
+  <p>Loading posts...</p>
+}
+</div>

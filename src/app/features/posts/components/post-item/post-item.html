@@ -1,0 +1,9 @@
+<li class="post-card">
+      <span class="post-title">
+        <span class="post-id">#{{ post().id }}</span> {{ titleDisplay() }}
+      </span>
+      <div class="actions">
+        <button class="btn btn-edit" (click)="onEdit()">Edit</button>
+        <button class="btn btn-danger" (click)="onDelete()">Delete</button>
+      </div>
+      </li>
