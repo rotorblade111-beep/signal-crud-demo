@@ -17,7 +17,7 @@ export class PostService {
 
 
   loadPosts() {
-    this.http.get<Post[]>(`${this.apiUrl}?_limit=5`).subscribe({
+    this.http.get<Post[]>(`${this.apiUrl}`).subscribe({
        next: (data) => this.posts.set(data),
        error: (err) => console.error('Failed to fetch posts', err)
     });
