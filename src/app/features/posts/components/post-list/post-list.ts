@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, effect, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -15,6 +15,7 @@ import { Post } from '../../models/post.model';
 })
 export class PostListComponent implements OnInit {
   postService = inject(PostService);
+  private router = inject(Router);
   titleSearch = signal('');
   bodySearch = signal('');
 
@@ -47,12 +48,8 @@ export class PostListComponent implements OnInit {
     // this.postService.loadPosts();
   }
 
-  editPost(post:Post): void {;
-    const updatedTitle = prompt('Enter new title:', post.title);
-    const postId: number = post.id;
-    if (updatedTitle) {
-      this.postService.updatePost(postId, { title: updatedTitle });
-    }
+  editPost(post: Post): void {
+    void this.router.navigate(['/edit-post', post.id]);
   }
 
   removePost(id: number): void {

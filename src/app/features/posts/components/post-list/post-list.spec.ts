@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { PostListComponent } from './post-list';
 import { Post } from '../../models/post.model';
 
@@ -47,6 +47,15 @@ describe('PostListComponent', () => {
     component.titleSearch.set('alpha');
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([]);
+  });
+
+  it('navigates to the edit-post route for the selected post', () => {
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+
+    component.editPost(posts[1]);
+
+    expect(navigateSpy).toHaveBeenCalledWith(['/edit-post', 2]);
   });
 
 });

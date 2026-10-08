@@ -40,6 +40,20 @@ describe('PostService', () => {
     expect(service.posts()).toEqual([initialPost]);
   });
 
+  it('loads a post by ID when it is not cached', () => {
+    service.getPost(1).subscribe(post => expect(post).toEqual(initialPost));
+    httpTesting.expectOne(`${apiUrl}/1`).flush(initialPost);
+
+    expect(service.posts()).toEqual([initialPost]);
+  });
+
+  it('uses a cached post without another API request', () => {
+    service.posts.set([initialPost]);
+    service.getPost(1).subscribe(post => expect(post).toEqual(initialPost));
+
+    httpTesting.expectNone(`${apiUrl}/1`);
+  });
+
   it('creates and prepends a post containing both title and body', () => {
     service.createPost(initialPost).subscribe();
     const request = httpTesting.expectOne(apiUrl);
@@ -50,14 +64,26 @@ describe('PostService', () => {
     expect(service.posts()).toEqual([initialPost]);
   });
 
-  it('updates a post title without losing its body', () => {
+  it('updates a post title and body', () => {
     service.posts.set([initialPost]);
-    service.updatePost(1, { title: 'Updated title' });
+    const updatedPost = {
+      ...initialPost,
+      title: 'Updated title',
+      body: 'Updated body'
+    };
+    service.updatePost(1, {
+      title: updatedPost.title,
+      body: updatedPost.body
+    }).subscribe();
     const request = httpTesting.expectOne(`${apiUrl}/1`);
     expect(request.request.method).toBe('PUT');
-    request.flush({ ...initialPost, title: 'Updated title' });
+    expect(request.request.body).toEqual({
+      title: 'Updated title',
+      body: 'Updated body'
+    });
+    request.flush(updatedPost);
 
-    expect(service.posts()).toEqual([{ ...initialPost, title: 'Updated title' }]);
+    expect(service.posts()).toEqual([updatedPost]);
   });
 
   it('removes a deleted post from the list', () => {

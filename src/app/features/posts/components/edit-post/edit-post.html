@@ -1,0 +1,52 @@
+<main class="mx-auto my-10 max-w-[680px] rounded-xl bg-white p-6 font-sans text-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+  <h1 class="mb-5 mt-0 text-2xl font-bold text-slate-900">Edit Post</h1>
+
+  @if (isLoading()) {
+    <p class="text-slate-500" role="status">Loading post...</p>
+  } @else if (post(); as currentPost) {
+    <form class="flex flex-col gap-4" (ngSubmit)="savePost()">
+      <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+        Title
+        <input
+          class="box-border w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-[0.95rem] font-normal outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+          name="title"
+          [(ngModel)]="title"
+          [ngModelOptions]="{ standalone: true }"
+          required />
+      </label>
+
+      <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
+        Post body
+        <textarea
+          class="box-border min-h-32 w-full resize-y rounded-lg border border-slate-200 px-3.5 py-2.5 text-[0.95rem] font-normal leading-relaxed outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+          name="body"
+          [(ngModel)]="body"
+          [ngModelOptions]="{ standalone: true }"
+          rows="6"></textarea>
+      </label>
+
+      @if (errorMessage(); as error) {
+        <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
+      }
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors active:scale-[0.98] hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="isSaving() || !title.trim()">
+          {{ isSaving() ? 'Saving...' : 'Save Changes' }}
+        </button>
+        <a
+          routerLink="/home"
+          class="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 no-underline transition-colors hover:bg-slate-200">
+          Cancel
+        </a>
+      </div>
+    </form>
+  } @else {
+    <p class="text-red-700" role="alert">
+      {{ errorMessage() ?? 'Post not found.' }}
+    </p>
+    <a routerLink="/home" class="text-blue-700 underline">Return to posts</a>
+  }
+</main>

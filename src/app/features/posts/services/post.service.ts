@@ -1,6 +1,6 @@
 import { inject, Injectable, signal, computed, } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { Post } from '../models/post.model';
 
 @Injectable({
@@ -33,6 +33,22 @@ export class PostService {
     });
   }
 
+  getPost(id: number): Observable<Post> {
+    const cachedPost = this.posts().find(post => post.id === id);
+    if (cachedPost) {
+      return of(cachedPost);
+    }
+
+    return this.http.get<Post>(`${this.apiUrl}/${id}`).pipe(
+      tap(post => {
+        this.posts.update(current => [
+          ...current.filter(item => item.id !== post.id),
+          post
+        ]);
+      })
+    );
+  }
+
   createPost(newPost: Post): Observable<Post> {
     return this.http.post<Post>(this.apiUrl, newPost).pipe(
       tap((createdPost) => {
@@ -42,14 +58,14 @@ export class PostService {
     );
   }
 
-  updatePost(id: number, updatedData: Partial<Post>): void {
-    this.http.put<Post>(`${this.apiUrl}/${id}`, updatedData).subscribe({
-      next: () => {
+  updatePost(id: number, updatedData: Partial<Post>): Observable<Post> {
+    return this.http.put<Post>(`${this.apiUrl}/${id}`, updatedData).pipe(
+      tap(() => {
         this.posts.update(current =>
           current.map(item => item.id === id ? { ...item, ...updatedData } : item)
         );
-      }
-    });
+      })
+    );
   }
 
   deletePost(id: number): void {

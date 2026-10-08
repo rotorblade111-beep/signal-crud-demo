@@ -33,3 +33,11 @@ Check out your Vite / network configuration and https://vite.dev/config/server-o
 [ 8135994ms] [LOG] [Effect Triggered] Post count changed to: 101 @ http://localhost:4200/main.js:356
 [ 8140997ms] [LOG] Deleting post with ID: 101 @ http://localhost:4200/main.js:82
 [ 8142064ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:356
+[ 9644496ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[ 9644510ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[ 9644547ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:367
+[ 9644782ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:367
+[10004685ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[10004690ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[10004697ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:367
+[10004708ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:367
