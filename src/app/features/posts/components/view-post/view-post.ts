@@ -1,10 +1,16 @@
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnDestroy, effect, inject, signal } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { Post } from '../../models/post.model';
 import { PostService } from '../../services/post.service';
+
+type ViewPostResult =
+  | { type: 'loading' }
+  | { type: 'invalid' }
+  | { type: 'error' }
+  | { type: 'post'; post: Post };
 
 @Component({
   selector: 'app-view-post',
@@ -20,17 +26,12 @@ export class ViewPostComponent implements OnDestroy {
   post = signal<Post | null>(null);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
-
-  constructor() {
+  private postResult = toSignal(
     this.route.paramMap.pipe(
       switchMap(params => {
         const id = Number(params.get('id'));
-        this.post.set(null);
-        this.errorMessage.set(null);
-        this.isLoading.set(true);
-
         if (!Number.isSafeInteger(id) || id <= 0) {
-          return of({ type: 'invalid' as const });
+          return of({ type: 'loading' as const }, { type: 'invalid' as const });
         }
 
         return this.postService.getPost(id).pipe(
@@ -38,18 +39,26 @@ export class ViewPostComponent implements OnDestroy {
           catchError((error: unknown) => {
             console.error('Failed to load post details', error);
             return of({ type: 'error' as const });
-          })
+          }),
+          startWith({ type: 'loading' as const })
         );
       }),
-      takeUntilDestroyed()
-    ).subscribe(result => {
-      this.isLoading.set(false);
+    ),
+    { initialValue: { type: 'loading' } as ViewPostResult }
+  );
+
+  constructor() {
+    effect(() => {
+      const result = this.postResult();
+      this.post.set(null);
+      this.errorMessage.set(null);
+      this.isLoading.set(result.type === 'loading');
 
       if (result.type === 'invalid') {
         this.errorMessage.set('The requested post ID is invalid.');
       } else if (result.type === 'error') {
         this.errorMessage.set('Could not load this post. Please return to the post list.');
-      } else {
+      } else if (result.type === 'post') {
         this.post.set(result.post);
         this.updateMetadata(result.post);
       }
