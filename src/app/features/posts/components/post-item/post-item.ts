@@ -1,9 +1,11 @@
 import { Component, computed, input , output} from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Post } from '../../models/post.model';
 
 @Component({
   selector: 'app-post-item',
   standalone: true,
+  imports: [RouterLink],
   templateUrl: './post-item.html'
 })
 export class PostItemComponent {

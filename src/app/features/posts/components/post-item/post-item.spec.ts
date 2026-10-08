@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { PostItemComponent } from './post-item';
 import { Post } from '../../models/post.model';
 
@@ -13,7 +14,8 @@ describe('PostItemComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PostItemComponent]
+      imports: [PostItemComponent],
+      providers: [provideRouter([])]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PostItemComponent);
