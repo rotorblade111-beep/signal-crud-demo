@@ -1,3 +1,61 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import 'tailwindcss';
+
+@theme {
+  --animate-post-enter: post-enter 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  --animate-post-leave: post-leave 150ms ease-in both;
+  --animate-route-enter: route-enter 220ms ease-out both;
+  --animate-route-leave: route-leave 180ms ease-in both;
+
+  @keyframes post-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.99);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes post-leave {
+    to {
+      opacity: 0;
+      transform: translateX(8px) scale(0.98);
+    }
+  }
+
+  @keyframes route-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes route-leave {
+    to {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+}
+
+::view-transition-old(page) {
+  animation: var(--animate-route-leave);
+}
+
+::view-transition-new(page) {
+  animation: var(--animate-route-enter);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(page),
+  ::view-transition-new(page) {
+    animation: none;
+  }
+}

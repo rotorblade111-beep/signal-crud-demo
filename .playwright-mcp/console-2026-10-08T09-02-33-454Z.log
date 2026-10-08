@@ -1,0 +1,11 @@
+[    2503ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[    2518ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[    2521ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:369
+[    2601ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:369
+[    8159ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:369
+[   14026ms] [LOG] Deleting post with ID: 1 @ http://localhost:4200/main.js:92
+[   15265ms] [LOG] [Effect Triggered] Post count changed to: 99 @ http://localhost:4200/main.js:369
+[  222692ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[  222703ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[  222705ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:369
+[  222719ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:369

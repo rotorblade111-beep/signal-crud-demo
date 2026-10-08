@@ -1,4 +1,4 @@
-<div class="mx-auto my-10 max-w-[680px] rounded-xl bg-white p-6 font-sans text-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+<div class="mx-auto my-10 max-w-[680px] rounded-xl bg-white p-6 font-sans text-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)] [view-transition-name:page]">
   <h2 class="mb-5 mt-0 text-2xl font-bold text-slate-900">Posts (Signal CRUD Demo)</h2>
 
   <!-- Stats Header -->
@@ -38,6 +38,8 @@
         <app-post-item
           [post]="post"
           class="block w-full flex-1"
+          animate.enter="animate-post-enter motion-reduce:animate-none"
+          animate.leave="animate-post-leave motion-reduce:animate-none"
           (edit)="editPost($event)"
           (delete)="removePost($event)" />
       } @placeholder {
