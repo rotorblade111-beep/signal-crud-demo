@@ -1,47 +1,50 @@
-<div class="container">
-  <h2>Posts (Signal CRUD Demo)</h2>
+<div class="mx-auto my-10 max-w-[680px] rounded-xl bg-white p-6 font-sans text-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+  <h2 class="mb-5 mt-0 text-2xl font-bold text-slate-900">Posts (Signal CRUD Demo)</h2>
 
   <!-- Stats Header -->
- <div style="margin-bottom: 20px; background: #e2e8f0; padding: 12px; border-radius: 8px;">
+  <div class="mb-5 rounded-lg bg-slate-200 p-3">
     <strong>Total Posts:</strong> {{ postCount() }}
   </div> 
 
   <!-- Create Form -->
-  <div class="form-group">
-    <app-post-title-input [(title)]="newTitle" />
-    <button class="btn btn-primary" (click)="addPost()">Add Post</button>
+  <div class="mb-6 flex gap-2.5">
+    <app-post-title-input class="min-w-0 flex-1" [(title)]="newTitle" />
+    <button
+      class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors active:scale-[0.98] hover:bg-blue-700"
+      (click)="addPost()">
+      Add Post
+    </button>
   </div>
-  <h1 #hover>Post List</h1>
-@defer (on hover(hover)) {
+  <h1 #hover class="text-xl font-semibold">Post List</h1>
+  @defer (on hover(hover)) {
   <!-- Post List -->
-  <ul class="post-list">
+  <ul class="m-0 flex list-none flex-col gap-3 p-0">
     @for (post of postList(); track post.id) {
       @defer (on viewport) {
         <app-post-item
           [post]="post"
-          style="flex: 1;"
+          class="block w-full flex-1"
           (edit)="editPost($event)"
           (delete)="removePost($event)" />
       } @placeholder {
-        <li class="post-card post-loading" role="status">
-          <span class="loader" aria-hidden="true"></span>
+        <li class="flex items-center justify-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-[18px] py-[14px] text-slate-500" role="status">
+          <span class="inline-block h-[18px] w-[18px] shrink-0 box-border animate-spin rounded-full border-2 border-slate-300 border-t-blue-600 motion-reduce:animate-none" aria-hidden="true"></span>
           <span>Loading post...</span>
         </li>
       } @loading (after 100ms; minimum 300ms) {
-        <li class="post-card post-loading" role="status">
-          <span class="loader" aria-hidden="true"></span>
+        <li class="flex items-center justify-start gap-3 rounded-lg border border-slate-200 bg-slate-50 px-[18px] py-[14px] text-slate-500" role="status">
+          <span class="inline-block h-[18px] w-[18px] shrink-0 box-border animate-spin rounded-full border-2 border-slate-300 border-t-blue-600 motion-reduce:animate-none" aria-hidden="true"></span>
           <span>Loading post...</span>
         </li>
       } @error {
-        <li class="post-card post-error" role="alert">Could not load this post.</li>
+        <li class="rounded-lg border border-slate-200 bg-slate-50 px-[18px] py-[14px] text-red-700" role="alert">Could not load this post.</li>
       }
     } @empty {
-      <li class="empty-state">No posts available.</li>
+      <li class="py-5 text-center text-slate-500">No posts available.</li>
     }
   </ul>
 
-}
-@placeholder {
-  <p>Loading posts...</p>
-}
+  } @placeholder {
+    <p class="py-5 text-center text-slate-500">Loading posts...</p>
+  }
 </div>

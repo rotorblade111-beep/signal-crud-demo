@@ -11,7 +11,6 @@ import { Post } from '../../models/post.model';
   selector: 'app-post-list',
   imports: [PostTitleInputComponent, PostItemComponent],
   templateUrl: './post-list.html',
-  styleUrl: './post-list.css'
 })
 export class PostListComponent implements OnInit {
   postService = inject(PostService);

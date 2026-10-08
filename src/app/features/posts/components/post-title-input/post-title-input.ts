@@ -5,8 +5,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-post-title-input',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './post-title-input.html',
-  styleUrl: './post-title-input.css'
+  templateUrl: './post-title-input.html'
 })
 export class PostTitleInputComponent {
   title = model('');

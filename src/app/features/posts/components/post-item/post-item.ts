@@ -4,8 +4,7 @@ import { Post } from '../../models/post.model';
 @Component({
   selector: 'app-post-item',
   standalone: true,
-  templateUrl: './post-item.html',
-  styleUrl: './post-item.css'
+  templateUrl: './post-item.html'
 })
 export class PostItemComponent {
   // Required signal input from parent
