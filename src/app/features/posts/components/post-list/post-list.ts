@@ -1,8 +1,8 @@
 import { Component, inject, OnInit, effect, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
-import { PostTitleInputComponent } from '../post-title-input/post-title-input';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Post } from '../../models/post.model';
 
@@ -10,13 +10,11 @@ import { Post } from '../../models/post.model';
 
 @Component({
   selector: 'app-post-list',
-  imports: [FormsModule, PostTitleInputComponent, PostItemComponent],
+  imports: [FormsModule, RouterLink, PostItemComponent],
   templateUrl: './post-list.html',
 })
 export class PostListComponent implements OnInit {
   postService = inject(PostService);
-  newTitle = '';
-  newBody = '';
   titleSearch = signal('');
   bodySearch = signal('');
 
@@ -47,18 +45,6 @@ export class PostListComponent implements OnInit {
 
   ngOnInit(): void {
     // this.postService.loadPosts();
-  }
-
-  addPost(): void {
-    const title = this.newTitle;
-    this.postService.createPost({
-      id: Date.now(),  // Using timestamp as a temporary ID for demonstration
-      title: title,
-      body: this.newBody
-    });
-    
-    this.newTitle = '';
-    this.newBody = '';
   }
 
   editPost(post:Post): void {;

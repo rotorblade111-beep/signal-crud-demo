@@ -1,5 +1,6 @@
 import { inject, Injectable, signal, computed, } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 import { Post } from '../models/post.model';
 
 @Injectable({
@@ -14,22 +15,31 @@ export class PostService {
 
   // Computed Signal: Derived directly from posts signal
   postCount = computed(() => this.posts().length);
+  private hasLoadedPosts = false;
 
 
   loadPosts() {
+    if (this.hasLoadedPosts) {
+      return;
+    }
+
+    this.hasLoadedPosts = true;
     this.http.get<Post[]>(`${this.apiUrl}`).subscribe({
        next: (data) => this.posts.set(data),
-       error: (err) => console.error('Failed to fetch posts', err)
+       error: (err) => {
+         this.hasLoadedPosts = false;
+         console.error('Failed to fetch posts', err);
+       }
     });
   }
 
-  createPost(newPost: Post): void {
-    this.http.post<Post>(this.apiUrl, newPost).subscribe({
-      next: (createdPost) => {
+  createPost(newPost: Post): Observable<Post> {
+    return this.http.post<Post>(this.apiUrl, newPost).pipe(
+      tap((createdPost) => {
         console.log('Post created:', createdPost);
         this.posts.update(current => [createdPost, ...current]);
-      }
-    });
+      })
+    );
   }
 
   updatePost(id: number, updatedData: Partial<Post>): void {

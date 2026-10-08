@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 import { PostListComponent } from './post-list';
 import { Post } from '../../models/post.model';
 
@@ -16,7 +17,7 @@ describe('PostListComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PostListComponent],
-      providers: [provideHttpClient(), provideHttpClientTesting()]
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])]
     }).compileComponents();
 
     httpTesting = TestBed.inject(HttpTestingController);
@@ -48,43 +49,4 @@ describe('PostListComponent', () => {
     expect(component.filteredPosts()).toEqual([]);
   });
 
-  it('creates a post with its entered title and body, then clears both fields', async () => {
-    fixture.detectChanges();
-    const titleInput = fixture.nativeElement.querySelector(
-      'app-post-title-input input'
-    ) as HTMLInputElement;
-    const bodyInput = fixture.nativeElement.querySelector(
-      'app-post-title-input textarea'
-    ) as HTMLTextAreaElement;
-    titleInput.value = 'New headline';
-    titleInput.dispatchEvent(new Event('input', { bubbles: true }));
-    bodyInput.value = 'New body content';
-    bodyInput.dispatchEvent(new Event('input', { bubbles: true }));
-    fixture.detectChanges();
-
-    expect(component.newTitle).toBe('New headline');
-    expect(component.newBody).toBe('New body content');
-    component.addPost();
-
-    const request = httpTesting.expectOne('https://jsonplaceholder.typicode.com/posts');
-    expect(request.request.method).toBe('POST');
-    expect(request.request.body).toMatchObject({
-      title: 'New headline',
-      body: 'New body content'
-    });
-    request.flush({ id: 3, title: 'New headline', body: 'New body content' });
-
-    expect(component.newTitle).toBe('');
-    expect(component.newBody).toBe('');
-    expect(component.postService.posts()[0]).toEqual({
-      id: 3,
-      title: 'New headline',
-      body: 'New body content'
-    });
-
-    fixture.detectChanges();
-    await fixture.whenStable();
-    expect(titleInput.value).toBe('');
-    expect(bodyInput.value).toBe('');
-  });
 });

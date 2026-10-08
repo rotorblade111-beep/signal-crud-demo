@@ -17,3 +17,19 @@ Check out your Vite / network configuration and https://vite.dev/config/server-o
 [     199ms] [ERROR] ERROR TypeError: Failed to fetch dynamically imported module: http://localhost:4200/@ng/component?c=src%2Fapp%2Ffeatures%2Fposts%2Fcomponents%2Fpost-list%2Fpost-list.ts%40PostListComponent&t=1791436113776 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/_resource-chunk-BhVVYwBj.js?v=a6b1ac96:3691
 [     199ms] [ERROR] ERROR TypeError: Failed to fetch dynamically imported module: http://localhost:4200/@ng/component?c=src%2Fapp%2Fapp.ts%40App&t=1791436113777 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/_resource-chunk-BhVVYwBj.js?v=a6b1ac96:3691
 [     200ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:330
+[ 6742998ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=1a814be7:9372
+[ 6743008ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=1a814be7:9372
+[ 6743019ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:418
+[ 6743030ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:418
+[ 7150734ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=1a814be7:9372
+[ 7150743ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-Du5D2Hrc.js?v=1a814be7:9372
+[ 7150749ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:418
+[ 7150849ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:418
+[ 7805392ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[ 7805409ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=ac4f2cf2:9363
+[ 7805417ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:356
+[ 7805428ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:356
+[ 8135989ms] [LOG] Post created: {id: 101, title: Hello, body: } @ http://localhost:4200/main.js:70
+[ 8135994ms] [LOG] [Effect Triggered] Post count changed to: 101 @ http://localhost:4200/main.js:356
+[ 8140997ms] [LOG] Deleting post with ID: 101 @ http://localhost:4200/main.js:82
+[ 8142064ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:356

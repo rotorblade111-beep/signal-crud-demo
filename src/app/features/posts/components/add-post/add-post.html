@@ -1,0 +1,28 @@
+<main class="mx-auto my-10 max-w-[680px] rounded-xl bg-white p-6 font-sans text-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+  <h1 class="mb-5 mt-0 text-2xl font-bold text-slate-900">Add a Post</h1>
+
+  <form class="flex flex-col gap-4" (ngSubmit)="addPost()">
+    <app-post-title-input
+      class="flex min-w-0 flex-1 flex-col gap-2.5"
+      [(title)]="newTitle"
+      [(body)]="newBody" />
+
+    @if (submitError(); as error) {
+      <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
+    }
+
+    <div class="flex flex-wrap gap-3">
+      <button
+        type="submit"
+        class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors active:scale-[0.98] hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+        [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Adding...' : 'Add Post' }}
+      </button>
+      <a
+        routerLink="/home"
+        class="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 no-underline transition-colors hover:bg-slate-200">
+        Cancel
+      </a>
+    </div>
+  </form>
+</main>

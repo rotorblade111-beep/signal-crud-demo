@@ -6,17 +6,12 @@
     <strong>Total Posts:</strong> {{ postCount() }}
   </div> 
 
-  <!-- Create Form -->
-  <div class="mb-6 flex flex-col gap-2.5">
-    <app-post-title-input
-      class="flex min-w-0 flex-1 flex-col gap-2.5"
-      [(title)]="newTitle"
-      [(body)]="newBody" />
-    <button
-      class="cursor-pointer self-start rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors active:scale-[0.98] hover:bg-blue-700"
-      (click)="addPost()">
+  <div class="mb-6">
+    <a
+      routerLink="/add-post"
+      class="inline-block cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white no-underline transition-colors active:scale-[0.98] hover:bg-blue-700">
       Add Post
-    </button>
+    </a>
   </div>
   <h1 #hover class="text-xl font-semibold">Post List</h1>
   @defer (on hover(hover)) {

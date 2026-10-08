@@ -32,8 +32,16 @@ describe('PostService', () => {
     expect(service.postCount()).toBe(1);
   });
 
+  it('does not refetch posts when the list route is revisited', () => {
+    service.loadPosts();
+    service.loadPosts();
+    httpTesting.expectOne(apiUrl).flush([initialPost]);
+
+    expect(service.posts()).toEqual([initialPost]);
+  });
+
   it('creates and prepends a post containing both title and body', () => {
-    service.createPost(initialPost);
+    service.createPost(initialPost).subscribe();
     const request = httpTesting.expectOne(apiUrl);
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual(initialPost);
