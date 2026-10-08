@@ -9,4 +9,5 @@ import { FormsModule } from '@angular/forms';
 })
 export class PostTitleInputComponent {
   title = model('');
+  body = model('');
 }

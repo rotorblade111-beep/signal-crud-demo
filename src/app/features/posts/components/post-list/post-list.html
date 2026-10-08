@@ -7,19 +7,38 @@
   </div> 
 
   <!-- Create Form -->
-  <div class="mb-6 flex gap-2.5">
-    <app-post-title-input class="min-w-0 flex-1" [(title)]="newTitle" />
+  <div class="mb-6 flex flex-col gap-2.5">
+    <app-post-title-input
+      class="flex min-w-0 flex-1 flex-col gap-2.5"
+      [(title)]="newTitle"
+      [(body)]="newBody" />
     <button
-      class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors active:scale-[0.98] hover:bg-blue-700"
+      class="cursor-pointer self-start rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors active:scale-[0.98] hover:bg-blue-700"
       (click)="addPost()">
       Add Post
     </button>
   </div>
   <h1 #hover class="text-xl font-semibold">Post List</h1>
   @defer (on hover(hover)) {
+  <div class="mb-4 grid gap-3 sm:grid-cols-2" role="search" aria-label="Filter posts">
+    <input
+      type="search"
+      class="box-border w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-[0.95rem] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+      aria-label="Search post titles"
+      placeholder="Search titles..."
+      [ngModel]="titleSearch()"
+      (ngModelChange)="titleSearch.set($event)" />
+    <input
+      type="search"
+      class="box-border w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-[0.95rem] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+      aria-label="Search post bodies"
+      placeholder="Search post bodies..."
+      [ngModel]="bodySearch()"
+      (ngModelChange)="bodySearch.set($event)" />
+  </div>
   <!-- Post List -->
   <ul class="m-0 flex list-none flex-col gap-3 p-0">
-    @for (post of postList(); track post.id) {
+    @for (post of filteredPosts(); track post.id) {
       @defer (on viewport) {
         <app-post-item
           [post]="post"
@@ -40,7 +59,13 @@
         <li class="rounded-lg border border-slate-200 bg-slate-50 px-[18px] py-[14px] text-red-700" role="alert">Could not load this post.</li>
       }
     } @empty {
-      <li class="py-5 text-center text-slate-500">No posts available.</li>
+      <li class="py-5 text-center text-slate-500">
+        @if (postList().length === 0) {
+          No posts available.
+        } @else {
+          No posts match these search terms.
+        }
+      </li>
     }
   </ul>
 

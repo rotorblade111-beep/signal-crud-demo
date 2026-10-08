@@ -1,21 +1,29 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PostItem } from './post-item';
+import { PostItemComponent } from './post-item';
+import { Post } from '../../models/post.model';
 
-describe('PostItem', () => {
-  let component: PostItem;
-  let fixture: ComponentFixture<PostItem>;
+describe('PostItemComponent', () => {
+  let component: PostItemComponent;
+  let fixture: ComponentFixture<PostItemComponent>;
+  const post: Post = {
+    id: 1,
+    title: 'A post title',
+    body: 'A post body'
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PostItem],
+      imports: [PostItemComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(PostItem);
+    fixture = TestBed.createComponent(PostItemComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.componentRef.setInput('post', post);
+    fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('renders the post title and body', () => {
+    expect(fixture.nativeElement.textContent).toContain('A post title');
+    expect(fixture.nativeElement.textContent).toContain('A post body');
   });
 });
