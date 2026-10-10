@@ -22,7 +22,7 @@
     <div class="flex items-center justify-center md:justify-end text-sm font-medium">
       @if (auth.currentUser()) {
         <button type="button" (click)="logOut()" class="cursor-pointer border-0 bg-transparent p-0 text-slate-700 transition-colors hover:text-blue-700">Log Out</button>
-      } @else {
+      } @else if (!isAuthPage()) {
         <a routerLink="/login" class="text-slate-700 no-underline transition-colors hover:text-blue-700">Sign UP/Login</a>
       }
     </div>

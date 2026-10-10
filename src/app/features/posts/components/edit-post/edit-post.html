@@ -1,4 +1,10 @@
 <main class="mx-auto my-10 max-w-[680px] rounded-xl bg-white p-6 font-sans text-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.05)] [view-transition-name:page]">
+  <a routerLink="/home" class="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 no-underline transition-colors hover:text-blue-700">
+    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10H17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    Home
+  </a>
   <h1 class="mb-5 mt-0 text-2xl font-bold text-slate-900">Edit Post</h1>
 
   @if (isLoading()) {

@@ -42,6 +42,9 @@ describe('EditPostComponent', () => {
   afterEach(() => httpTesting.verify());
 
   it('loads the selected post and saves its updated title and body', async () => {
+    const homeLink = fixture.nativeElement.querySelector('a[routerLink="/home"]') as HTMLAnchorElement;
+    expect(homeLink.textContent).toContain('Home');
+
     const titleInput = fixture.nativeElement.querySelector('input[name="title"]') as HTMLInputElement;
     const bodyInput = fixture.nativeElement.querySelector('textarea[name="body"]') as HTMLTextAreaElement;
     expect(titleInput.value).toBe('Original title');

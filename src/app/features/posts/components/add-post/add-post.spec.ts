@@ -35,6 +35,9 @@ describe('AddPostComponent', () => {
   afterEach(() => httpTesting.verify());
 
   it('submits the title and body, then returns to the list route', async () => {
+    const homeLink = fixture.nativeElement.querySelector('a[routerLink="/home"]') as HTMLAnchorElement;
+    expect(homeLink.textContent).toContain('Home');
+
     const titleInput = fixture.nativeElement.querySelector(
       'app-post-title-input input'
     ) as HTMLInputElement;

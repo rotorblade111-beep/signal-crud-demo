@@ -52,6 +52,8 @@ describe('ViewPostComponent', () => {
 
     expect(fixture.nativeElement.textContent).toContain(post.title);
     expect(fixture.nativeElement.textContent).toContain(post.body);
+    const homeLink = fixture.nativeElement.querySelector('a[routerLink="/home"]') as HTMLAnchorElement;
+    expect(homeLink.textContent).toContain('Home');
     expect(title.getTitle()).toBe('A useful post title | Signal CRUD Demo');
     expect(meta.getTag('name="description"')?.content).toBe(post.body);
     expect(meta.getTag('property="og:type"')?.content).toBe('article');
