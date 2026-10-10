@@ -49,6 +49,63 @@ describe('PostListComponent', () => {
     expect(component.filteredPosts()).toEqual([]);
   });
 
+  it('shows at most 10 posts per page and navigates across all pages', async () => {
+    const hundredPosts = Array.from({ length: 100 }, (_, index) => ({
+      id: index + 1,
+      title: `Post ${index + 1}`,
+      body: `Body ${index + 1}`
+    }));
+    component.postService.posts.set(hundredPosts);
+    await fixture.whenStable();
+
+    expect(component.totalPages()).toBe(10);
+    expect(component.paginatedPosts()).toHaveLength(10);
+    expect(component.paginatedPosts()[0]).toEqual(hundredPosts[0]);
+    expect(component.paginatedPosts()[9]).toEqual(hundredPosts[9]);
+
+    component.goToPage(2);
+    expect(component.currentPage()).toBe(2);
+    expect(component.paginatedPosts()).toHaveLength(10);
+    expect(component.paginatedPosts()[0]).toEqual(hundredPosts[10]);
+
+    component.goToPage(10);
+    expect(component.paginatedPosts()[0]).toEqual(hundredPosts[90]);
+    expect(component.paginatedPosts()[9]).toEqual(hundredPosts[99]);
+  });
+
+  it('resets pagination when a search changes and applies filters before slicing', async () => {
+    const hundredPosts = Array.from({ length: 100 }, (_, index) => ({
+      id: index + 1,
+      title: `Post ${index + 1}`,
+      body: index === 75 ? 'needle in body' : `Body ${index + 1}`
+    }));
+    component.postService.posts.set(hundredPosts);
+    await fixture.whenStable();
+    component.goToPage(8);
+
+    component.setBodySearch('needle');
+
+    expect(component.currentPage()).toBe(1);
+    expect(component.totalPages()).toBe(1);
+    expect(component.paginatedPosts()).toEqual([hundredPosts[75]]);
+  });
+
+  it('keeps the displayed page valid if posts are removed from the last page', async () => {
+    const hundredPosts = Array.from({ length: 100 }, (_, index) => ({
+      id: index + 1,
+      title: `Post ${index + 1}`,
+      body: `Body ${index + 1}`
+    }));
+    component.postService.posts.set(hundredPosts);
+    await fixture.whenStable();
+    component.goToPage(10);
+    component.postService.posts.set(hundredPosts.slice(0, 85));
+    await fixture.whenStable();
+
+    expect(component.displayedPage()).toBe(9);
+    expect(component.paginatedPosts()).toHaveLength(5);
+  });
+
   it('navigates to the edit-post route for the selected post', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
