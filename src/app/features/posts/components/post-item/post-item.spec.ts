@@ -28,4 +28,30 @@ describe('PostItemComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('A post title');
     expect(fixture.nativeElement.textContent).toContain('A post body');
   });
+
+  it('only emits the delete event after confirmation', () => {
+    const deleted = vi.fn();
+    component.delete.subscribe(deleted);
+    fixture.nativeElement.querySelector('button:last-child').click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain(
+      "Are you sure you want to delete this post? This action can't be undone."
+    );
+    expect(deleted).not.toHaveBeenCalled();
+
+    fixture.nativeElement.querySelector('app-confirmation button:last-child').click();
+    fixture.detectChanges();
+    expect(deleted).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.querySelector('app-confirmation')).toBeNull();
+
+    fixture.nativeElement.querySelector('button:last-child').click();
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('app-confirmation button:first-child').click();
+    fixture.detectChanges();
+
+    expect(deleted).toHaveBeenCalledOnce();
+    expect(deleted).toHaveBeenCalledWith(post.id);
+    expect(fixture.nativeElement.querySelector('app-confirmation')).toBeNull();
+  });
 });

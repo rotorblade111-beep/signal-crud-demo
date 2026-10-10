@@ -35,3 +35,9 @@
 [ 4387463ms] [LOG] [Effect Triggered] Post count changed to: 99 @ http://localhost:4200/main.js:396
 [ 4396753ms] [LOG] Post created: {id: 101, title: Hello, body: hello} @ http://localhost:4200/main.js:82
 [ 4396758ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:396
+[ 5874190ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:4200/@vite/client:1030
+[ 5874485ms] [WARNING] NG0505: Angular hydration was requested on the client, but there was no serialized information present in the server response, thus hydration was not enabled. Make sure the `provideClientHydration()` is included into the list of providers in the server part of the application configuration. Find more at https://v22.angular.dev/errors/NG0505 @ http://localhost:4200/@vite/client:298
+[ 5874504ms] [LOG] Angular is running in development mode. @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=c5bf038a:9363
+[ 5874524ms] [LOG] NG0751: Angular has detected that this application contains `@defer` blocks and the hot module replacement (HMR) mode is enabled. All `@defer` block dependencies will be loaded eagerly. Find more at https://v22.angular.dev/errors/NG0751 @ http://localhost:4200/@fs/C:/Users/nawsad/Desktop/Projects/signal-crud-demo/.angular/cache/22.2.1/signal-crud-demo/vite/deps/core-DHWaREvY.js?v=c5bf038a:9363
+[ 5874532ms] [LOG] [Effect Triggered] Post count changed to: 0 @ http://localhost:4200/main.js:396
+[ 5875164ms] [LOG] [Effect Triggered] Post count changed to: 100 @ http://localhost:4200/main.js:396

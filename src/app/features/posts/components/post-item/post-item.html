@@ -22,3 +22,9 @@
     </button>
   </div>
 </li>
+@if (showDeleteConfirmation()) {
+  <app-confirmation
+    message="Are you sure you want to delete this post? This action can't be undone."
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()" />
+}
