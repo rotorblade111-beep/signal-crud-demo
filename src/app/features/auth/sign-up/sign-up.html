@@ -1,0 +1,104 @@
+<main class="mx-auto flex min-h-[65vh] max-w-6xl items-center justify-center px-4 py-10">
+  <section class="grid w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl md:grid-cols-[0.9fr_1.1fr]">
+    <div class="hidden flex-col justify-between bg-[#5865f2] p-9 text-white md:flex">
+      <div>
+        <div class="mb-8 flex items-center gap-3 text-2xl font-bold">
+          <span class="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 text-xl">P</span>
+          Posthub
+        </div>
+        <h1 class="text-3xl font-bold leading-tight">Join the conversation.</h1>
+        <p class="mt-4 leading-relaxed text-indigo-100">Create an account to discover, share, and manage posts.</p>
+      </div>
+      <p class="text-sm text-indigo-100">Your next great idea starts here.</p>
+    </div>
+
+    <div class="p-6 sm:p-9">
+      <p class="mb-1 text-sm font-semibold uppercase tracking-widest text-[#5865f2] md:hidden">Posthub</p>
+      <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Create your account</h2>
+      <p class="mb-6 mt-0 text-sm text-slate-500">Enter your details to get started.</p>
+
+      <form class="flex flex-col gap-4" (ngSubmit)="signUp()" #signUpForm="ngForm">
+        <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+          Email
+          <input
+            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            #emailField="ngModel"
+            required
+            email
+            autocomplete="email"
+            placeholder="you@example.com" />
+          @if (emailField.invalid && emailField.touched) {
+            <span class="text-xs font-normal text-red-700">Enter a valid email address.</span>
+          }
+        </label>
+
+        <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+          Password
+          <input
+            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            required
+            autocomplete="new-password"
+            placeholder="Enter a password" />
+        </label>
+
+        <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+          Re-type password
+          <input
+            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            type="password"
+            name="repeatedPassword"
+            [(ngModel)]="repeatedPassword"
+            required
+            autocomplete="new-password"
+            placeholder="Enter your password again" />
+        </label>
+
+        <fieldset class="m-0 border-0 p-0">
+          <legend class="mb-1.5 text-sm font-semibold text-slate-700">Date of Birth</legend>
+          <div class="grid grid-cols-3 gap-2">
+            <select name="month" [ngModel]="month()" (ngModelChange)="updateMonth($event)" required aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+              <option value="">Month</option>
+              @for (item of months; track item.value) {
+                <option [value]="item.value">{{ item.name }}</option>
+              }
+            </select>
+            <select name="day" [(ngModel)]="day" required aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]" [disabled]="!days().length">
+              <option value="">Day</option>
+              @for (item of days(); track item) {
+                <option [value]="item">{{ item }}</option>
+              }
+            </select>
+            <select name="year" [ngModel]="year()" (ngModelChange)="updateYear($event)" required aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+              <option value="">Year</option>
+              @for (item of years; track item) {
+                <option [value]="item">{{ item }}</option>
+              }
+            </select>
+          </div>
+        </fieldset>
+
+        @if (errorMessage(); as error) {
+          <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
+        }
+
+        <button
+          type="submit"
+          class="mt-1 cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:cursor-not-allowed disabled:opacity-50"
+          [disabled]="signUpForm.invalid">
+          Create Account
+        </button>
+      </form>
+
+      <p class="mb-0 mt-5 text-sm text-slate-600">
+        Already have an account?
+        <a routerLink="/login" class="font-semibold text-[#4752c4] no-underline hover:underline">Log in instead.</a>
+      </p>
+    </div>
+  </section>
+</main>

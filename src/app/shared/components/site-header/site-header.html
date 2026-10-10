@@ -1,6 +1,6 @@
 <header class="border-b border-slate-200 bg-white">
   <div class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-4 px-5 py-4 md:grid-cols-[1fr_auto_1fr]">
-    <a routerLink="/home" aria-label="Posthub home" class="mx-auto flex items-center gap-2.5 text-xl font-bold tracking-tight text-slate-900 no-underline md:mx-0">
+    <a [routerLink]="auth.currentUser() ? '/home' : '/login'" aria-label="Posthub home" class="mx-auto flex items-center gap-2.5 text-xl font-bold tracking-tight text-slate-900 no-underline md:mx-0">
       <svg class="h-9 w-9 text-blue-600" viewBox="0 0 40 40" fill="none" aria-hidden="true">
         <rect x="3" y="3" width="34" height="34" rx="11" fill="currentColor" />
         <path d="M13 12.5h9.5a5.5 5.5 0 0 1 0 11H18v5h-5V12.5Zm5 4.5v2h4.5a1 1 0 1 0 0-2H18Z" fill="white" />
@@ -9,8 +9,12 @@
     </a>
 
     <nav aria-label="Main navigation" class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium">
-      <a routerLink="/home" class="text-slate-700 no-underline transition-colors hover:text-blue-700">Home</a>
-      <a href="#" (click)="$event.preventDefault()" class="text-slate-700 no-underline transition-colors hover:text-blue-700">Sign UP/Login</a>
+      @if (auth.currentUser()) {
+        <a routerLink="/home" class="text-slate-700 no-underline transition-colors hover:text-blue-700">Home</a>
+        <button type="button" (click)="logOut()" class="cursor-pointer border-0 bg-transparent p-0 text-slate-700 transition-colors hover:text-blue-700">Log Out</button>
+      } @else {
+        <a routerLink="/login" class="text-slate-700 no-underline transition-colors hover:text-blue-700">Sign UP/Login</a>
+      }
       <a href="#" (click)="$event.preventDefault()" class="text-slate-700 no-underline transition-colors hover:text-blue-700">FAQ</a>
       <a href="#" (click)="$event.preventDefault()" class="text-slate-700 no-underline transition-colors hover:text-blue-700">Contact</a>
     </nav>

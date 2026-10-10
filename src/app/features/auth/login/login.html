@@ -1,0 +1,64 @@
+<main class="mx-auto flex min-h-[65vh] max-w-6xl items-center justify-center px-4 py-10">
+  <section class="grid w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl md:grid-cols-[0.9fr_1.1fr]">
+    <div class="hidden flex-col justify-between bg-[#5865f2] p-9 text-white md:flex">
+      <div>
+        <div class="mb-8 flex items-center gap-3 text-2xl font-bold">
+          <span class="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 text-xl">P</span>
+          Posthub
+        </div>
+        <h1 class="text-3xl font-bold leading-tight">Welcome back.</h1>
+        <p class="mt-4 leading-relaxed text-indigo-100">Log in to continue exploring and sharing posts.</p>
+      </div>
+      <p class="text-sm text-indigo-100">Good to have you back.</p>
+    </div>
+
+    <div class="p-6 sm:p-9">
+      <p class="mb-1 text-sm font-semibold uppercase tracking-widest text-[#5865f2] md:hidden">Posthub</p>
+      @if (isResettingPassword()) {
+        <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Reset your password</h2>
+        <p class="mb-6 mt-0 text-sm text-slate-500">Enter your account email and choose a new password.</p>
+        <form class="flex flex-col gap-4" (ngSubmit)="resetPassword()" #resetForm="ngForm">
+          <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+            Email
+            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="email" name="resetEmail" [(ngModel)]="resetEmail" required email autocomplete="email" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+            New password
+            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="password" name="newPassword" [(ngModel)]="newPassword" required autocomplete="new-password" />
+          </label>
+          @if (errorMessage(); as error) {
+            <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
+          }
+          <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:opacity-50" [disabled]="resetForm.invalid">Reset Password</button>
+          <button type="button" class="cursor-pointer self-start text-sm font-semibold text-[#4752c4] hover:underline" (click)="isResettingPassword.set(false)">Back to login</button>
+        </form>
+      } @else {
+        <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Welcome back!</h2>
+        <p class="mb-6 mt-0 text-sm text-slate-500">We're so excited to see you again.</p>
+        <form class="flex flex-col gap-4" (ngSubmit)="logIn()" #loginForm="ngForm">
+          <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+            Username
+            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="email" name="username" [(ngModel)]="username" required email autocomplete="username" placeholder="you@example.com" />
+          </label>
+          <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+            Password
+            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" />
+          </label>
+          @if (errorMessage(); as error) {
+            <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
+          }
+          @if (successMessage(); as success) {
+            <p class="m-0 text-sm text-green-700" role="status">{{ success }}</p>
+          }
+          <button type="button" class="cursor-pointer self-start text-sm font-semibold text-[#4752c4] hover:underline" (click)="isResettingPassword.set(true); errorMessage.set(null); successMessage.set(null)">Forgot your password?</button>
+          <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:cursor-not-allowed disabled:opacity-50" [disabled]="loginForm.invalid">Log In</button>
+        </form>
+
+        <p class="mb-0 mt-5 text-sm text-slate-600">
+          Don't have an account?
+          <a routerLink="/sign-up" class="font-semibold text-[#4752c4] no-underline hover:underline">Sign Up.</a>
+        </p>
+      }
+    </div>
+  </section>
+</main>
