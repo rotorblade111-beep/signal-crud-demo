@@ -19,6 +19,7 @@ export class SignUpComponent {
   day = '';
   year = signal('');
   errorMessage = signal<string | null>(null);
+  dateOfBirthError = signal<string | null>(null);
   months = [
     { value: 1, name: 'January' }, { value: 2, name: 'February' },
     { value: 3, name: 'March' }, { value: 4, name: 'April' },
@@ -46,21 +47,32 @@ export class SignUpComponent {
   updateMonth(month: string): void {
     this.month.set(month);
     this.resetInvalidDay();
+    this.updateDateOfBirthError();
   }
 
   updateYear(year: string): void {
     this.year.set(year);
     this.resetInvalidDay();
+    this.updateDateOfBirthError();
+  }
+
+  onDayAttempt(): void {
+    this.dateOfBirthError.set(this.missingDatePrerequisitesMessage());
   }
 
   signUp(): void {
     this.errorMessage.set(null);
+    this.dateOfBirthError.set(null);
 
     if (this.password !== this.repeatedPassword) {
       this.errorMessage.set('Passwords do not match.');
       return;
     }
-    if (!this.month() || !this.day || !this.year() || !this.days().includes(Number(this.day))) {
+    if (!this.month() || !this.year()) {
+      this.dateOfBirthError.set(this.missingDatePrerequisitesMessage());
+      return;
+    }
+    if (!this.day || !this.days().includes(Number(this.day))) {
       this.errorMessage.set('Select a valid date of birth.');
       return;
     }
@@ -82,5 +94,24 @@ export class SignUpComponent {
     if (this.day && !this.days().includes(Number(this.day))) {
       this.day = '';
     }
+  }
+
+  private updateDateOfBirthError(): void {
+    if (this.dateOfBirthError()) {
+      this.dateOfBirthError.set(this.missingDatePrerequisitesMessage());
+    }
+  }
+
+  private missingDatePrerequisitesMessage(): string | null {
+    if (!this.year() && !this.month()) {
+      return 'Please select your year of birth and month of birth.';
+    }
+    if (!this.year()) {
+      return 'Please select your year of birth.';
+    }
+    if (!this.month()) {
+      return 'Please select your month of birth.';
+    }
+    return null;
   }
 }

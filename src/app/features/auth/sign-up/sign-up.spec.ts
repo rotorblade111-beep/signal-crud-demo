@@ -45,6 +45,38 @@ describe('SignUpComponent', () => {
     expect(component.days()).not.toContain(31);
   });
 
+  it('orders date selectors by year, month, then day', () => {
+    const selectors = Array.from(
+      fixture.nativeElement.querySelectorAll('fieldset select') as NodeListOf<HTMLSelectElement>
+    );
+
+    expect(selectors.map(select => select.getAttribute('aria-label'))).toEqual([
+      'Year',
+      'Month',
+      'Day'
+    ]);
+  });
+
+  it('shows specific missing year and month messages when the day selector is focused', () => {
+    const component = fixture.componentInstance;
+    const daySelect = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
+
+    daySelect.dispatchEvent(new FocusEvent('focus'));
+    fixture.detectChanges();
+    expect(component.dateOfBirthError()).toBe(
+      'Please select your year of birth and month of birth.'
+    );
+
+    component.updateYear('2002');
+    daySelect.dispatchEvent(new FocusEvent('focus'));
+    fixture.detectChanges();
+    expect(component.dateOfBirthError()).toBe('Please select your month of birth.');
+
+    component.updateMonth('4');
+    expect(component.dateOfBirthError()).toBeNull();
+    expect(component.days()).toHaveLength(30);
+  });
+
   it('registers valid input and navigates to the protected home page', async () => {
     const component = fixture.componentInstance;
     const router = TestBed.inject(Router);

@@ -62,25 +62,28 @@
         <fieldset class="m-0 border-0 p-0">
           <legend class="mb-1.5 text-sm font-semibold text-slate-700">Date of Birth</legend>
           <div class="grid grid-cols-3 gap-2">
-            <select name="month" [ngModel]="month()" (ngModelChange)="updateMonth($event)" required aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
-              <option value="">Month</option>
-              @for (item of months; track item.value) {
-                <option [value]="item.value">{{ item.name }}</option>
-              }
-            </select>
-            <select name="day" [(ngModel)]="day" required aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]" [disabled]="!days().length">
-              <option value="">Day</option>
-              @for (item of days(); track item) {
-                <option [value]="item">{{ item }}</option>
-              }
-            </select>
             <select name="year" [ngModel]="year()" (ngModelChange)="updateYear($event)" required aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
               <option value="">Year</option>
               @for (item of years; track item) {
                 <option [value]="item">{{ item }}</option>
               }
             </select>
+            <select name="month" [ngModel]="month()" (ngModelChange)="updateMonth($event)" required aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+              <option value="">Month</option>
+              @for (item of months; track item.value) {
+                <option [value]="item.value">{{ item.name }}</option>
+              }
+            </select>
+            <select name="day" [(ngModel)]="day" (focus)="onDayAttempt()" required aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+              <option value="">Day</option>
+              @for (item of days(); track item) {
+                <option [value]="item">{{ item }}</option>
+              }
+            </select>
           </div>
+          @if (dateOfBirthError(); as error) {
+            <p class="mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ error }}</p>
+          }
         </fieldset>
 
         @if (errorMessage(); as error) {
