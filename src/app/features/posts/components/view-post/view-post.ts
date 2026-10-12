@@ -1,94 +1,36 @@
-import { Component, OnDestroy, effect, inject, signal } from '@angular/core';
-import { Meta, Title } from '@angular/platform-browser';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, map, of, startWith, switchMap } from 'rxjs';
-import { Post } from '../../models/post.model';
-import { PostService } from '../../services/post.service';
-
-type ViewPostResult =
-  | { type: 'loading' }
-  | { type: 'invalid' }
-  | { type: 'error' }
-  | { type: 'post'; post: Post };
+import { map } from 'rxjs';
+import { ViewPostRouteData } from '../../../../app.routes';
 
 @Component({
   selector: 'app-view-post',
   imports: [RouterLink],
   templateUrl: './view-post.html'
 })
-export class ViewPostComponent implements OnDestroy {
+export class ViewPostComponent {
   private route = inject(ActivatedRoute);
-  private postService = inject(PostService);
-  private titleService = inject(Title);
-  private meta = inject(Meta);
 
-  post = signal<Post | null>(null);
+  post = signal<ViewPostRouteData['post']>(null);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
-  private postResult = toSignal(
-    this.route.paramMap.pipe(
-      switchMap(params => {
-        const id = Number(params.get('id'));
-        if (!Number.isSafeInteger(id) || id <= 0) {
-          return of({ type: 'loading' as const }, { type: 'invalid' as const });
-        }
-
-        return this.postService.getPost(id).pipe(
-          map(post => ({ type: 'post' as const, post })),
-          catchError((error: unknown) => {
-            console.error('Failed to load post details', error);
-            return of({ type: 'error' as const });
-          }),
-          startWith({ type: 'loading' as const })
-        );
-      }),
-    ),
-    { initialValue: { type: 'loading' } as ViewPostResult }
+  private routeData = toSignal(
+    this.route.data.pipe(map(data => data['seo'] as ViewPostRouteData)),
+    { initialValue: null }
   );
 
   constructor() {
     effect(() => {
-      const result = this.postResult();
-      this.post.set(null);
-      this.errorMessage.set(null);
-      this.isLoading.set(result.type === 'loading');
-
-      if (result.type === 'invalid') {
-        this.errorMessage.set('The requested post ID is invalid.');
-      } else if (result.type === 'error') {
-        this.errorMessage.set('Could not load this post. Please return to the post list.');
-      } else if (result.type === 'post') {
-        this.post.set(result.post);
-        this.updateMetadata(result.post);
+      const data = this.routeData();
+      if (!data) {
+        this.isLoading.set(true);
+        return;
       }
+
+      this.post.set(data.post);
+      this.errorMessage.set(data.errorMessage);
+      this.isLoading.set(false);
     });
-  }
-
-  ngOnDestroy(): void {
-    this.titleService.setTitle('Signal CRUD Demo');
-    this.updateMetaTags({
-      description: 'Browse and manage posts in the Signal CRUD Demo.',
-      title: 'Signal CRUD Demo',
-      type: 'website'
-    });
-  }
-
-  private updateMetadata(post: Post): void {
-    const title = `${post.title} | Signal CRUD Demo`;
-    const description = post.body.replace(/\s+/g, ' ').trim().slice(0, 160)
-      || `Read post ${post.id} in the Signal CRUD Demo.`;
-
-    this.titleService.setTitle(title);
-    this.updateMetaTags({ description, title, type: 'article' });
-  }
-
-  private updateMetaTags(values: { description: string; title: string; type: string }): void {
-    this.meta.updateTag({ name: 'description', content: values.description });
-    this.meta.updateTag({ property: 'og:title', content: values.title });
-    this.meta.updateTag({ property: 'og:description', content: values.description });
-    this.meta.updateTag({ property: 'og:type', content: values.type });
-    this.meta.updateTag({ name: 'twitter:title', content: values.title });
-    this.meta.updateTag({ name: 'twitter:description', content: values.description });
   }
 }

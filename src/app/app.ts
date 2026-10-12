@@ -1,7 +1,10 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Meta, Title } from '@angular/platform-browser';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { SiteFooterComponent } from './shared/components/site-footer/site-footer';
 import { SiteHeaderComponent } from './shared/components/site-header/site-header';
+import { RouteSeoData } from './app.routes';
 
 @Component({
   imports: [RouterOutlet, SiteHeaderComponent, SiteFooterComponent],
@@ -9,5 +12,34 @@ import { SiteHeaderComponent } from './shared/components/site-header/site-header
   templateUrl: './app.html',
 })
 export class App {
-  protected readonly title = signal('signal-crud-demo');
+  private readonly router = inject(Router);
+  private readonly title = inject(Title);
+  private readonly meta = inject(Meta);
+
+  constructor() {
+    this.applyRouteMetadata();
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe(() => this.applyRouteMetadata());
+  }
+
+  private applyRouteMetadata(): void {
+    let route = this.router.routerState.snapshot.root;
+    while (route.firstChild) {
+      route = route.firstChild;
+    }
+
+    const metadata = route.data['seo'] as RouteSeoData | undefined;
+    const title = metadata?.title ?? 'Signal CRUD Demo';
+    const description = metadata?.description ?? 'Browse and manage posts in the Signal CRUD Demo.';
+    const type = metadata?.type ?? 'website';
+
+    this.title.setTitle(title);
+    this.meta.updateTag({ name: 'description', content: description });
+    this.meta.updateTag({ property: 'og:title', content: title });
+    this.meta.updateTag({ property: 'og:description', content: description });
+    this.meta.updateTag({ property: 'og:type', content: type });
+    this.meta.updateTag({ name: 'twitter:title', content: title });
+    this.meta.updateTag({ name: 'twitter:description', content: description });
+  }
 }
