@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 import { SiteFooterComponent } from './shared/components/site-footer/site-footer';
 import { SiteHeaderComponent } from './shared/components/site-header/site-header';
@@ -16,11 +17,22 @@ export class App {
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
-  constructor() {
-    this.applyRouteMetadata();
+  // 1. Convert the router navigation events stream into a read-only signal
+  private readonly navEnd = toSignal(
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
-    ).subscribe(() => this.applyRouteMetadata());
+    ),
+    { initialValue: null }
+  );
+
+  constructor() {
+    // 2. effect() executes immediately on creation (handling initial page load)
+    // and automatically re-runs whenever navEnd() changes on subsequent navigations.
+    effect(() => {
+      // Accessing navEnd() registers it as a tracked dependency for the effect
+      this.navEnd(); 
+      this.applyRouteMetadata();
+    });
   }
 
   private applyRouteMetadata(): void {
