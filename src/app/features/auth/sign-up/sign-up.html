@@ -17,21 +17,27 @@
       <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Create your account</h2>
       <p class="mb-6 mt-0 text-sm text-slate-500">Enter your details to get started.</p>
 
-      <form class="flex flex-col gap-4" (ngSubmit)="signUp()" #signUpForm="ngForm">
+      <form class="flex flex-col gap-4" (ngSubmit)="signUp()" novalidate>
         <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
           Email
           <input
             class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
             type="email"
             name="email"
-            [(ngModel)]="email"
+            [ngModel]="email"
+            (ngModelChange)="updateEmail($event)"
             #emailField="ngModel"
             required
             email
             autocomplete="email"
             placeholder="you@example.com" />
-          @if (emailField.invalid && emailField.touched) {
+          @if ((emailField.touched || submitted()) && emailField.errors?.['required']) {
+            <span class="text-xs font-normal text-red-700">Email is required.</span>
+          } @else if ((emailField.touched || submitted()) && emailField.errors?.['email']) {
             <span class="text-xs font-normal text-red-700">Enter a valid email address.</span>
+          }
+          @if (emailError(); as error) {
+            <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
           }
         </label>
 
@@ -42,9 +48,13 @@
             type="password"
             name="password"
             [(ngModel)]="password"
+            #passwordField="ngModel"
             required
             autocomplete="new-password"
             placeholder="Enter a password" />
+          @if ((passwordField.touched || submitted()) && passwordField.errors?.['required']) {
+            <span class="text-xs font-normal text-red-700">Password is required.</span>
+          }
         </label>
 
         <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
@@ -53,47 +63,61 @@
             class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
             type="password"
             name="repeatedPassword"
-            [(ngModel)]="repeatedPassword"
+            [ngModel]="repeatedPassword"
+            (ngModelChange)="updateRepeatedPassword($event)"
+            #repeatedPasswordField="ngModel"
             required
             autocomplete="new-password"
             placeholder="Enter your password again" />
+          @if ((repeatedPasswordField.touched || submitted()) && repeatedPasswordField.errors?.['required']) {
+            <span class="text-xs font-normal text-red-700">Please re-type your password.</span>
+          } @else if ((repeatedPasswordField.touched || submitted()) && repeatedPassword && repeatedPassword !== password) {
+            <span class="text-xs font-normal text-red-700" role="alert">Passwords do not match.</span>
+          }
+          @if (repeatedPasswordError(); as error) {
+            <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
+          }
         </label>
 
         <fieldset class="m-0 border-0 p-0">
           <legend class="mb-1.5 text-sm font-semibold text-slate-700">Date of Birth</legend>
           <div class="grid grid-cols-3 gap-2">
-            <select name="year" [ngModel]="year()" (ngModelChange)="updateYear($event)" required aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+            <select name="year" [ngModel]="year()" (ngModelChange)="updateYear($event)" #yearField="ngModel" required aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
               <option value="">Year</option>
               @for (item of years; track item) {
                 <option [value]="item">{{ item }}</option>
               }
             </select>
-            <select name="month" [ngModel]="month()" (ngModelChange)="updateMonth($event)" required aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+            <select name="month" [ngModel]="month()" (ngModelChange)="updateMonth($event)" #monthField="ngModel" required aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
               <option value="">Month</option>
               @for (item of months; track item.value) {
                 <option [value]="item.value">{{ item.name }}</option>
               }
             </select>
-            <select name="day" [(ngModel)]="day" (focus)="onDayAttempt()" required aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+            <select name="day" [(ngModel)]="day" (focus)="onDayAttempt()" #dayField="ngModel" required aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
               <option value="">Day</option>
               @for (item of days(); track item) {
                 <option [value]="item">{{ item }}</option>
               }
             </select>
           </div>
+          @if ((yearField.touched || submitted()) && yearField.errors?.['required']) {
+            <p class="mb-0 mt-2 text-sm font-normal text-red-700">Year of birth is required.</p>
+          }
+          @if ((monthField.touched || submitted()) && monthField.errors?.['required']) {
+            <p class="mb-0 mt-2 text-sm font-normal text-red-700">Month of birth is required.</p>
+          }
+          @if ((dayField.touched || submitted()) && dayField.errors?.['required'] && year() && month()) {
+            <p class="mb-0 mt-2 text-sm font-normal text-red-700">Day of birth is required.</p>
+          }
           @if (dateOfBirthError(); as error) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ error }}</p>
           }
         </fieldset>
 
-        @if (errorMessage(); as error) {
-          <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
-        }
-
         <button
           type="submit"
-          class="mt-1 cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:cursor-not-allowed disabled:opacity-50"
-          [disabled]="signUpForm.invalid">
+          class="mt-1 cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4]">
           Create Account
         </button>
       </form>

@@ -17,41 +17,63 @@
       @if (isResettingPassword()) {
         <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Reset your password</h2>
         <p class="mb-6 mt-0 text-sm text-slate-500">Enter your account email and choose a new password.</p>
-        <form class="flex flex-col gap-4" (ngSubmit)="resetPassword()" #resetForm="ngForm">
+        <form class="flex flex-col gap-4" (ngSubmit)="resetPassword()" novalidate>
           <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Email
-            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="email" name="resetEmail" [(ngModel)]="resetEmail" required email autocomplete="email" />
+            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="email" name="resetEmail" [ngModel]="resetEmail" (ngModelChange)="updateResetEmail($event)" #resetEmailField="ngModel" required email autocomplete="email" />
+            @if ((resetEmailField.touched || resetSubmitted()) && resetEmailField.errors?.['required']) {
+              <span class="text-xs font-normal text-red-700">Email is required.</span>
+            } @else if ((resetEmailField.touched || resetSubmitted()) && resetEmailField.errors?.['email']) {
+              <span class="text-xs font-normal text-red-700">Enter a valid email address.</span>
+            }
+            @if (resetEmailError(); as error) {
+              <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
+            }
           </label>
           <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             New password
-            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="password" name="newPassword" [(ngModel)]="newPassword" required autocomplete="new-password" />
+            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="password" name="newPassword" [ngModel]="newPassword" (ngModelChange)="updateNewPassword($event)" #newPasswordField="ngModel" required autocomplete="new-password" />
+            @if ((newPasswordField.touched || resetSubmitted()) && newPasswordField.errors?.['required']) {
+              <span class="text-xs font-normal text-red-700">Password is required.</span>
+            }
+            @if (resetPasswordError(); as error) {
+              <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
+            }
           </label>
-          @if (errorMessage(); as error) {
-            <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
-          }
-          <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:opacity-50" [disabled]="resetForm.invalid">Reset Password</button>
+          <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4]">Reset Password</button>
           <button type="button" class="cursor-pointer self-start text-sm font-semibold text-[#4752c4] hover:underline" (click)="isResettingPassword.set(false)">Back to login</button>
         </form>
       } @else {
         <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Welcome back!</h2>
         <p class="mb-6 mt-0 text-sm text-slate-500">We're so excited to see you again.</p>
-        <form class="flex flex-col gap-4" (ngSubmit)="logIn()" #loginForm="ngForm">
+        <form class="flex flex-col gap-4" (ngSubmit)="logIn()" novalidate>
           <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Username
-            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="email" name="username" [(ngModel)]="username" required email autocomplete="username" placeholder="you@example.com" />
+            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="email" name="username" [ngModel]="username" (ngModelChange)="updateUsername($event)" #usernameField="ngModel" required email autocomplete="username" placeholder="you@example.com" />
+            @if ((usernameField.touched || submitted()) && usernameField.errors?.['required']) {
+              <span class="text-xs font-normal text-red-700">Username is required.</span>
+            } @else if ((usernameField.touched || submitted()) && usernameField.errors?.['email']) {
+              <span class="text-xs font-normal text-red-700">Enter a valid email address.</span>
+            }
+            @if (usernameError(); as error) {
+              <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
+            }
           </label>
           <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Password
-            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" />
+            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2]" type="password" name="password" [ngModel]="password" (ngModelChange)="updatePassword($event)" #passwordField="ngModel" required autocomplete="current-password" />
+            @if ((passwordField.touched || submitted()) && passwordField.errors?.['required']) {
+              <span class="text-xs font-normal text-red-700">Password is required.</span>
+            }
+            @if (passwordError(); as error) {
+              <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
+            }
           </label>
-          @if (errorMessage(); as error) {
-            <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
-          }
           @if (successMessage(); as success) {
             <p class="m-0 text-sm text-green-700" role="status">{{ success }}</p>
           }
-          <button type="button" class="cursor-pointer self-start text-sm font-semibold text-[#4752c4] hover:underline" (click)="isResettingPassword.set(true); errorMessage.set(null); successMessage.set(null)">Forgot your password?</button>
-          <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:cursor-not-allowed disabled:opacity-50" [disabled]="loginForm.invalid">Log In</button>
+          <button type="button" class="cursor-pointer self-start text-sm font-semibold text-[#4752c4] hover:underline" (click)="isResettingPassword.set(true); successMessage.set(null)">Forgot your password?</button>
+          <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4]">Log In</button>
         </form>
 
         <p class="mb-0 mt-5 text-sm text-slate-600">

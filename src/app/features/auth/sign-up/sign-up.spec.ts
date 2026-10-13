@@ -45,6 +45,57 @@ describe('SignUpComponent', () => {
     expect(component.days()).not.toContain(31);
   });
 
+  it('keeps account creation enabled and shows required errors after an empty submit', () => {
+    const button = fixture.nativeElement.querySelector('button[type="submit"]') as HTMLButtonElement;
+    expect(button.disabled).toBe(false);
+
+    button.click();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Email is required.');
+    expect(fixture.nativeElement.textContent).toContain('Password is required.');
+    expect(fixture.nativeElement.textContent).toContain('Please re-type your password.');
+    expect(fixture.nativeElement.textContent).toContain('Year of birth is required.');
+    expect(fixture.nativeElement.textContent).toContain('Month of birth is required.');
+  });
+
+  it('shows email format feedback after blur and mismatch feedback beside confirmation', () => {
+    const email = fixture.nativeElement.querySelector('input[name="email"]') as HTMLInputElement;
+    email.value = 'not-an-email';
+    email.dispatchEvent(new Event('input', { bubbles: true }));
+    email.dispatchEvent(new Event('blur', { bubbles: true }));
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Enter a valid email address.');
+
+    const component = fixture.componentInstance;
+    component.email = 'valid@example.com';
+    component.password = 'one';
+    component.repeatedPassword = 'two';
+    component.updateYear('2002');
+    component.updateMonth('4');
+    component.day = '1';
+    component.signUp();
+    fixture.detectChanges();
+    expect(component.repeatedPasswordError()).toBe('Passwords do not match.');
+  });
+
+  it('shows only one invalid-email message after repeated sign-up submissions', () => {
+    const email = fixture.nativeElement.querySelector('input[name="email"]') as HTMLInputElement;
+    const submit = fixture.nativeElement.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    email.value = 'not-an-email';
+    email.dispatchEvent(new Event('input', { bubbles: true }));
+    email.dispatchEvent(new Event('blur', { bubbles: true }));
+    fixture.detectChanges();
+    submit.click();
+    fixture.detectChanges();
+    submit.click();
+    fixture.detectChanges();
+
+    const emailLabel = email.closest('label')?.textContent ?? '';
+    expect(emailLabel.match(/Enter a valid email address\./g)).toHaveLength(1);
+  });
+
   it('orders date selectors by year, month, then day', () => {
     const selectors = Array.from(
       fixture.nativeElement.querySelectorAll('fieldset select') as NodeListOf<HTMLSelectElement>
@@ -59,6 +110,7 @@ describe('SignUpComponent', () => {
 
   it('shows specific missing year and month messages when the day selector is focused', () => {
     const component = fixture.componentInstance;
+    component.email = 'valid@example.com';
     const daySelect = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
 
     daySelect.dispatchEvent(new FocusEvent('focus'));
@@ -100,15 +152,15 @@ describe('SignUpComponent', () => {
     component.password = 'secret';
     component.repeatedPassword = 'different';
     component.updateMonth('4');
-    component.day = '31';
     component.updateYear('2002');
+    component.day = '31';
 
     component.signUp();
 
-    expect(component.errorMessage()).toBe('Passwords do not match.');
+    expect(component.repeatedPasswordError()).toBe('Passwords do not match.');
     component.repeatedPassword = 'secret';
     component.signUp();
-    expect(component.errorMessage()).toBe('Select a valid date of birth.');
+    expect(component.dateOfBirthError()).toBe('Select a valid date of birth.');
     expect(TestBed.inject(AuthService).currentUser()).toBeNull();
   });
 });

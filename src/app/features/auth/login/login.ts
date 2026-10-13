@@ -17,15 +17,39 @@ export class LoginComponent {
   password = '';
   resetEmail = '';
   newPassword = '';
+  submitted = signal(false);
+  resetSubmitted = signal(false);
+  usernameError = signal<string | null>(null);
+  passwordError = signal<string | null>(null);
+  resetEmailError = signal<string | null>(null);
+  resetPasswordError = signal<string | null>(null);
   isResettingPassword = signal(false);
-  errorMessage = signal<string | null>(null);
   successMessage = signal<string | null>(null);
 
+  updateUsername(username: string): void {
+    this.username = username;
+    this.usernameError.set(null);
+  }
+
+  updatePassword(password: string): void {
+    this.password = password;
+    this.passwordError.set(null);
+  }
+
   logIn(): void {
-    this.errorMessage.set(null);
+    this.submitted.set(true);
     this.successMessage.set(null);
+    this.usernameError.set(null);
+    this.passwordError.set(null);
+
+    if (!this.username.trim() || !this.password) {
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.username.trim())) {
+      return;
+    }
     if (!this.auth.logIn(this.username, this.password)) {
-      this.errorMessage.set('The username or password is incorrect.');
+      this.passwordError.set('The username or password is incorrect.');
       return;
     }
 
@@ -37,15 +61,38 @@ export class LoginComponent {
   }
 
   resetPassword(): void {
-    this.errorMessage.set(null);
+    this.resetSubmitted.set(true);
     this.successMessage.set(null);
+    this.resetEmailError.set(null);
+    this.resetPasswordError.set(null);
+    if (!this.resetEmail.trim()) {
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.resetEmail.trim())) {
+      this.resetEmailError.set('Enter a valid email address.');
+      return;
+    }
+    if (!this.newPassword) {
+      return;
+    }
     if (!this.auth.resetPassword(this.resetEmail, this.newPassword)) {
-      this.errorMessage.set('No account was found for that email address.');
+      this.resetEmailError.set('No account was found for that email address.');
       return;
     }
 
     this.isResettingPassword.set(false);
     this.successMessage.set('Password reset. You can now log in with your new password.');
     this.newPassword = '';
+    this.resetSubmitted.set(false);
+  }
+
+  updateResetEmail(email: string): void {
+    this.resetEmail = email;
+    this.resetEmailError.set(null);
+  }
+
+  updateNewPassword(password: string): void {
+    this.newPassword = password;
+    this.resetPasswordError.set(null);
   }
 }

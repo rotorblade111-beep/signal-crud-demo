@@ -18,7 +18,9 @@ export class SignUpComponent {
   month = signal('');
   day = '';
   year = signal('');
-  errorMessage = signal<string | null>(null);
+  submitted = signal(false);
+  emailError = signal<string | null>(null);
+  repeatedPasswordError = signal<string | null>(null);
   dateOfBirthError = signal<string | null>(null);
   months = [
     { value: 1, name: 'January' }, { value: 2, name: 'February' },
@@ -56,24 +58,49 @@ export class SignUpComponent {
     this.updateDateOfBirthError();
   }
 
+  updateEmail(email: string): void {
+    this.email = email;
+    this.emailError.set(null);
+  }
+
+  updateRepeatedPassword(password: string): void {
+    this.repeatedPassword = password;
+    this.repeatedPasswordError.set(null);
+  }
+
   onDayAttempt(): void {
     this.dateOfBirthError.set(this.missingDatePrerequisitesMessage());
   }
 
   signUp(): void {
-    this.errorMessage.set(null);
+    this.submitted.set(true);
+    this.emailError.set(null);
+    this.repeatedPasswordError.set(null);
     this.dateOfBirthError.set(null);
+    let hasInvalidInput = false;
 
-    if (this.password !== this.repeatedPassword) {
-      this.errorMessage.set('Passwords do not match.');
-      return;
+    if (this.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email.trim())) {
+      hasInvalidInput = true;
+    }
+    if (this.repeatedPassword && this.password !== this.repeatedPassword) {
+      this.repeatedPasswordError.set('Passwords do not match.');
+      hasInvalidInput = true;
     }
     if (!this.month() || !this.year()) {
       this.dateOfBirthError.set(this.missingDatePrerequisitesMessage());
-      return;
+      hasInvalidInput = true;
+    } else if (!this.day) {
+      this.dateOfBirthError.set('Please select your day of birth.');
+      hasInvalidInput = true;
+    } else if (!this.days().includes(Number(this.day))) {
+      this.dateOfBirthError.set('Select a valid date of birth.');
+      hasInvalidInput = true;
     }
-    if (!this.day || !this.days().includes(Number(this.day))) {
-      this.errorMessage.set('Select a valid date of birth.');
+
+    if (!this.email.trim() || !this.password || !this.repeatedPassword) {
+      hasInvalidInput = true;
+    }
+    if (hasInvalidInput) {
       return;
     }
 
@@ -83,7 +110,7 @@ export class SignUpComponent {
       dateOfBirth: `${this.year()}-${this.month().padStart(2, '0')}-${this.day.padStart(2, '0')}`
     });
     if (!result.success) {
-      this.errorMessage.set('An account with this email already exists.');
+      this.emailError.set('An account with this email already exists.');
       return;
     }
 
