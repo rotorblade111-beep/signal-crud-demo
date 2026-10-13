@@ -1,12 +1,6 @@
 import { inject } from '@angular/core';
 import { ResolveFn, Routes } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
-import { PostListComponent } from './features/posts/components/post-list/post-list';
-import { AddPostComponent } from './features/posts/components/add-post/add-post';
-import { EditPostComponent } from './features/posts/components/edit-post/edit-post';
-import { ViewPostComponent } from './features/posts/components/view-post/view-post';
-import { LoginComponent } from './features/auth/login/login';
-import { SignUpComponent } from './features/auth/sign-up/sign-up';
 import { authGuard } from './core/auth/auth.guard';
 import { Post } from './features/posts/models/post.model';
 import { PostService } from './features/posts/services/post.service';
@@ -62,35 +56,35 @@ export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
     path: 'login',
-    component: LoginComponent,
+    loadComponent: () => import('./features/auth/login/login').then(m => m.LoginComponent),
     data: { seo: { title: 'Log in | Posthub', description: 'Log in to your Posthub account.', type: 'website' } }
   },
   {
     path: 'sign-up',
-    component: SignUpComponent,
+    loadComponent: () => import('./features/auth/sign-up/sign-up').then(m => m.SignUpComponent),
     data: { seo: { title: 'Sign up | Posthub', description: 'Create your Posthub account.', type: 'website' } }
   },
   {
     path: 'home',
-    component: PostListComponent,
+    loadComponent: () => import('./features/posts/components/post-list/post-list').then(m => m.PostListComponent),
     canActivate: [authGuard],
     data: { seo: { title: 'Posts | Posthub', description: siteDescription, type: 'website' } }
   },
   {
     path: 'add-post',
-    component: AddPostComponent,
+    loadComponent: () => import('./features/posts/components/add-post/add-post').then(m => m.AddPostComponent),
     canActivate: [authGuard],
     data: { seo: { title: 'Add a post | Posthub', description: 'Create a new post on Posthub.', type: 'website' } }
   },
   {
     path: 'edit-post/:id',
-    component: EditPostComponent,
+    loadComponent: () => import('./features/posts/components/edit-post/edit-post').then(m => m.EditPostComponent),
     canActivate: [authGuard],
     data: { seo: { title: 'Edit post | Posthub', description: 'Edit a post on Posthub.', type: 'website' } }
   },
   {
     path: 'view-post/:id',
-    component: ViewPostComponent,
+    loadComponent: () => import('./features/posts/components/view-post/view-post').then(m => m.ViewPostComponent),
     canActivate: [authGuard],
     resolve: { seo: viewPostResolver }
   },
