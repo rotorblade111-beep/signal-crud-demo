@@ -72,6 +72,15 @@ export class SignUpComponent {
     this.dateOfBirthError.set(this.missingDatePrerequisitesMessage());
   }
 
+  shouldShowDateOfBirthError(yearTouched: boolean | null, monthTouched: boolean | null): boolean {
+    return Boolean(
+      this.dateOfBirthError() &&
+      !this.submitted() &&
+      !(yearTouched && !this.year()) &&
+      !(monthTouched && !this.month())
+    );
+  }
+
   signUp(): void {
     this.submitted.set(true);
     this.emailError.set(null);
@@ -87,13 +96,11 @@ export class SignUpComponent {
       hasInvalidInput = true;
     }
     if (!this.month() || !this.year()) {
-      this.dateOfBirthError.set(this.missingDatePrerequisitesMessage());
+      hasInvalidInput = true;
+    } else if (this.day && !this.days().includes(Number(this.day))) {
+      this.dateOfBirthError.set('Select a valid date of birth.');
       hasInvalidInput = true;
     } else if (!this.day) {
-      this.dateOfBirthError.set('Please select your day of birth.');
-      hasInvalidInput = true;
-    } else if (!this.days().includes(Number(this.day))) {
-      this.dateOfBirthError.set('Select a valid date of birth.');
       hasInvalidInput = true;
     }
 

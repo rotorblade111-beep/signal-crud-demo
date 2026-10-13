@@ -55,8 +55,11 @@ describe('SignUpComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Email is required.');
     expect(fixture.nativeElement.textContent).toContain('Password is required.');
     expect(fixture.nativeElement.textContent).toContain('Please re-type your password.');
-    expect(fixture.nativeElement.textContent).toContain('Year of birth is required.');
-    expect(fixture.nativeElement.textContent).toContain('Month of birth is required.');
+    const dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
+    expect(dateOfBirthText.match(/Year of birth is required\./g)).toHaveLength(1);
+    expect(dateOfBirthText.match(/Month of birth is required\./g)).toHaveLength(1);
+    expect(dateOfBirthText.match(/Day of birth is required\./g)).toHaveLength(1);
+    expect(dateOfBirthText).not.toContain('Please select your year of birth and month of birth.');
   });
 
   it('shows email format feedback after blur and mismatch feedback beside confirmation', () => {
@@ -127,6 +130,47 @@ describe('SignUpComponent', () => {
     component.updateMonth('4');
     expect(component.dateOfBirthError()).toBeNull();
     expect(component.days()).toHaveLength(30);
+  });
+
+  it('shows only the missing prerequisite message after submitting with one DOB part selected', () => {
+    const component = fixture.componentInstance;
+    component.email = 'valid@example.com';
+    component.password = 'secret';
+    component.repeatedPassword = 'secret';
+    component.updateYear('2002');
+
+    component.signUp();
+    fixture.detectChanges();
+
+    let dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
+    expect(dateOfBirthText.match(/Month of birth is required\./g)).toHaveLength(1);
+    expect(dateOfBirthText).not.toContain('Please select your month of birth.');
+    expect(dateOfBirthText).not.toContain('Day of birth is required.');
+
+    component.submitted.set(false);
+    component.updateYear('');
+    component.updateMonth('4');
+    component.signUp();
+    fixture.detectChanges();
+
+    dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
+    expect(dateOfBirthText.match(/Year of birth is required\./g)).toHaveLength(1);
+    expect(dateOfBirthText).not.toContain('Please select your year of birth.');
+    expect(dateOfBirthText).not.toContain('Day of birth is required.');
+  });
+
+  it('does not duplicate the year error with the day-prerequisite message after year was touched', () => {
+    const component = fixture.componentInstance;
+    const yearSelect = fixture.nativeElement.querySelector('select[name="year"]') as HTMLSelectElement;
+    const daySelect = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
+    yearSelect.dispatchEvent(new FocusEvent('focus'));
+    yearSelect.dispatchEvent(new FocusEvent('blur'));
+    daySelect.dispatchEvent(new FocusEvent('focus'));
+    fixture.detectChanges();
+
+    const dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
+    expect(dateOfBirthText.match(/Year of birth is required\./g)).toHaveLength(1);
+    expect(dateOfBirthText).not.toContain('Please select your year of birth and month of birth.');
   });
 
   it('registers valid input and navigates to the protected home page', async () => {

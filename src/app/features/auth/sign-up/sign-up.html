@@ -107,11 +107,11 @@
           @if ((monthField.touched || submitted()) && monthField.errors?.['required']) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700">Month of birth is required.</p>
           }
-          @if ((dayField.touched || submitted()) && dayField.errors?.['required'] && year() && month()) {
+          @if ((dayField.touched || submitted()) && dayField.errors?.['required'] && ((year() && month()) || (!year() && !month()))) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700">Day of birth is required.</p>
           }
-          @if (dateOfBirthError(); as error) {
-            <p class="mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ error }}</p>
+          @if (shouldShowDateOfBirthError(yearField.touched, monthField.touched)) {
+            <p class="mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ dateOfBirthError() }}</p>
           }
         </fieldset>
 
