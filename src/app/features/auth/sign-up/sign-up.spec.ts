@@ -55,6 +55,16 @@ describe('SignUpComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Email is required.');
     expect(fixture.nativeElement.textContent).toContain('Password is required.');
     expect(fixture.nativeElement.textContent).toContain('Please re-type your password.');
+    const email = fixture.nativeElement.querySelector('input[name="email"]') as HTMLInputElement;
+    const password = fixture.nativeElement.querySelector('input[name="password"]') as HTMLInputElement;
+    const repeatedPassword = fixture.nativeElement.querySelector('input[name="repeatedPassword"]') as HTMLInputElement;
+    const year = fixture.nativeElement.querySelector('select[name="year"]') as HTMLSelectElement;
+    const month = fixture.nativeElement.querySelector('select[name="month"]') as HTMLSelectElement;
+    const day = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
+    for (const field of [email, password, repeatedPassword, year, month, day]) {
+      expect(field.classList).toContain('!border-red-500');
+      expect(field.classList).toContain('ring-4');
+    }
     const dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
     expect(dateOfBirthText.match(/Year of birth is required\./g)).toHaveLength(1);
     expect(dateOfBirthText.match(/Month of birth is required\./g)).toHaveLength(1);
@@ -67,8 +77,16 @@ describe('SignUpComponent', () => {
     email.value = 'not-an-email';
     email.dispatchEvent(new Event('input', { bubbles: true }));
     email.dispatchEvent(new Event('blur', { bubbles: true }));
+    fixture.nativeElement.querySelector('main').dispatchEvent(new Event('click', { bubbles: true }));
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Enter a valid email address.');
+    expect(email.classList).toContain('!border-red-500');
+
+    const day = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
+    day.dispatchEvent(new FocusEvent('focus'));
+    fixture.detectChanges();
+    expect(day.classList).toContain('!border-red-500');
+    expect(day.classList).toContain('ring-4');
 
     const component = fixture.componentInstance;
     component.email = 'valid@example.com';

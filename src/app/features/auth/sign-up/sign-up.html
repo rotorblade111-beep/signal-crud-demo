@@ -21,7 +21,8 @@
         <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
           Email
           <input
-            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            [class]="((emailField.touched || submitted()) && (emailField.errors?.['required'] || emailField.errors?.['email'])) || emailError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
             type="email"
             name="email"
             [ngModel]="email"
@@ -44,7 +45,8 @@
         <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
           Password
           <input
-            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            [class]="(passwordField.touched || submitted()) && passwordField.errors?.['required'] ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
             type="password"
             name="password"
             [(ngModel)]="password"
@@ -60,7 +62,8 @@
         <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
           Re-type password
           <input
-            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+            [class]="((repeatedPasswordField.touched || submitted()) && (repeatedPasswordField.errors?.['required'] || (repeatedPassword && repeatedPassword !== password))) || repeatedPasswordError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
             type="password"
             name="repeatedPassword"
             [ngModel]="repeatedPassword"
@@ -82,19 +85,19 @@
         <fieldset class="m-0 border-0 p-0">
           <legend class="mb-1.5 text-sm font-semibold text-slate-700">Date of Birth</legend>
           <div class="grid grid-cols-3 gap-2">
-            <select name="year" [ngModel]="year()" (ngModelChange)="updateYear($event)" #yearField="ngModel" required aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+            <select name="year" [ngModel]="year()" (ngModelChange)="updateYear($event)" #yearField="ngModel" required aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15 focus:invalid:!border-red-500 focus:invalid:!ring-red-500/20" [class]="(yearField.touched || submitted()) && yearField.errors?.['required'] ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
               <option value="">Year</option>
               @for (item of years; track item) {
                 <option [value]="item">{{ item }}</option>
               }
             </select>
-            <select name="month" [ngModel]="month()" (ngModelChange)="updateMonth($event)" #monthField="ngModel" required aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+            <select name="month" [ngModel]="month()" (ngModelChange)="updateMonth($event)" #monthField="ngModel" required aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15 focus:invalid:!border-red-500 focus:invalid:!ring-red-500/20" [class]="(monthField.touched || submitted()) && monthField.errors?.['required'] ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
               <option value="">Month</option>
               @for (item of months; track item.value) {
                 <option [value]="item.value">{{ item.name }}</option>
               }
             </select>
-            <select name="day" [(ngModel)]="day" (focus)="onDayAttempt()" #dayField="ngModel" required aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none focus:border-[#5865f2]">
+            <select name="day" [(ngModel)]="day" (focus)="onDayAttempt()" #dayField="ngModel" required aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15 focus:invalid:!border-red-500 focus:invalid:!ring-red-500/20" [class]="((dayField.touched || submitted()) && dayField.errors?.['required']) || dateOfBirthError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
               <option value="">Day</option>
               @for (item of days(); track item) {
                 <option [value]="item">{{ item }}</option>

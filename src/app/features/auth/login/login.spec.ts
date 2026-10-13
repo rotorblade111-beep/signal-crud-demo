@@ -51,6 +51,12 @@ describe('LoginComponent', () => {
     expect(component.submitted()).toBe(true);
     expect(fixture.nativeElement.textContent).toContain('Username is required.');
     expect(fixture.nativeElement.textContent).toContain('Password is required.');
+    const username = fixture.nativeElement.querySelector('input[name="username"]') as HTMLInputElement;
+    const password = fixture.nativeElement.querySelector('input[name="password"]') as HTMLInputElement;
+    expect(username.classList).toContain('!border-red-500');
+    expect(password.classList).toContain('!border-red-500');
+    expect(username.classList).toContain('ring-4');
+    expect(password.classList).toContain('ring-4');
     expect(auth.currentUser()).toBeNull();
   });
 
@@ -60,8 +66,10 @@ describe('LoginComponent', () => {
     username.value = 'not-an-email';
     username.dispatchEvent(new Event('input', { bubbles: true }));
     username.dispatchEvent(new Event('blur', { bubbles: true }));
+    fixture.nativeElement.querySelector('main').dispatchEvent(new Event('click', { bubbles: true }));
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Enter a valid email address.');
+    expect(username.classList).toContain('!border-red-500');
 
     component.username = 'member@example.com';
     component.password = 'incorrect';
