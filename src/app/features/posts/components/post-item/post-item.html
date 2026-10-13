@@ -3,6 +3,7 @@
     <h2 class="m-0 text-[0.95rem] font-semibold text-slate-800">
       <a
         [routerLink]="['/view-post', post().id]"
+        [state]="{ post: post() }"
         class="text-inherit no-underline hover:text-blue-700 hover:underline">
         <span class="mr-2 text-[0.85rem] font-normal text-slate-400">#{{ post().id }}</span>{{ titleDisplay() }}
       </a>

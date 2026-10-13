@@ -1,3 +1,4 @@
+import { Location } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -73,6 +74,19 @@ describe('EditPostComponent', () => {
 
     await fixture.whenStable();
     expect(router.url).toBe('/home');
+  });
+
+  it('uses a matching post from router state without fetching it again', () => {
+    fixture.destroy();
+    vi.spyOn(TestBed.inject(Location), 'getState').mockReturnValue({ post });
+    fixture = TestBed.createComponent(EditPostComponent);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.post()).toEqual(post);
+    expect(fixture.componentInstance.title).toBe(post.title);
+    expect(fixture.componentInstance.body).toBe(post.body);
+    expect(fixture.componentInstance.isLoading()).toBe(false);
+    httpTesting.expectNone(`${apiUrl}/7`);
   });
 
 });

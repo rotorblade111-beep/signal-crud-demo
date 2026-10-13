@@ -60,7 +60,7 @@ export class PostListComponent implements OnInit {
   }
 
   editPost(post: Post): void {
-    void this.router.navigate(['/edit-post', post.id]);
+    void this.router.navigate(['/edit-post', post.id], { state: { post } });
   }
 
   removePost(id: number): void {

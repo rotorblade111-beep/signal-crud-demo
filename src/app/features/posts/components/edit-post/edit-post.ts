@@ -1,10 +1,33 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, catchError, map, of, switchMap } from 'rxjs';
 import { PostService } from '../../services/post.service';
 import { Post } from '../../models/post.model';
+
+function postFromRouterState(state: unknown): Post | null {
+  if (!state || typeof state !== 'object' || !('post' in state)) {
+    return null;
+  }
+
+  const post = state.post;
+  if (
+    !post ||
+    typeof post !== 'object' ||
+    !('id' in post) ||
+    !('title' in post) ||
+    !('body' in post) ||
+    typeof post.id !== 'number' ||
+    typeof post.title !== 'string' ||
+    typeof post.body !== 'string'
+  ) {
+    return null;
+  }
+
+  return { id: post.id, title: post.title, body: post.body };
+}
 
 type PostResult =
   | { type: 'loaded'; post: Post }
@@ -19,6 +42,7 @@ type PostResult =
 export class EditPostComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private location = inject(Location);
   private postService = inject(PostService);
   private saveRequests = new Subject<{ id: number; title: string; body: string }>();
 
@@ -43,9 +67,16 @@ export class EditPostComponent {
 
   constructor() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
+    const navigationState = this.router.getCurrentNavigation()?.extras.state ?? this.location.getState();
+    const statePost = postFromRouterState(navigationState);
     if (!Number.isSafeInteger(id) || id <= 0) {
       this.isLoading.set(false);
       this.errorMessage.set('The requested post ID is invalid.');
+    } else if (statePost?.id === id) {
+      this.post.set(statePost);
+      this.title = statePost.title;
+      this.body = statePost.body;
+      this.isLoading.set(false);
     } else {
       const postResult = toSignal(
         this.postService.getPost(id).pipe(

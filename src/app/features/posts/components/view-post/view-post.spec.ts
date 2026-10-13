@@ -1,5 +1,6 @@
+import { Location } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { Post } from '../../models/post.model';
 import { ViewPostComponent } from './view-post';
@@ -21,6 +22,7 @@ describe('ViewPostComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
+            snapshot: { paramMap: convertToParamMap({ id: String(post.id) }) },
             data: of({
               seo: {
                 title: `${post.title} | Posthub`,
@@ -48,5 +50,18 @@ describe('ViewPostComponent', () => {
     expect(fixture.nativeElement.textContent).toContain(post.body);
     const homeLink = fixture.nativeElement.querySelector('a[routerLink="/home"]') as HTMLAnchorElement;
     expect(homeLink.textContent).toContain('Home');
+  });
+
+  it('prefers the complete post supplied in router state', () => {
+    fixture.destroy();
+    vi.spyOn(TestBed.inject(Location), 'getState').mockReturnValue({
+      post: { ...post, title: 'Post from router state' }
+    });
+    fixture = TestBed.createComponent(ViewPostComponent);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.post()?.title).toBe('Post from router state');
+    expect(fixture.componentInstance.errorMessage()).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Post from router state');
   });
 });

@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { RouterLink, provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
 import { PostItemComponent } from './post-item';
 import { Post } from '../../models/post.model';
 
@@ -27,6 +28,12 @@ describe('PostItemComponent', () => {
   it('renders the post title and body', () => {
     expect(fixture.nativeElement.textContent).toContain('A post title');
     expect(fixture.nativeElement.textContent).toContain('A post body');
+  });
+
+  it('passes the full post in router state when opening the detail page', () => {
+    const link = fixture.debugElement.query(By.directive(RouterLink)).injector.get(RouterLink);
+
+    expect(link.state).toEqual({ post });
   });
 
   it('only emits the delete event after confirmation', () => {

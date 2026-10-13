@@ -112,7 +112,7 @@ describe('PostListComponent', () => {
 
     component.editPost(posts[1]);
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/edit-post', 2]);
+    expect(navigateSpy).toHaveBeenCalledWith(['/edit-post', 2], { state: { post: posts[1] } });
   });
 
 });
