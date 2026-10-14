@@ -39,10 +39,10 @@ describe('AddPostComponent', () => {
     expect(homeLink.textContent).toContain('Home');
 
     const titleInput = fixture.nativeElement.querySelector(
-      'app-post-title-input input'
+      'app-post-input input'
     ) as HTMLInputElement;
     const bodyInput = fixture.nativeElement.querySelector(
-      'app-post-title-input textarea'
+      'app-post-input textarea'
     ) as HTMLTextAreaElement;
     titleInput.value = 'New headline';
     titleInput.dispatchEvent(new Event('input', { bubbles: true }));

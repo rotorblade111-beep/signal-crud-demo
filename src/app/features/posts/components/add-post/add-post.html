@@ -8,8 +8,8 @@
   <h1 class="mb-5 mt-0 text-2xl font-bold text-slate-900">Add a Post</h1>
 
   <form class="flex flex-col gap-4" (ngSubmit)="addPost()">
-    <app-post-title-input
-      class="flex min-w-0 flex-1 flex-col gap-2.5"
+    <app-post-input
+      class="flex min-w-0 flex-1 flex-col gap-4"
       [(title)]="newTitle"
       [(body)]="newBody" />
 

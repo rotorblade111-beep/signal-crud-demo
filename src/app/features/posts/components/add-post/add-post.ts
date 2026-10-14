@@ -4,11 +4,11 @@ import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, catchError, map, of, switchMap } from 'rxjs';
 import { PostService } from '../../services/post.service';
-import { PostTitleInputComponent } from '../post-title-input/post-title-input';
+import { PostInputComponent } from '../post-input/post-input';
 
 @Component({
   selector: 'app-add-post',
-  imports: [FormsModule, PostTitleInputComponent, RouterLink],
+  imports: [FormsModule, PostInputComponent, RouterLink],
   templateUrl: './add-post.html'
 })
 export class AddPostComponent {

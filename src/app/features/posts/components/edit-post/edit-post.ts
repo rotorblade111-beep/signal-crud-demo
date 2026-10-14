@@ -6,6 +6,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, catchError, map, of, switchMap } from 'rxjs';
 import { PostService } from '../../services/post.service';
 import { Post } from '../../models/post.model';
+import { PostInputComponent } from '../post-input/post-input';
 
 function postFromRouterState(state: unknown): Post | null {
   if (!state || typeof state !== 'object' || !('post' in state)) {
@@ -36,7 +37,7 @@ type PostResult =
 
 @Component({
   selector: 'app-edit-post',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, PostInputComponent, RouterLink],
   templateUrl: './edit-post.html'
 })
 export class EditPostComponent {

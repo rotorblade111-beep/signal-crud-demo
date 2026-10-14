@@ -2,12 +2,12 @@ import { Component, model } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-post-title-input',
+  selector: 'app-post-input',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './post-title-input.html'
+  templateUrl: './post-input.html'
 })
-export class PostTitleInputComponent {
+export class PostInputComponent {
   title = model('');
   body = model('');
 }
