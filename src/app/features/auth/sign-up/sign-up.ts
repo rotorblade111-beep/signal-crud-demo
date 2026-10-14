@@ -151,12 +151,25 @@ export class SignUpComponent {
     this.dateOfBirthError.set(this.missingDatePrerequisitesMessage());
   }
 
-  shouldShowDateOfBirthError(yearTouched: boolean | null, monthTouched: boolean | null): boolean {
+  shouldShowDateOfBirthError(): boolean {
+    return Boolean(this.dateOfBirthError() && !this.submitted());
+  }
+
+  shouldShowDateOfBirthFieldError(touched: boolean | null, value: string): boolean {
     return Boolean(
-      this.dateOfBirthError() &&
-      !this.submitted() &&
-      !(yearTouched && !this.year) &&
-      !(monthTouched && !this.month)
+      (touched || this.submitted()) &&
+      !value &&
+      (!this.dateOfBirthError() || this.submitted())
+    );
+  }
+
+  shouldShowDayRequiredError(touched: boolean | null): boolean {
+    const bothPrerequisitesSelected = Boolean(this.year && this.month);
+    const neitherPrerequisiteSelected = !this.year && !this.month;
+    return Boolean(
+      (touched || this.submitted()) &&
+      !this.day &&
+      (bothPrerequisitesSelected || (this.submitted() && neitherPrerequisiteSelected))
     );
   }
 

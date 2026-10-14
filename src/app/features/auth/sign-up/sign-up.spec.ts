@@ -197,8 +197,45 @@ describe('SignUpComponent', () => {
     fixture.detectChanges();
 
     const dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
-    expect(dateOfBirthText.match(/Year of birth is required\./g)).toHaveLength(1);
-    expect(dateOfBirthText).not.toContain('Please select your year of birth and month of birth.');
+    expect(dateOfBirthText.match(/Please select your year of birth and month of birth\./g)).toHaveLength(1);
+    expect(dateOfBirthText).not.toContain('Year of birth is required.');
+  });
+
+  it('keeps prerequisite guidance without duplicate required messages when moving from day to year or month', () => {
+    const component = fixture.componentInstance;
+    const daySelect = fixture.nativeElement.querySelector('#signup-day') as HTMLSelectElement;
+    const yearSelect = fixture.nativeElement.querySelector('#signup-year') as HTMLSelectElement;
+    const monthSelect = fixture.nativeElement.querySelector('#signup-month') as HTMLSelectElement;
+
+    daySelect.focus();
+    daySelect.blur();
+    yearSelect.focus();
+    fixture.detectChanges();
+
+    let dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
+    expect(dateOfBirthText.match(/Please select your year of birth and month of birth\./g)).toHaveLength(1);
+    expect(dateOfBirthText).not.toContain('Year of birth is required.');
+    expect(dateOfBirthText).not.toContain('Day of birth is required.');
+    expect(document.activeElement).toBe(yearSelect);
+
+    yearSelect.blur();
+    monthSelect.focus();
+    fixture.detectChanges();
+    dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
+    expect(dateOfBirthText.match(/Please select your year of birth and month of birth\./g)).toHaveLength(1);
+    expect(dateOfBirthText).not.toContain('Month of birth is required.');
+    expect(document.activeElement).toBe(monthSelect);
+  });
+
+  it('keeps only prerequisite guidance after the incomplete day selector is blurred', () => {
+    const daySelect = fixture.nativeElement.querySelector('#signup-day') as HTMLSelectElement;
+    daySelect.dispatchEvent(new FocusEvent('focus'));
+    daySelect.dispatchEvent(new FocusEvent('blur'));
+    fixture.detectChanges();
+
+    const dateOfBirthText = fixture.nativeElement.querySelector('fieldset').textContent as string;
+    expect(dateOfBirthText.match(/Please select your year of birth and month of birth\./g)).toHaveLength(1);
+    expect(dateOfBirthText).not.toContain('Day of birth is required.');
   });
 
   it('registers valid input and navigates to the protected home page', async () => {

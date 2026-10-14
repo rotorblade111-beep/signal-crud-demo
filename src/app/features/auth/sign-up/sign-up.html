@@ -97,16 +97,16 @@
               }
             </select>
           </div>
-          @if ((signUpForm.year().touched() || submitted()) && signUpForm.year().getError('required')) {
+          @if (shouldShowDateOfBirthFieldError(signUpForm.year().touched(), year) && signUpForm.year().getError('required')) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700">Year of birth is required.</p>
           }
-          @if ((signUpForm.month().touched() || submitted()) && signUpForm.month().getError('required')) {
+          @if (shouldShowDateOfBirthFieldError(signUpForm.month().touched(), month) && signUpForm.month().getError('required')) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700">Month of birth is required.</p>
           }
-          @if ((signUpForm.day().touched() || submitted()) && signUpForm.day().getError('required') && ((year && month) || (!year && !month))) {
+          @if (shouldShowDayRequiredError(signUpForm.day().touched()) && signUpForm.day().getError('required')) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700">Day of birth is required.</p>
           }
-          @if (shouldShowDateOfBirthError(signUpForm.year().touched(), signUpForm.month().touched())) {
+          @if (shouldShowDateOfBirthError()) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ dateOfBirthError() }}</p>
           }
         </fieldset>
