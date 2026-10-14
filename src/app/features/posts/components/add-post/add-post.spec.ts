@@ -39,10 +39,10 @@ describe('AddPostComponent', () => {
     expect(homeLink.textContent).toContain('Home');
 
     const titleInput = fixture.nativeElement.querySelector(
-      'app-post-input input'
+      '#post-title'
     ) as HTMLInputElement;
     const bodyInput = fixture.nativeElement.querySelector(
-      'app-post-input textarea'
+      '#post-body'
     ) as HTMLTextAreaElement;
     titleInput.value = 'New headline';
     titleInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -83,5 +83,12 @@ describe('AddPostComponent', () => {
     expect(router.url).not.toBe('/home');
     expect(fixture.componentInstance.submitError()).toContain('Could not add the post');
     expect(fixture.componentInstance.isSubmitting()).toBe(false);
+  });
+
+  it('does not submit the form when the required title is empty', () => {
+    fixture.componentInstance.addPost();
+
+    expect(fixture.componentInstance.isSubmitting()).toBe(false);
+    httpTesting.expectNone(apiUrl);
   });
 });

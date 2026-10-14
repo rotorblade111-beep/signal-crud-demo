@@ -1,11 +1,21 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormField, form, required, validate } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
 
+interface LoginFormModel {
+  username: string;
+  password: string;
+}
+
+interface PasswordResetFormModel {
+  email: string;
+  newPassword: string;
+}
+
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink],
+  imports: [FormField, RouterLink],
   templateUrl: './login.html'
 })
 export class LoginComponent {
@@ -13,10 +23,34 @@ export class LoginComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  username = '';
-  password = '';
-  resetEmail = '';
-  newPassword = '';
+  loginModel = signal<LoginFormModel>({ username: '', password: '' });
+  loginForm = form(this.loginModel, path => {
+    validate(path.username, ({ value }) => {
+      const username = value().trim();
+      if (!username) {
+        return { kind: 'required', message: 'Username is required.' };
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(username)) {
+        return { kind: 'email', message: 'Enter a valid email address.' };
+      }
+      return undefined;
+    });
+    required(path.password, { message: 'Password is required.' });
+  });
+  resetModel = signal<PasswordResetFormModel>({ email: '', newPassword: '' });
+  resetForm = form(this.resetModel, path => {
+    validate(path.email, ({ value }) => {
+      const email = value().trim();
+      if (!email) {
+        return { kind: 'required', message: 'Email is required.' };
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return { kind: 'email', message: 'Enter a valid email address.' };
+      }
+      return undefined;
+    });
+    required(path.newPassword, { message: 'Password is required.' });
+  });
   submitted = signal(false);
   resetSubmitted = signal(false);
   usernameError = signal<string | null>(null);
@@ -26,26 +60,46 @@ export class LoginComponent {
   isResettingPassword = signal(false);
   successMessage = signal<string | null>(null);
 
-  updateUsername(username: string): void {
-    this.username = username;
-    this.usernameError.set(null);
+  get username(): string {
+    return this.loginModel().username;
   }
 
-  updatePassword(password: string): void {
-    this.password = password;
-    this.passwordError.set(null);
+  set username(username: string) {
+    this.loginModel.update(model => ({ ...model, username }));
   }
 
-  logIn(): void {
+  get password(): string {
+    return this.loginModel().password;
+  }
+
+  set password(password: string) {
+    this.loginModel.update(model => ({ ...model, password }));
+  }
+
+  get resetEmail(): string {
+    return this.resetModel().email;
+  }
+
+  set resetEmail(email: string) {
+    this.resetModel.update(model => ({ ...model, email }));
+  }
+
+  get newPassword(): string {
+    return this.resetModel().newPassword;
+  }
+
+  set newPassword(newPassword: string) {
+    this.resetModel.update(model => ({ ...model, newPassword }));
+  }
+
+  logIn(event?: Event): void {
+    event?.preventDefault();
     this.submitted.set(true);
     this.successMessage.set(null);
     this.usernameError.set(null);
     this.passwordError.set(null);
 
-    if (!this.username.trim() || !this.password) {
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.username.trim())) {
+    if (!this.loginForm().valid()) {
       return;
     }
     if (!this.auth.logIn(this.username, this.password)) {
@@ -60,19 +114,13 @@ export class LoginComponent {
     void this.router.navigateByUrl(destination);
   }
 
-  resetPassword(): void {
+  resetPassword(event?: Event): void {
+    event?.preventDefault();
     this.resetSubmitted.set(true);
     this.successMessage.set(null);
     this.resetEmailError.set(null);
     this.resetPasswordError.set(null);
-    if (!this.resetEmail.trim()) {
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.resetEmail.trim())) {
-      this.resetEmailError.set('Enter a valid email address.');
-      return;
-    }
-    if (!this.newPassword) {
+    if (!this.resetForm().valid()) {
       return;
     }
     if (!this.auth.resetPassword(this.resetEmail, this.newPassword)) {
@@ -82,17 +130,7 @@ export class LoginComponent {
 
     this.isResettingPassword.set(false);
     this.successMessage.set('Password reset. You can now log in with your new password.');
-    this.newPassword = '';
+    this.resetModel.update(model => ({ ...model, newPassword: '' }));
     this.resetSubmitted.set(false);
-  }
-
-  updateResetEmail(email: string): void {
-    this.resetEmail = email;
-    this.resetEmailError.set(null);
-  }
-
-  updateNewPassword(password: string): void {
-    this.newPassword = password;
-    this.resetPasswordError.set(null);
   }
 }

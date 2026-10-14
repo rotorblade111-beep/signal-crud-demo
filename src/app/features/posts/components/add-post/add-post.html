@@ -7,11 +7,10 @@
   </a>
   <h1 class="mb-5 mt-0 text-2xl font-bold text-slate-900">Add a Post</h1>
 
-  <form class="flex flex-col gap-4" (ngSubmit)="addPost()">
+  <form class="flex flex-col gap-4" novalidate (submit)="addPost($event)">
     <app-post-input
       class="flex min-w-0 flex-1 flex-col gap-4"
-      [(title)]="newTitle"
-      [(body)]="newBody" />
+      [fields]="postForm" />
 
     @if (submitError(); as error) {
       <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>

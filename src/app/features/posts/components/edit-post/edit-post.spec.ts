@@ -46,8 +46,8 @@ describe('EditPostComponent', () => {
     const homeLink = fixture.nativeElement.querySelector('a[routerLink="/home"]') as HTMLAnchorElement;
     expect(homeLink.textContent).toContain('Home');
 
-    const titleInput = fixture.nativeElement.querySelector('input[name="title"]') as HTMLInputElement;
-    const bodyInput = fixture.nativeElement.querySelector('textarea[name="body"]') as HTMLTextAreaElement;
+    const titleInput = fixture.nativeElement.querySelector('#post-title') as HTMLInputElement;
+    const bodyInput = fixture.nativeElement.querySelector('#post-body') as HTMLTextAreaElement;
     expect(titleInput.value).toBe('Original title');
     expect(bodyInput.value).toBe('Original body stays unchanged');
 

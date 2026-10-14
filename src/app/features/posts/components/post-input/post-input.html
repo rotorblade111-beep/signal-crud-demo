@@ -3,21 +3,16 @@
   <input
     class="box-border w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-[0.95rem] font-normal outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
     type="text"
-    name="title"
-    [ngModel]="title()"
-    (ngModelChange)="title.set($event)"
-    [ngModelOptions]="{ standalone: true }"
-    placeholder="Enter post title..."
-    required />
+    id="post-title"
+    [formField]="fields().title"
+    placeholder="Enter post title..." />
 </label>
 <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
   Post body
   <textarea
     class="box-border min-h-32 w-full resize-y rounded-lg border border-slate-200 px-3.5 py-2.5 text-[0.95rem] font-normal leading-relaxed outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
-    name="body"
-    [ngModel]="body()"
-    (ngModelChange)="body.set($event)"
-    [ngModelOptions]="{ standalone: true }"
+    id="post-body"
+    [formField]="fields().body"
     placeholder="Enter post body..."
     rows="6"></textarea>
 </label>

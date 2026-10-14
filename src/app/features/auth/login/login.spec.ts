@@ -51,8 +51,8 @@ describe('LoginComponent', () => {
     expect(component.submitted()).toBe(true);
     expect(fixture.nativeElement.textContent).toContain('Username is required.');
     expect(fixture.nativeElement.textContent).toContain('Password is required.');
-    const username = fixture.nativeElement.querySelector('input[name="username"]') as HTMLInputElement;
-    const password = fixture.nativeElement.querySelector('input[name="password"]') as HTMLInputElement;
+    const username = fixture.nativeElement.querySelector('#login-username') as HTMLInputElement;
+    const password = fixture.nativeElement.querySelector('#login-password') as HTMLInputElement;
     expect(username.classList).toContain('!border-red-500');
     expect(password.classList).toContain('!border-red-500');
     expect(username.classList).toContain('ring-4');
@@ -60,9 +60,20 @@ describe('LoginComponent', () => {
     expect(auth.currentUser()).toBeNull();
   });
 
+  it('treats whitespace-only usernames as required', () => {
+    const component = fixture.componentInstance;
+    component.username = '   ';
+    component.password = 'correct';
+    component.logIn();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Username is required.');
+    expect(auth.currentUser()).toBeNull();
+  });
+
   it('shows an email format error after blur and a credentials error under password', () => {
     const component = fixture.componentInstance;
-    const username = fixture.nativeElement.querySelector('input[name="username"]') as HTMLInputElement;
+    const username = fixture.nativeElement.querySelector('#login-username') as HTMLInputElement;
     username.value = 'not-an-email';
     username.dispatchEvent(new Event('input', { bubbles: true }));
     username.dispatchEvent(new Event('blur', { bubbles: true }));
@@ -79,8 +90,8 @@ describe('LoginComponent', () => {
   });
 
   it('shows only one invalid-email message after repeated login submissions', () => {
-    const username = fixture.nativeElement.querySelector('input[name="username"]') as HTMLInputElement;
-    const password = fixture.nativeElement.querySelector('input[name="password"]') as HTMLInputElement;
+    const username = fixture.nativeElement.querySelector('#login-username') as HTMLInputElement;
+    const password = fixture.nativeElement.querySelector('#login-password') as HTMLInputElement;
     const submit = fixture.nativeElement.querySelector('button[type="submit"]') as HTMLButtonElement;
 
     username.value = 'not-an-email';

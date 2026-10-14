@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, effect, computed, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
@@ -10,7 +9,7 @@ import { Post } from '../../models/post.model';
 
 @Component({
   selector: 'app-post-list',
-  imports: [FormsModule, RouterLink, PostItemComponent],
+  imports: [RouterLink, PostItemComponent],
   templateUrl: './post-list.html',
 })
 export class PostListComponent implements OnInit {

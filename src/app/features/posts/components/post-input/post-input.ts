@@ -1,13 +1,17 @@
-import { Component, model } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, input } from '@angular/core';
+import { FieldTree, FormField } from '@angular/forms/signals';
+
+export interface PostInputModel {
+  title: string;
+  body: string;
+}
 
 @Component({
   selector: 'app-post-input',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormField],
   templateUrl: './post-input.html'
 })
 export class PostInputComponent {
-  title = model('');
-  body = model('');
+  fields = input.required<FieldTree<PostInputModel>>();
 }

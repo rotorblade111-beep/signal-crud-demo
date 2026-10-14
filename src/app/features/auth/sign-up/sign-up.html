@@ -17,24 +17,21 @@
       <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Create your account</h2>
       <p class="mb-6 mt-0 text-sm text-slate-500">Enter your details to get started.</p>
 
-      <form class="flex flex-col gap-4" (ngSubmit)="signUp()" novalidate>
+      <form class="flex flex-col gap-4" (submit)="signUp($event)" novalidate>
         <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
           Email
           <input
             class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
-            [class]="((emailField.touched || submitted()) && (emailField.errors?.['required'] || emailField.errors?.['email'])) || emailError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
+            [class]="((signUpForm.email().touched() || submitted()) && signUpForm.email().invalid()) || emailError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
             type="email"
-            name="email"
-            [ngModel]="email"
-            (ngModelChange)="updateEmail($event)"
-            #emailField="ngModel"
-            required
-            email
+            id="signup-email"
+            [formField]="signUpForm.email"
+            (input)="emailError.set(null)"
             autocomplete="email"
             placeholder="you@example.com" />
-          @if ((emailField.touched || submitted()) && emailField.errors?.['required']) {
+          @if ((signUpForm.email().touched() || submitted()) && signUpForm.email().getError('required')) {
             <span class="text-xs font-normal text-red-700">Email is required.</span>
-          } @else if ((emailField.touched || submitted()) && emailField.errors?.['email']) {
+          } @else if ((signUpForm.email().touched() || submitted()) && signUpForm.email().getError('email')) {
             <span class="text-xs font-normal text-red-700">Enter a valid email address.</span>
           }
           @if (emailError(); as error) {
@@ -46,15 +43,13 @@
           Password
           <input
             class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
-            [class]="(passwordField.touched || submitted()) && passwordField.errors?.['required'] ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
+            [class]="(signUpForm.password().touched() || submitted()) && signUpForm.password().invalid() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
             type="password"
-            name="password"
-            [(ngModel)]="password"
-            #passwordField="ngModel"
-            required
+            id="signup-password"
+            [formField]="signUpForm.password"
             autocomplete="new-password"
             placeholder="Enter a password" />
-          @if ((passwordField.touched || submitted()) && passwordField.errors?.['required']) {
+          @if ((signUpForm.password().touched() || submitted()) && signUpForm.password().getError('required')) {
             <span class="text-xs font-normal text-red-700">Password is required.</span>
           }
         </label>
@@ -63,18 +58,16 @@
           Re-type password
           <input
             class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
-            [class]="((repeatedPasswordField.touched || submitted()) && (repeatedPasswordField.errors?.['required'] || (repeatedPassword && repeatedPassword !== password))) || repeatedPasswordError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
+            [class]="((signUpForm.repeatedPassword().touched() || submitted()) && (signUpForm.repeatedPassword().invalid() || (repeatedPassword && repeatedPassword !== password))) || repeatedPasswordError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''"
             type="password"
-            name="repeatedPassword"
-            [ngModel]="repeatedPassword"
-            (ngModelChange)="updateRepeatedPassword($event)"
-            #repeatedPasswordField="ngModel"
-            required
+            id="signup-repeated-password"
+            [formField]="signUpForm.repeatedPassword"
+            (input)="repeatedPasswordError.set(null)"
             autocomplete="new-password"
             placeholder="Enter your password again" />
-          @if ((repeatedPasswordField.touched || submitted()) && repeatedPasswordField.errors?.['required']) {
+          @if ((signUpForm.repeatedPassword().touched() || submitted()) && signUpForm.repeatedPassword().getError('required')) {
             <span class="text-xs font-normal text-red-700">Please re-type your password.</span>
-          } @else if ((repeatedPasswordField.touched || submitted()) && repeatedPassword && repeatedPassword !== password) {
+          } @else if ((signUpForm.repeatedPassword().touched() || submitted()) && repeatedPassword && repeatedPassword !== password) {
             <span class="text-xs font-normal text-red-700" role="alert">Passwords do not match.</span>
           }
           @if (repeatedPasswordError(); as error) {
@@ -85,35 +78,35 @@
         <fieldset class="m-0 border-0 p-0">
           <legend class="mb-1.5 text-sm font-semibold text-slate-700">Date of Birth</legend>
           <div class="grid grid-cols-3 gap-2">
-            <select name="year" [ngModel]="year()" (ngModelChange)="updateYear($event)" #yearField="ngModel" required aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15 focus:invalid:!border-red-500 focus:invalid:!ring-red-500/20" [class]="(yearField.touched || submitted()) && yearField.errors?.['required'] ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
+            <select id="signup-year" [formField]="signUpForm.year" aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="(signUpForm.year().touched() || submitted()) && signUpForm.year().invalid() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
               <option value="">Year</option>
               @for (item of years; track item) {
                 <option [value]="item">{{ item }}</option>
               }
             </select>
-            <select name="month" [ngModel]="month()" (ngModelChange)="updateMonth($event)" #monthField="ngModel" required aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15 focus:invalid:!border-red-500 focus:invalid:!ring-red-500/20" [class]="(monthField.touched || submitted()) && monthField.errors?.['required'] ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
+            <select id="signup-month" [formField]="signUpForm.month" aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="(signUpForm.month().touched() || submitted()) && signUpForm.month().invalid() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
               <option value="">Month</option>
               @for (item of months; track item.value) {
                 <option [value]="item.value">{{ item.name }}</option>
               }
             </select>
-            <select name="day" [(ngModel)]="day" (focus)="onDayAttempt()" #dayField="ngModel" required aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15 focus:invalid:!border-red-500 focus:invalid:!ring-red-500/20" [class]="((dayField.touched || submitted()) && dayField.errors?.['required']) || dateOfBirthError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
+            <select id="signup-day" [formField]="signUpForm.day" (focus)="onDayAttempt()" aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((signUpForm.day().touched() || submitted()) && signUpForm.day().invalid()) || dateOfBirthError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''">
               <option value="">Day</option>
               @for (item of days(); track item) {
                 <option [value]="item">{{ item }}</option>
               }
             </select>
           </div>
-          @if ((yearField.touched || submitted()) && yearField.errors?.['required']) {
+          @if ((signUpForm.year().touched() || submitted()) && signUpForm.year().getError('required')) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700">Year of birth is required.</p>
           }
-          @if ((monthField.touched || submitted()) && monthField.errors?.['required']) {
+          @if ((signUpForm.month().touched() || submitted()) && signUpForm.month().getError('required')) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700">Month of birth is required.</p>
           }
-          @if ((dayField.touched || submitted()) && dayField.errors?.['required'] && ((year() && month()) || (!year() && !month()))) {
+          @if ((signUpForm.day().touched() || submitted()) && signUpForm.day().getError('required') && ((year && month) || (!year && !month))) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700">Day of birth is required.</p>
           }
-          @if (shouldShowDateOfBirthError(yearField.touched, monthField.touched)) {
+          @if (shouldShowDateOfBirthError(signUpForm.year().touched(), signUpForm.month().touched())) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ dateOfBirthError() }}</p>
           }
         </fieldset>

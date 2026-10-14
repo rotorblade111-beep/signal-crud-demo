@@ -10,11 +10,10 @@
   @if (isLoading()) {
     <p class="text-slate-500" role="status">Loading post...</p>
   } @else if (post(); as currentPost) {
-    <form class="flex flex-col gap-4" (ngSubmit)="savePost()">
+    <form class="flex flex-col gap-4" novalidate (submit)="savePost($event)">
       <app-post-input
         class="flex min-w-0 flex-1 flex-col gap-4"
-        [(title)]="title"
-        [(body)]="body" />
+        [fields]="postForm" />
 
       @if (errorMessage(); as error) {
         <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
@@ -24,7 +23,7 @@
         <button
           type="submit"
           class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors active:scale-[0.98] hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isSaving() || !title.trim()">
+          [disabled]="isSaving() || !postModel().title.trim()">
           {{ isSaving() ? 'Saving...' : 'Save Changes' }}
         </button>
         <a

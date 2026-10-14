@@ -31,7 +31,7 @@ describe('SignUpComponent', () => {
   });
 
   it('validates email input and only offers valid days for the selected month and year', () => {
-    const email = fixture.nativeElement.querySelector('input[name="email"]') as HTMLInputElement;
+    const email = fixture.nativeElement.querySelector('#signup-email') as HTMLInputElement;
     email.value = 'not-an-email';
     email.dispatchEvent(new Event('input', { bubbles: true }));
     fixture.detectChanges();
@@ -55,12 +55,12 @@ describe('SignUpComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Email is required.');
     expect(fixture.nativeElement.textContent).toContain('Password is required.');
     expect(fixture.nativeElement.textContent).toContain('Please re-type your password.');
-    const email = fixture.nativeElement.querySelector('input[name="email"]') as HTMLInputElement;
-    const password = fixture.nativeElement.querySelector('input[name="password"]') as HTMLInputElement;
-    const repeatedPassword = fixture.nativeElement.querySelector('input[name="repeatedPassword"]') as HTMLInputElement;
-    const year = fixture.nativeElement.querySelector('select[name="year"]') as HTMLSelectElement;
-    const month = fixture.nativeElement.querySelector('select[name="month"]') as HTMLSelectElement;
-    const day = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
+    const email = fixture.nativeElement.querySelector('#signup-email') as HTMLInputElement;
+    const password = fixture.nativeElement.querySelector('#signup-password') as HTMLInputElement;
+    const repeatedPassword = fixture.nativeElement.querySelector('#signup-repeated-password') as HTMLInputElement;
+    const year = fixture.nativeElement.querySelector('#signup-year') as HTMLSelectElement;
+    const month = fixture.nativeElement.querySelector('#signup-month') as HTMLSelectElement;
+    const day = fixture.nativeElement.querySelector('#signup-day') as HTMLSelectElement;
     for (const field of [email, password, repeatedPassword, year, month, day]) {
       expect(field.classList).toContain('!border-red-500');
       expect(field.classList).toContain('ring-4');
@@ -73,7 +73,7 @@ describe('SignUpComponent', () => {
   });
 
   it('shows email format feedback after blur and mismatch feedback beside confirmation', () => {
-    const email = fixture.nativeElement.querySelector('input[name="email"]') as HTMLInputElement;
+    const email = fixture.nativeElement.querySelector('#signup-email') as HTMLInputElement;
     email.value = 'not-an-email';
     email.dispatchEvent(new Event('input', { bubbles: true }));
     email.dispatchEvent(new Event('blur', { bubbles: true }));
@@ -82,7 +82,7 @@ describe('SignUpComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Enter a valid email address.');
     expect(email.classList).toContain('!border-red-500');
 
-    const day = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
+    const day = fixture.nativeElement.querySelector('#signup-day') as HTMLSelectElement;
     day.dispatchEvent(new FocusEvent('focus'));
     fixture.detectChanges();
     expect(day.classList).toContain('!border-red-500');
@@ -101,7 +101,7 @@ describe('SignUpComponent', () => {
   });
 
   it('shows only one invalid-email message after repeated sign-up submissions', () => {
-    const email = fixture.nativeElement.querySelector('input[name="email"]') as HTMLInputElement;
+    const email = fixture.nativeElement.querySelector('#signup-email') as HTMLInputElement;
     const submit = fixture.nativeElement.querySelector('button[type="submit"]') as HTMLButtonElement;
 
     email.value = 'not-an-email';
@@ -115,6 +115,16 @@ describe('SignUpComponent', () => {
 
     const emailLabel = email.closest('label')?.textContent ?? '';
     expect(emailLabel.match(/Enter a valid email address\./g)).toHaveLength(1);
+  });
+
+  it('treats whitespace-only email as required', () => {
+    const component = fixture.componentInstance;
+    component.email = '   ';
+    component.signUp();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Email is required.');
+    expect(TestBed.inject(AuthService).currentUser()).toBeNull();
   });
 
   it('orders date selectors by year, month, then day', () => {
@@ -132,7 +142,7 @@ describe('SignUpComponent', () => {
   it('shows specific missing year and month messages when the day selector is focused', () => {
     const component = fixture.componentInstance;
     component.email = 'valid@example.com';
-    const daySelect = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
+    const daySelect = fixture.nativeElement.querySelector('#signup-day') as HTMLSelectElement;
 
     daySelect.dispatchEvent(new FocusEvent('focus'));
     fixture.detectChanges();
@@ -179,8 +189,8 @@ describe('SignUpComponent', () => {
 
   it('does not duplicate the year error with the day-prerequisite message after year was touched', () => {
     const component = fixture.componentInstance;
-    const yearSelect = fixture.nativeElement.querySelector('select[name="year"]') as HTMLSelectElement;
-    const daySelect = fixture.nativeElement.querySelector('select[name="day"]') as HTMLSelectElement;
+    const yearSelect = fixture.nativeElement.querySelector('#signup-year') as HTMLSelectElement;
+    const daySelect = fixture.nativeElement.querySelector('#signup-day') as HTMLSelectElement;
     yearSelect.dispatchEvent(new FocusEvent('focus'));
     yearSelect.dispatchEvent(new FocusEvent('blur'));
     daySelect.dispatchEvent(new FocusEvent('focus'));

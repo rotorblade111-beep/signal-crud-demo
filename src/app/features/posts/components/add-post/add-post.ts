@@ -1,14 +1,15 @@
 import { Component, effect, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { form, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, catchError, map, of, switchMap } from 'rxjs';
 import { PostService } from '../../services/post.service';
 import { PostInputComponent } from '../post-input/post-input';
+import { PostInputModel } from '../post-input/post-input';
 
 @Component({
   selector: 'app-add-post',
-  imports: [FormsModule, PostInputComponent, RouterLink],
+  imports: [PostInputComponent, RouterLink],
   templateUrl: './add-post.html'
 })
 export class AddPostComponent {
@@ -16,8 +17,8 @@ export class AddPostComponent {
   private router = inject(Router);
   private createRequests = new Subject<{ id: number; title: string; body: string }>();
 
-  newTitle = '';
-  newBody = '';
+  postModel = signal<PostInputModel>({ title: '', body: '' });
+  postForm = form(this.postModel, path => required(path.title));
   isSubmitting = signal(false);
   submitError = signal<string | null>(null);
   private createResult = toSignal(
@@ -33,6 +34,22 @@ export class AddPostComponent {
     { initialValue: null }
   );
 
+  get newTitle(): string {
+    return this.postModel().title;
+  }
+
+  set newTitle(title: string) {
+    this.postModel.update(model => ({ ...model, title }));
+  }
+
+  get newBody(): string {
+    return this.postModel().body;
+  }
+
+  set newBody(body: string) {
+    this.postModel.update(model => ({ ...model, body }));
+  }
+
   constructor() {
     this.postService.loadPosts();
     effect(() => {
@@ -43,8 +60,7 @@ export class AddPostComponent {
 
       this.isSubmitting.set(false);
       if (result.success) {
-        this.newTitle = '';
-        this.newBody = '';
+        this.postModel.set({ title: '', body: '' });
         void this.router.navigateByUrl('/home');
       } else {
         this.submitError.set('Could not add the post. Please try again.');
@@ -52,14 +68,19 @@ export class AddPostComponent {
     });
   }
 
-  addPost(): void {
+  addPost(event?: Event): void {
+    event?.preventDefault();
+    if (!this.postForm().valid()) {
+      return;
+    }
+
     this.isSubmitting.set(true);
     this.submitError.set(null);
 
     this.createRequests.next({
       id: Date.now(),
-      title: this.newTitle,
-      body: this.newBody
+      title: this.postModel().title,
+      body: this.postModel().body
     });
   }
 }

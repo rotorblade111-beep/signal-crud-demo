@@ -1,12 +1,13 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { Location } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { form, required } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Subject, catchError, map, of, switchMap } from 'rxjs';
 import { PostService } from '../../services/post.service';
 import { Post } from '../../models/post.model';
 import { PostInputComponent } from '../post-input/post-input';
+import { PostInputModel } from '../post-input/post-input';
 
 function postFromRouterState(state: unknown): Post | null {
   if (!state || typeof state !== 'object' || !('post' in state)) {
@@ -37,7 +38,7 @@ type PostResult =
 
 @Component({
   selector: 'app-edit-post',
-  imports: [FormsModule, PostInputComponent, RouterLink],
+  imports: [PostInputComponent, RouterLink],
   templateUrl: './edit-post.html'
 })
 export class EditPostComponent {
@@ -48,8 +49,8 @@ export class EditPostComponent {
   private saveRequests = new Subject<{ id: number; title: string; body: string }>();
 
   post = signal<Post | null>(null);
-  title = '';
-  body = '';
+  postModel = signal<PostInputModel>({ title: '', body: '' });
+  postForm = form(this.postModel, path => required(path.title));
   isLoading = signal(true);
   isSaving = signal(false);
   errorMessage = signal<string | null>(null);
@@ -75,8 +76,7 @@ export class EditPostComponent {
       this.errorMessage.set('The requested post ID is invalid.');
     } else if (statePost?.id === id) {
       this.post.set(statePost);
-      this.title = statePost.title;
-      this.body = statePost.body;
+      this.postModel.set({ title: statePost.title, body: statePost.body });
       this.isLoading.set(false);
     } else {
       const postResult = toSignal(
@@ -99,8 +99,7 @@ export class EditPostComponent {
         this.isLoading.set(false);
         if (result.type === 'loaded') {
           this.post.set(result.post);
-          this.title = result.post.title;
-          this.body = result.post.body;
+          this.postModel.set({ title: result.post.title, body: result.post.body });
         } else {
           this.errorMessage.set('Could not load this post. Please return to the post list.');
         }
@@ -122,9 +121,26 @@ export class EditPostComponent {
     });
   }
 
-  savePost(): void {
+  get title(): string {
+    return this.postModel().title;
+  }
+
+  set title(title: string) {
+    this.postModel.update(model => ({ ...model, title }));
+  }
+
+  get body(): string {
+    return this.postModel().body;
+  }
+
+  set body(body: string) {
+    this.postModel.update(model => ({ ...model, body }));
+  }
+
+  savePost(event?: Event): void {
+    event?.preventDefault();
     const post = this.post();
-    if (!post || this.isSaving()) {
+    if (!post || this.isSaving() || !this.postForm().valid()) {
       return;
     }
 
@@ -132,8 +148,8 @@ export class EditPostComponent {
     this.errorMessage.set(null);
     this.saveRequests.next({
       id: post.id,
-      title: this.title,
-      body: this.body
+      title: this.postModel().title,
+      body: this.postModel().body
     });
   }
 }
