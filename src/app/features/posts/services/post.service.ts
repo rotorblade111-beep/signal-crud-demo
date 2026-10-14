@@ -1,5 +1,6 @@
-import { inject, Injectable, signal, computed, } from '@angular/core';
+import { inject, Injectable, signal, computed, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, of, tap } from 'rxjs';
 import { Post } from '../models/post.model';
 
@@ -10,28 +11,31 @@ export class PostService {
   private http = inject(HttpClient);
   private apiUrl = 'https://jsonplaceholder.typicode.com/posts';
 
-  // State managed via Signals
+  // 1. Declarative fetch converted automatically to a signal via toSignal()
+  // This triggers automatically upon service creation without manual .subscribe() or guard flags.
+  private fetchedPosts = toSignal(
+    this.http.get<Post[]>(this.apiUrl),
+    { initialValue: [] }
+  );
+
+  // 2. Writable state signal for local CRUD operations (.set / .update)
   posts = signal<Post[]>([]);
 
-  // Computed Signal: Derived directly from posts signal
+  // 3. Computed Signal: Derived directly from posts signal
   postCount = computed(() => this.posts().length);
-  private hasLoadedPosts = false;
 
-
-  loadPosts() {
-    if (this.hasLoadedPosts) {
-      return;
-    }
-
-    this.hasLoadedPosts = true;
-    this.http.get<Post[]>(`${this.apiUrl}`).subscribe({
-       next: (data) => this.posts.set(data),
-       error: (err) => {
-         this.hasLoadedPosts = false;
-         console.error('Failed to fetch posts', err);
-       }
+  constructor() {
+    // Synchronize initial server-fetched posts into our local writable state signal
+    effect(() => {
+      const data = this.fetchedPosts();
+      if (data.length > 0 && this.posts().length === 0) {
+        this.posts.set(data);
+      }
     });
   }
+
+  // loadPosts() method is no longer needed! 
+  // toSignal() handles initialization and subscription lifecycle automatically.
 
   getPost(id: number): Observable<Post> {
     const cachedPost = this.posts().find(post => post.id === id);
@@ -42,7 +46,7 @@ export class PostService {
     return this.http.get<Post>(`${this.apiUrl}/${id}`).pipe(
       tap(post => {
         this.posts.update(current => [
-          ...current.filter(item => item.id !== post.id),
+          ...current.filter(item => item.id !== id),
           post
         ]);
       })
@@ -68,12 +72,13 @@ export class PostService {
     );
   }
 
-  deletePost(id: number): void {
+  // Refactored deletePost: returns an Observable instead of calling .subscribe() internally
+  deletePost(id: number): Observable<void> {
     console.log(`Deleting post with ID: ${id}`);
-    this.http.delete(`${this.apiUrl}/${id}`).subscribe({
-      next: () => {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
         this.posts.update(current => current.filter(item => item.id !== id));
-      }
-    });
+      })
+    );
   }
 }

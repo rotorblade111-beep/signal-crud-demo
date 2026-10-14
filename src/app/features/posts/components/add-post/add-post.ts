@@ -51,7 +51,6 @@ export class AddPostComponent {
   }
 
   constructor() {
-    this.postService.loadPosts();
     effect(() => {
       const result = this.createResult();
       if (!result) {

@@ -13,6 +13,9 @@
       Add Post
     </a>
   </div>
+  @if (deleteError(); as error) {
+    <p class="mb-4 mt-0 text-sm text-red-700" role="alert">{{ error }}</p>
+  }
   <h1 #hover class="text-xl font-semibold">Post List</h1>
   @defer (on hover(hover)) {
   <div class="mb-4 grid gap-3 sm:grid-cols-2" role="search" aria-label="Filter posts">

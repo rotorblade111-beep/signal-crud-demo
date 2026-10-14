@@ -1,5 +1,6 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Post } from '../models/post.model';
 import { PostService } from './post.service';
@@ -24,37 +25,45 @@ describe('PostService', () => {
 
   afterEach(() => httpTesting.verify());
 
-  it('loads posts with their title and body', () => {
-    service.loadPosts();
-    httpTesting.expectOne(apiUrl).flush([initialPost]);
+  const flushInitialPosts = async (posts: Post[] = []): Promise<void> => {
+    httpTesting.expectOne(apiUrl).flush(posts);
+    await TestBed.inject(ApplicationRef).whenStable();
+  };
+
+  it('loads posts with their title and body', async () => {
+    await flushInitialPosts([initialPost]);
 
     expect(service.posts()).toEqual([initialPost]);
     expect(service.postCount()).toBe(1);
   });
 
-  it('does not refetch posts when the list route is revisited', () => {
-    service.loadPosts();
-    service.loadPosts();
-    httpTesting.expectOne(apiUrl).flush([initialPost]);
+  it('does not refetch posts when the signal is read repeatedly', async () => {
+    await flushInitialPosts([initialPost]);
 
     expect(service.posts()).toEqual([initialPost]);
+    expect(service.posts()).toEqual([initialPost]);
+    httpTesting.expectNone(apiUrl);
   });
 
-  it('loads a post by ID when it is not cached', () => {
+  it('loads a post by ID when it is not cached', async () => {
+    await flushInitialPosts();
     service.getPost(1).subscribe(post => expect(post).toEqual(initialPost));
     httpTesting.expectOne(`${apiUrl}/1`).flush(initialPost);
+    await TestBed.inject(ApplicationRef).whenStable();
 
     expect(service.posts()).toEqual([initialPost]);
   });
 
-  it('uses a cached post without another API request', () => {
+  it('uses a cached post without another API request', async () => {
+    await flushInitialPosts();
     service.posts.set([initialPost]);
     service.getPost(1).subscribe(post => expect(post).toEqual(initialPost));
 
     httpTesting.expectNone(`${apiUrl}/1`);
   });
 
-  it('creates and prepends a post containing both title and body', () => {
+  it('creates and prepends a post containing both title and body', async () => {
+    await flushInitialPosts();
     service.createPost(initialPost).subscribe();
     const request = httpTesting.expectOne(apiUrl);
     expect(request.request.method).toBe('POST');
@@ -64,7 +73,8 @@ describe('PostService', () => {
     expect(service.posts()).toEqual([initialPost]);
   });
 
-  it('updates a post title and body', () => {
+  it('updates a post title and body', async () => {
+    await flushInitialPosts();
     service.posts.set([initialPost]);
     const updatedPost = {
       ...initialPost,
@@ -86,9 +96,10 @@ describe('PostService', () => {
     expect(service.posts()).toEqual([updatedPost]);
   });
 
-  it('removes a deleted post from the list', () => {
+  it('removes a deleted post from the list', async () => {
+    await flushInitialPosts();
     service.posts.set([initialPost]);
-    service.deletePost(1);
+    service.deletePost(1).subscribe();
     const request = httpTesting.expectOne(`${apiUrl}/1`);
     expect(request.request.method).toBe('DELETE');
     request.flush({});

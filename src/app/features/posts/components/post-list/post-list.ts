@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, effect, computed, signal } from '@angular/core';
+import { Component, effect, inject, computed, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Post } from '../../models/post.model';
+import { Subject, catchError, map, mergeMap, of } from 'rxjs';
 
 
 
@@ -12,13 +13,28 @@ import { Post } from '../../models/post.model';
   imports: [RouterLink, PostItemComponent],
   templateUrl: './post-list.html',
 })
-export class PostListComponent implements OnInit {
+export class PostListComponent  {
   readonly pageSize = 10;
   postService = inject(PostService);
   private router = inject(Router);
+  private deleteRequests = new Subject<number>();
   titleSearch = signal('');
   bodySearch = signal('');
   currentPage = signal(1);
+  deleteError = signal<string | null>(null);
+
+  private deleteResult = toSignal(
+    this.deleteRequests.pipe(
+      mergeMap(id => this.postService.deletePost(id).pipe(
+        map(() => ({ success: true as const })),
+        catchError((error: unknown) => {
+          console.error(`Failed to delete post ${id}`, error);
+          return of({ success: false as const });
+        })
+      ))
+    ),
+    { initialValue: null }
+  );
 
   postList = toSignal(toObservable(this.postService.posts), {
     initialValue: []
@@ -45,17 +61,14 @@ export class PostListComponent implements OnInit {
   });
 
   constructor() {
-    // Registered inside constructor (Injection Context)
-    this.postService.loadPosts();
     effect(() => {
-
-      const currentCount = this.postService.postCount();
-      console.log(`[Effect Triggered] Post count changed to: ${currentCount}`);
+      const result = this.deleteResult();
+      if (result) {
+        this.deleteError.set(
+          result.success ? null : 'Could not delete the post. Please try again.'
+        );
+      }
     });
-  }
-
-  ngOnInit(): void {
-    // this.postService.loadPosts();
   }
 
   editPost(post: Post): void {
@@ -63,7 +76,8 @@ export class PostListComponent implements OnInit {
   }
 
   removePost(id: number): void {
-    this.postService.deletePost(id);
+    this.deleteError.set(null);
+    this.deleteRequests.next(id);
   }
 
   setTitleSearch(value: string): void {

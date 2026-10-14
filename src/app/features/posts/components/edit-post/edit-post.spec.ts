@@ -36,6 +36,7 @@ describe('EditPostComponent', () => {
     fixture = TestBed.createComponent(EditPostComponent);
     httpTesting = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router);
+    httpTesting.expectOne(apiUrl).flush([]);
     httpTesting.expectOne(`${apiUrl}/7`).flush(post);
     fixture.detectChanges();
   });

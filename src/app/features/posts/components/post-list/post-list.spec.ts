@@ -106,6 +106,34 @@ describe('PostListComponent', () => {
     expect(component.paginatedPosts()).toHaveLength(5);
   });
 
+  it('executes deletion and updates the displayed post list', async () => {
+    component.removePost(posts[0].id);
+    const request = httpTesting.expectOne('https://jsonplaceholder.typicode.com/posts/1');
+    expect(request.request.method).toBe('DELETE');
+    request.flush({});
+    await fixture.whenStable();
+
+    expect(component.postService.posts()).toEqual([posts[1]]);
+    expect(component.postList()).toEqual([posts[1]]);
+    expect(component.postCount()).toBe(1);
+    expect(component.paginatedPosts()).toEqual([posts[1]]);
+    expect(component.deleteError()).toBeNull();
+  });
+
+  it('reports deletion failures and leaves the post in the list', async () => {
+    component.removePost(posts[0].id);
+    httpTesting.expectOne('https://jsonplaceholder.typicode.com/posts/1').flush(
+      { message: 'Unavailable' },
+      { status: 500, statusText: 'Server Error' }
+    );
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.postService.posts()).toEqual(posts);
+    expect(component.deleteError()).toContain('Could not delete the post');
+    expect(fixture.nativeElement.textContent).toContain('Could not delete the post');
+  });
+
   it('navigates to the edit-post route for the selected post', () => {
     const router = TestBed.inject(Router);
     const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
