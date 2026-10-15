@@ -33,8 +33,10 @@
           <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             New password
             <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((resetForm.newPassword().touched() || resetSubmitted()) && resetForm.newPassword().invalid()) || resetPasswordError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''" type="password" id="reset-new-password" [formField]="resetForm.newPassword" (input)="resetPasswordError.set(null)" autocomplete="new-password" />
-            @if ((resetForm.newPassword().touched() || resetSubmitted()) && resetForm.newPassword().getError('required')) {
-              <span class="text-xs font-normal text-red-700">{{resetForm.newPassword().getError('required')?.message}} </span>
+            @if (resetForm.newPassword().touched() || resetSubmitted()) {
+              @for (error of resetForm.newPassword().errors(); track error.kind) {
+                <span class="text-xs font-normal text-red-700">{{ error.message }}</span>
+              }
             }
             @if (resetPasswordError(); as error) {
               <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
@@ -50,20 +52,22 @@
           <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Username
             <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((loginForm.username().touched() || submitted()) && loginForm.username().invalid()) || usernameError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''" type="email" id="login-username" [formField]="loginForm.username" (input)="usernameError.set(null)" autocomplete="username" placeholder="you@example.com" />
-            @if ((loginForm.username().touched() || submitted()) && loginForm.username().getError('required')) {
-              <span class="text-xs font-normal text-red-700">{{ loginForm.username().getError('required')?.message }}</span>
-            } @else if ((loginForm.username().touched() || submitted()) && loginForm.username().getError('email')) {
-              <span class="text-xs font-normal text-red-700">{{ loginForm.username().getError('email')?.message }}</span>
+            @if (loginForm.username().touched() || submitted()) {
+              @for (error of loginForm.username().errors(); track error.kind) {
+                <span class="text-xs font-normal text-red-700">{{ error.message }}</span>
+              }
             }
             @if (usernameError(); as error) {
-              <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
+              <span class="text-xs font-normal text-red-700" role="alert"></span>
             }
           </label>
           <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Password
             <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((loginForm.password().touched() || submitted()) && loginForm.password().invalid()) || passwordError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''" type="password" id="login-password" [formField]="loginForm.password" (input)="passwordError.set(null)" autocomplete="current-password" />
-            @if ((loginForm.password().touched() || submitted()) && loginForm.password().getError('required')) {
-              <span class="text-xs font-normal text-red-700">{{ loginForm.password().getError('required')?.message }} </span>
+            @if (loginForm.password().touched() || submitted()) {
+              @for (error of loginForm.password().errors(); track error.kind) {
+                <span class="text-xs font-normal text-red-700">{{ error.message }}</span>
+              }
             }
             @if (passwordError(); as error) {
               <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>

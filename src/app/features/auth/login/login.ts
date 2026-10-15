@@ -103,6 +103,7 @@ export class LoginComponent {
       return;
     }
     if (!this.auth.logIn(this.username, this.password)) {
+      this.usernameError.set('The username or password is incorrect.');
       this.passwordError.set('The username or password is incorrect.');
       return;
     }
