@@ -18,7 +18,11 @@ export class AddPostComponent {
   private createRequests = new Subject<{ id: number; title: string; body: string }>();
 
   postModel = signal<PostInputModel>({ title: '', body: '' });
-  postForm = form(this.postModel, path => [required(path.title), required(path.body)]);
+  postForm = form(this.postModel, path => [
+    required(path.title, { message: 'Title is required.' }),
+    required(path.body, { message: 'Post body is required.' })
+  ]);
+  submitAttempted = signal(false);
   isSubmitting = signal(false);
   submitError = signal<string | null>(null);
   private createResult = toSignal(
@@ -69,6 +73,7 @@ export class AddPostComponent {
 
   addPost(event?: Event): void {
     event?.preventDefault();
+    this.submitAttempted.set(true);
     if (!this.postForm().valid()) {
       return;
     }

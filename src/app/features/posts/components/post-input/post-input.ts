@@ -14,4 +14,5 @@ export interface PostInputModel {
 })
 export class PostInputComponent {
   fields = input.required<FieldTree<PostInputModel>>();
+  submitted = input(false);
 }

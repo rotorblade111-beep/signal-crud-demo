@@ -50,7 +50,11 @@ export class EditPostComponent {
 
   post = signal<Post | null>(null);
   postModel = signal<PostInputModel>({ title: '', body: '' });
-  postForm = form(this.postModel, path => [required(path.title), required(path.body)]);
+  postForm = form(this.postModel, path => [
+    required(path.title, { message: 'Title is required.' }),
+    required(path.body, { message: 'Post body is required.' })
+  ]);
+  submitAttempted = signal(false);
   isLoading = signal(true);
   isSaving = signal(false);
   errorMessage = signal<string | null>(null);
@@ -145,6 +149,7 @@ export class EditPostComponent {
 
   savePost(event?: Event): void {
     event?.preventDefault();
+    this.submitAttempted.set(true);
     const post = this.post();
     if (!post || this.isSaving() || !this.postForm().valid()) {
       return;

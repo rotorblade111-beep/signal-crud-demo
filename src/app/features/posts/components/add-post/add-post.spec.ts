@@ -85,10 +85,29 @@ describe('AddPostComponent', () => {
     expect(fixture.componentInstance.isSubmitting()).toBe(false);
   });
 
-  it('does not submit the form when the required title is empty', () => {
-    fixture.componentInstance.addPost();
+  it('shows required messages and highlights both fields when submitted empty', () => {
+    const submit = fixture.nativeElement.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submit.click();
+    fixture.detectChanges();
 
     expect(fixture.componentInstance.isSubmitting()).toBe(false);
     httpTesting.expectNone(apiUrl);
+    expect(fixture.nativeElement.textContent).toContain('Title is required.');
+    expect(fixture.nativeElement.textContent).toContain('Post body is required.');
+    const title = fixture.nativeElement.querySelector('#post-title') as HTMLInputElement;
+    const body = fixture.nativeElement.querySelector('#post-body') as HTMLTextAreaElement;
+    expect(title.classList).toContain('!border-red-500');
+    expect(body.classList).toContain('!border-red-500');
+  });
+
+  it('shows the required message and border after a field is touched', () => {
+    const title = fixture.nativeElement.querySelector('#post-title') as HTMLInputElement;
+    title.focus();
+    title.blur();
+    fixture.detectChanges();
+
+    expect(title.classList).toContain('!border-red-500');
+    expect(title.closest('label')?.textContent).toContain('Title is required.');
+    expect(fixture.nativeElement.textContent).not.toContain('Post body is required.');
   });
 });

@@ -89,4 +89,26 @@ describe('EditPostComponent', () => {
     httpTesting.expectNone(`${apiUrl}/7`);
   });
 
+  it('shows required messages and highlights both fields when submitted empty', () => {
+    const title = fixture.nativeElement.querySelector('#post-title') as HTMLInputElement;
+    const body = fixture.nativeElement.querySelector('#post-body') as HTMLTextAreaElement;
+    title.value = '';
+    title.dispatchEvent(new Event('input', { bubbles: true }));
+    body.value = '';
+    body.dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+
+    const submit = fixture.nativeElement.querySelector('button[type="submit"]') as HTMLButtonElement;
+    expect(submit.disabled).toBe(false);
+    submit.click();
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.isSaving()).toBe(false);
+    httpTesting.expectNone(`${apiUrl}/7`);
+    expect(fixture.nativeElement.textContent).toContain('Title is required.');
+    expect(fixture.nativeElement.textContent).toContain('Post body is required.');
+    expect(title.classList).toContain('!border-red-500');
+    expect(body.classList).toContain('!border-red-500');
+  });
+
 });

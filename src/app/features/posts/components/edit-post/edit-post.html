@@ -13,7 +13,8 @@
     <form class="flex flex-col gap-4" novalidate (submit)="savePost($event)">
       <app-post-input
         class="flex min-w-0 flex-1 flex-col gap-4"
-        [fields]="postForm" />
+        [fields]="postForm"
+        [submitted]="submitAttempted()" />
 
       @if (errorMessage(); as error) {
         <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
@@ -23,7 +24,7 @@
         <button
           type="submit"
           class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors active:scale-[0.98] hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-          [disabled]="isSaving() || !postModel().title.trim()">
+          [disabled]="isSaving()">
           {{ isSaving() ? 'Saving...' : 'Save Changes' }}
         </button>
         <a

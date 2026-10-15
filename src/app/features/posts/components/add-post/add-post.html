@@ -10,7 +10,8 @@
   <form class="flex flex-col gap-4" novalidate (submit)="addPost($event)">
     <app-post-input
       class="flex min-w-0 flex-1 flex-col gap-4"
-      [fields]="postForm" />
+      [fields]="postForm"
+      [submitted]="submitAttempted()" />
 
     @if (submitError(); as error) {
       <p class="m-0 text-sm text-red-700" role="alert">{{ error }}</p>
