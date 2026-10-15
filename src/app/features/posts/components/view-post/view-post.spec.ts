@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { ActivatedRoute, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { Post } from '../../models/post.model';
 import { ViewPostComponent } from './view-post';
@@ -22,7 +22,6 @@ describe('ViewPostComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            snapshot: { paramMap: convertToParamMap({ id: String(post.id) }) },
             data: of({
               seo: {
                 title: `${post.title} | Posthub`,
@@ -38,6 +37,7 @@ describe('ViewPostComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(ViewPostComponent);
+    fixture.componentRef.setInput('id', String(post.id));
     fixture.detectChanges();
   });
 
@@ -58,6 +58,7 @@ describe('ViewPostComponent', () => {
       post: { ...post, title: 'Post from router state' }
     });
     fixture = TestBed.createComponent(ViewPostComponent);
+    fixture.componentRef.setInput('id', String(post.id));
     fixture.detectChanges();
 
     expect(fixture.componentInstance.post()?.title).toBe('Post from router state');

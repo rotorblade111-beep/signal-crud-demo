@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -33,6 +33,7 @@ function postFromRouterState(state: unknown): ViewPostRouteData['post'] {
   templateUrl: './view-post.html'
 })
 export class ViewPostComponent {
+  id = input<string>();
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private location = inject(Location);
@@ -47,28 +48,27 @@ export class ViewPostComponent {
   );
 
   constructor() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
     const navigationState = this.router.getCurrentNavigation()?.extras.state ?? this.location.getState();
-    const statePost = postFromRouterState(navigationState);
-    this.statePost = statePost?.id === id ? statePost : null;
+    this.statePost = postFromRouterState(navigationState);
 
     effect(() => {
+      const id = Number(this.id());
+      const statePost = this.statePost?.id === id ? this.statePost : null;
       const data = this.routeData();
       if (!data) {
-        if (!this.statePost) {
+        if (!statePost) {
           this.isLoading.set(true);
+        } else {
+          this.post.set(statePost);
+          this.errorMessage.set(null);
+          this.isLoading.set(false);
         }
         return;
       }
 
-      this.post.set(this.statePost ?? data.post);
-      this.errorMessage.set(this.statePost ? null : data.errorMessage);
+      this.post.set(statePost ?? data.post);
+      this.errorMessage.set(statePost ? null : data.errorMessage);
       this.isLoading.set(false);
     });
-
-    if (this.statePost) {
-      this.post.set(this.statePost);
-      this.isLoading.set(false);
-    }
   }
 }

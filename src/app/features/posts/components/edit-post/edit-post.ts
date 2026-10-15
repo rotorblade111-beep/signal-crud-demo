@@ -1,9 +1,9 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { form, required } from '@angular/forms/signals';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Subject, catchError, map, of, switchMap } from 'rxjs';
+import { Router, RouterLink } from '@angular/router';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Subject, catchError, distinctUntilChanged, filter, map, of, switchMap } from 'rxjs';
 import { PostService } from '../../services/post.service';
 import { Post } from '../../models/post.model';
 import { PostInputComponent } from '../post-input/post-input';
@@ -42,7 +42,7 @@ type PostResult =
   templateUrl: './edit-post.html'
 })
 export class EditPostComponent {
-  private route = inject(ActivatedRoute);
+  id = input<string>();
   private router = inject(Router);
   private location = inject(Location);
   private postService = inject(PostService);
@@ -68,43 +68,49 @@ export class EditPostComponent {
   );
 
   constructor() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
     const navigationState = this.router.getCurrentNavigation()?.extras.state ?? this.location.getState();
     const statePost = postFromRouterState(navigationState);
-    if (!Number.isSafeInteger(id) || id <= 0) {
-      this.isLoading.set(false);
-      this.errorMessage.set('The requested post ID is invalid.');
-    } else if (statePost?.id === id) {
-      this.post.set(statePost);
-      this.postModel.set({ title: statePost.title, body: statePost.body });
-      this.isLoading.set(false);
-    } else {
-      const postResult = toSignal(
-        this.postService.getPost(id).pipe(
-          map(post => ({ type: 'loaded' as const, post })),
-          catchError((error: unknown) => {
-            console.error('Failed to load post for editing', error);
-            return of({ type: 'error' as const });
-          })
-        ),
-        { initialValue: null }
-      );
+    const postResult = toSignal(
+      toObservable(this.id).pipe(
+        filter((id): id is string => id !== undefined),
+        map(id => Number(id)),
+        distinctUntilChanged(),
+        switchMap(id => {
+          if (!Number.isSafeInteger(id) || id <= 0) {
+            return of({ type: 'invalid' as const });
+          }
+          if (statePost?.id === id) {
+            return of({ type: 'loaded' as const, post: statePost });
+          }
+          return this.postService.getPost(id).pipe(
+            map(post => ({ type: 'loaded' as const, post })),
+            catchError((error: unknown) => {
+              console.error('Failed to load post for editing', error);
+              return of({ type: 'error' as const });
+            })
+          );
+        })
+      ),
+      { initialValue: null }
+    );
 
-      effect(() => {
-        const result = postResult();
-        if (!result) {
-          return;
-        }
+    effect(() => {
+      const result = postResult();
+      if (!result) {
+        return;
+      }
 
-        this.isLoading.set(false);
-        if (result.type === 'loaded') {
-          this.post.set(result.post);
-          this.postModel.set({ title: result.post.title, body: result.post.body });
-        } else {
-          this.errorMessage.set('Could not load this post. Please return to the post list.');
-        }
-      });
-    }
+      this.isLoading.set(false);
+      if (result.type === 'loaded') {
+        this.post.set(result.post);
+        this.postModel.set({ title: result.post.title, body: result.post.body });
+        this.errorMessage.set(null);
+      } else if (result.type === 'invalid') {
+        this.errorMessage.set('The requested post ID is invalid.');
+      } else {
+        this.errorMessage.set('Could not load this post. Please return to the post list.');
+      }
+    });
 
     effect(() => {
       const result = this.saveResult();

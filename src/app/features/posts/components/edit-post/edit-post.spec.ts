@@ -2,7 +2,7 @@ import { Location } from '@angular/common';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { EditPostComponent } from './edit-post';
 import { PostListComponent } from '../post-list/post-list';
 import { Post } from '../../models/post.model';
@@ -25,18 +25,16 @@ describe('EditPostComponent', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        provideRouter([{ path: 'home', component: PostListComponent }]),
-        {
-          provide: ActivatedRoute,
-          useValue: { snapshot: { paramMap: convertToParamMap({ id: '7' }) } }
-        }
+        provideRouter([{ path: 'home', component: PostListComponent }])
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EditPostComponent);
+    fixture.componentRef.setInput('id', '7');
     httpTesting = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router);
     httpTesting.expectOne(apiUrl).flush([]);
+    fixture.detectChanges();
     httpTesting.expectOne(`${apiUrl}/7`).flush(post);
     fixture.detectChanges();
   });
@@ -81,6 +79,7 @@ describe('EditPostComponent', () => {
     fixture.destroy();
     vi.spyOn(TestBed.inject(Location), 'getState').mockReturnValue({ post });
     fixture = TestBed.createComponent(EditPostComponent);
+    fixture.componentRef.setInput('id', String(post.id));
     fixture.detectChanges();
 
     expect(fixture.componentInstance.post()).toEqual(post);
