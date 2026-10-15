@@ -14,41 +14,9 @@
 
     <div class="p-6 sm:p-9">
       <p class="mb-1 text-sm font-semibold uppercase tracking-widest text-[#5865f2] md:hidden">Posthub</p>
-      @if (isResettingPassword()) {
-        <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Reset your password</h2>
-        <p class="mb-6 mt-0 text-sm text-slate-500">Enter your account email and choose a new password.</p>
-        <form class="flex flex-col gap-4" (submit)="resetPassword($event)" novalidate>
-          <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-            Email
-            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((resetForm.email().touched() || resetSubmitted()) && resetForm.email().invalid()) || resetEmailError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''" type="email" id="reset-email" [formField]="resetForm.email" (input)="resetEmailError.set(null)" autocomplete="email" />
-            @if ((resetForm.email().touched() || resetSubmitted()) && resetForm.email().getError('required')) {
-              <span class="text-xs font-normal text-red-700">{{resetForm.email().getError('required')?.message}}</span>
-            } @else if ((resetForm.email().touched() || resetSubmitted()) && resetForm.email().getError('email')) {
-              <span class="text-xs font-normal text-red-700">{{resetForm.email().getError('email')?.message}}</span>
-            }
-            @if (resetEmailError(); as error) {
-              <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
-            }
-          </label>
-          <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
-            New password
-            <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((resetForm.newPassword().touched() || resetSubmitted()) && resetForm.newPassword().invalid()) || resetPasswordError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''" type="password" id="reset-new-password" [formField]="resetForm.newPassword" (input)="resetPasswordError.set(null)" autocomplete="new-password" />
-            @if (resetForm.newPassword().touched() || resetSubmitted()) {
-              @for (error of resetForm.newPassword().errors(); track error.kind) {
-                <span class="text-xs font-normal text-red-700">{{ error.message }}</span>
-              }
-            }
-            @if (resetPasswordError(); as error) {
-              <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
-            }
-          </label>
-          <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4]">Reset Password</button>
-          <button type="button" class="cursor-pointer self-start text-sm font-semibold text-[#4752c4] hover:underline" (click)="isResettingPassword.set(false)">Back to login</button>
-        </form>
-      } @else {
-        <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Welcome back!</h2>
-        <p class="mb-6 mt-0 text-sm text-slate-500">We're so excited to see you again.</p>
-        <form class="flex flex-col gap-4" (submit)="logIn($event)" novalidate>
+      <h2 class="mb-1 mt-0 text-2xl font-bold text-slate-900">Welcome back!</h2>
+      <p class="mb-6 mt-0 text-sm text-slate-500">We're so excited to see you again.</p>
+      <form class="flex flex-col gap-4" (submit)="logIn($event)" novalidate>
           <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
             Username
             <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((loginForm.username().touched() || submitted()) && loginForm.username().invalid()) || usernameError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''" type="email" id="login-username" [formField]="loginForm.username" (input)="usernameError.set(null)" autocomplete="username" placeholder="you@example.com" />
@@ -73,18 +41,14 @@
               <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
             }
           </label>
-          @if (successMessage(); as success) {
-            <p class="m-0 text-sm text-green-700" role="status">{{ success }}</p>
-          }
-          <button type="button" class="cursor-pointer self-start text-sm font-semibold text-[#4752c4] hover:underline" (click)="isResettingPassword.set(true); successMessage.set(null)">Forgot your password?</button>
-          <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4]">Log In</button>
-        </form>
+        <a routerLink="/reset-password" class="self-start text-sm font-semibold text-[#4752c4] no-underline hover:underline">Forgot your password?</a>
+        <button type="submit" class="cursor-pointer rounded-lg bg-[#5865f2] px-4 py-3 font-semibold text-white transition-colors hover:bg-[#4752c4]">Log In</button>
+      </form>
 
-        <p class="mb-0 mt-5 text-sm text-slate-600">
-          Don't have an account?
-          <a routerLink="/sign-up" class="font-semibold text-[#4752c4] no-underline hover:underline">Sign Up.</a>
-        </p>
-      }
+      <p class="mb-0 mt-5 text-sm text-slate-600">
+        Don't have an account?
+        <a routerLink="/sign-up" class="font-semibold text-[#4752c4] no-underline hover:underline">Sign Up.</a>
+      </p>
     </div>
   </section>
 </main>

@@ -109,15 +109,8 @@ describe('LoginComponent', () => {
     expect(usernameLabel.match(/Enter a valid email address\./g)).toHaveLength(1);
   });
 
-  it('resets a registered password through the forgot-password flow', () => {
-    const component = fixture.componentInstance;
-    component.isResettingPassword.set(true);
-    component.resetEmail = 'member@example.com';
-    component.newPassword = 'updated';
-    component.resetPassword();
-
-    expect(component.isResettingPassword()).toBe(false);
-    expect(component.successMessage()).toContain('Password reset');
-    expect(auth.logIn('member@example.com', 'updated')).toBe(true);
+  it('links to the standalone password reset page', () => {
+    const resetLink = fixture.nativeElement.querySelector('a[routerLink="/reset-password"]') as HTMLAnchorElement;
+    expect(resetLink.textContent).toContain('Forgot your password?');
   });
 });

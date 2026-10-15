@@ -65,6 +65,11 @@ export const routes: Routes = [
     data: { seo: { title: 'Sign up | Posthub', description: 'Create your Posthub account.', type: 'website' } }
   },
   {
+    path: 'reset-password',
+    loadComponent: () => import('./features/auth/reset-password/reset-password').then(m => m.ResetPasswordComponent),
+    data: { seo: { title: 'Reset password | Posthub', description: 'Reset your Posthub account password.', type: 'website' } }
+  },
+  {
     path: 'home',
     loadComponent: () => import('./features/posts/components/post-list/post-list').then(m => m.PostListComponent),
     canActivate: [authGuard],
