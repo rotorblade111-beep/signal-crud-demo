@@ -50,7 +50,7 @@ export class EditPostComponent {
 
   post = signal<Post | null>(null);
   postModel = signal<PostInputModel>({ title: '', body: '' });
-  postForm = form(this.postModel, path => required(path.title));
+  postForm = form(this.postModel, path => [required(path.title), required(path.body)]);
   isLoading = signal(true);
   isSaving = signal(false);
   errorMessage = signal<string | null>(null);

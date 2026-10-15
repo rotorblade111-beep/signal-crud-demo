@@ -18,7 +18,7 @@ export class AddPostComponent {
   private createRequests = new Subject<{ id: number; title: string; body: string }>();
 
   postModel = signal<PostInputModel>({ title: '', body: '' });
-  postForm = form(this.postModel, path => required(path.title));
+  postForm = form(this.postModel, path => [required(path.title), required(path.body)]);
   isSubmitting = signal(false);
   submitError = signal<string | null>(null);
   private createResult = toSignal(
