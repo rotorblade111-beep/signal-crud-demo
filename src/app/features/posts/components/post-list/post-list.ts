@@ -43,11 +43,11 @@ export class PostListComponent  {
   postCount = computed(() => this.postList().length);
   filteredPosts = computed(() => {
     const titleQuery = this.titleSearch().trim().toLocaleLowerCase();
-    const bodyQuery = this.bodySearch().trim().toLocaleLowerCase();
+    const bodyQuery = this.bodySearch().trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 
     return this.postList().filter(post =>
       post.title.toLocaleLowerCase().includes(titleQuery) &&
-      post.body.toLocaleLowerCase().includes(bodyQuery)
+      post.body.replace(/\s+/g, ' ').toLocaleLowerCase().includes(bodyQuery)
     );
   });
   totalPages = computed(() => Math.ceil(this.filteredPosts().length / this.pageSize));

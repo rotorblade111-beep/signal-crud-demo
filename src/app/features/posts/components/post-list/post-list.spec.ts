@@ -49,6 +49,22 @@ describe('PostListComponent', () => {
     expect(component.filteredPosts()).toEqual([]);
   });
 
+  it('matches body searches across line breaks and repeated whitespace', async () => {
+    const multilinePost: Post = {
+      id: 3,
+      title: 'Multiline post',
+      body: 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+    };
+    component.postService.posts.set([multilinePost]);
+
+    component.setBodySearch(
+      'suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto'
+    );
+    await fixture.whenStable();
+
+    expect(component.filteredPosts()).toEqual([multilinePost]);
+  });
+
   it('shows at most 10 posts per page and navigates across all pages', async () => {
     const hundredPosts = Array.from({ length: 100 }, (_, index) => ({
       id: index + 1,
