@@ -22,9 +22,9 @@
             Email
             <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((resetForm.email().touched() || resetSubmitted()) && resetForm.email().invalid()) || resetEmailError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''" type="email" id="reset-email" [formField]="resetForm.email" (input)="resetEmailError.set(null)" autocomplete="email" />
             @if ((resetForm.email().touched() || resetSubmitted()) && resetForm.email().getError('required')) {
-              <span class="text-xs font-normal text-red-700">Email is required.</span>
+              <span class="text-xs font-normal text-red-700">{{resetForm.email().getError('required')?.message}}</span>
             } @else if ((resetForm.email().touched() || resetSubmitted()) && resetForm.email().getError('email')) {
-              <span class="text-xs font-normal text-red-700">Enter a valid email address.</span>
+              <span class="text-xs font-normal text-red-700">{{resetForm.email().getError('email')?.message}}</span>
             }
             @if (resetEmailError(); as error) {
               <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
@@ -34,7 +34,7 @@
             New password
             <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class]="((resetForm.newPassword().touched() || resetSubmitted()) && resetForm.newPassword().invalid()) || resetPasswordError() ? '!border-red-500 ring-4 !ring-red-500/20 focus:!border-red-500 focus:!ring-red-500/20' : ''" type="password" id="reset-new-password" [formField]="resetForm.newPassword" (input)="resetPasswordError.set(null)" autocomplete="new-password" />
             @if ((resetForm.newPassword().touched() || resetSubmitted()) && resetForm.newPassword().getError('required')) {
-              <span class="text-xs font-normal text-red-700">Password is required.</span>
+              <span class="text-xs font-normal text-red-700">{{resetForm.newPassword().getError('required')?.message}} </span>
             }
             @if (resetPasswordError(); as error) {
               <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>

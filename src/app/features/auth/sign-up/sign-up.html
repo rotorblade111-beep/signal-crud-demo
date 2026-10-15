@@ -30,9 +30,9 @@
             autocomplete="email"
             placeholder="you@example.com" />
           @if ((signUpForm.email().touched() || submitted()) && signUpForm.email().getError('required')) {
-            <span class="text-xs font-normal text-red-700">Email is required.</span>
+            <span class="text-xs font-normal text-red-700"> {{ signUpForm.email().getError('required')?.message}} </span>
           } @else if ((signUpForm.email().touched() || submitted()) && signUpForm.email().getError('email')) {
-            <span class="text-xs font-normal text-red-700">Enter a valid email address.</span>
+            <span class="text-xs font-normal text-red-700"> {{ signUpForm.email().getError('email')?.message}} </span>
           }
           @if (emailError(); as error) {
             <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
@@ -50,7 +50,7 @@
             autocomplete="new-password"
             placeholder="Enter a password" />
           @if ((signUpForm.password().touched() || submitted()) && signUpForm.password().getError('required')) {
-            <span class="text-xs font-normal text-red-700">Password is required.</span>
+            <span class="text-xs font-normal text-red-700">{{ signUpForm.password().getError('required')?.message }}</span>
           }
         </label>
 
@@ -66,7 +66,7 @@
             autocomplete="new-password"
             placeholder="Enter your password again" />
           @if ((signUpForm.repeatedPassword().touched() || submitted()) && signUpForm.repeatedPassword().getError('required')) {
-            <span class="text-xs font-normal text-red-700">Please re-type your password.</span>
+            <span class="text-xs font-normal text-red-700">{{signUpForm.repeatedPassword().getError('required')?.message}}</span>
           } @else if ((signUpForm.repeatedPassword().touched() || submitted()) && repeatedPassword && repeatedPassword !== password) {
             <span class="text-xs font-normal text-red-700" role="alert">Passwords do not match.</span>
           }
@@ -98,13 +98,13 @@
             </select>
           </div>
           @if (shouldShowDateOfBirthFieldError(signUpForm.year().touched(), year) && signUpForm.year().getError('required')) {
-            <p class="mb-0 mt-2 text-sm font-normal text-red-700">Year of birth is required.</p>
+            <p class="mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.year().getError('required')?.message}}</p>
           }
           @if (shouldShowDateOfBirthFieldError(signUpForm.month().touched(), month) && signUpForm.month().getError('required')) {
-            <p class="mb-0 mt-2 text-sm font-normal text-red-700">Month of birth is required.</p>
+            <p class="mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.month().getError('required')?.message}}</p>
           }
           @if (shouldShowDayRequiredError(signUpForm.day().touched()) && signUpForm.day().getError('required')) {
-            <p class="mb-0 mt-2 text-sm font-normal text-red-700">Day of birth is required.</p>
+            <p class="mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.day().getError('required')?.message}}</p>
           }
           @if (shouldShowDateOfBirthError()) {
             <p class="mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ dateOfBirthError() }}</p>
