@@ -46,7 +46,7 @@ export class EditPostComponent {
   private router = inject(Router);
   private location = inject(Location);
   private postService = inject(PostService);
-  private saveRequests = new Subject<{ id: number; title: string; body: string }>();
+  private saveRequests = new Subject<Post>();
 
   post = signal<Post | null>(null);
   postModel = signal<PostInputModel>({ title: '', body: '' });
@@ -58,6 +58,29 @@ export class EditPostComponent {
   isLoading = signal(true);
   isSaving = signal(false);
   errorMessage = signal<string | null>(null);
+  navigationState = this.router.getCurrentNavigation()?.extras.state ?? this.location.getState();
+  statePost = postFromRouterState(this.navigationState);
+  postResult = toSignal(toObservable(this.id).pipe(filter((id): id is string => id !== undefined),
+        map(id => Number(id)),
+        distinctUntilChanged(),
+        switchMap(id => {
+          if (!Number.isSafeInteger(id) || id <= 0) {
+            return of({ type: 'invalid' as const });
+          }
+          if (this.statePost?.id === id) {
+            return of({ type: 'loaded' as const, post: this.statePost });
+          }
+          return this.postService.getPost(id).pipe(
+            map(post => ({ type: 'loaded' as const, post })),
+            catchError((error: unknown) => {
+              console.error('Failed to load post for editing', error);
+              return of({ type: 'error' as const });
+            })
+          );
+        })
+      ),
+      { initialValue: null }
+    );
   private saveResult = toSignal(
     this.saveRequests.pipe(
       switchMap(({ id, title, body }) => this.postService.updatePost(id, { title, body }).pipe(
@@ -72,34 +95,9 @@ export class EditPostComponent {
   );
 
   constructor() {
-    const navigationState = this.router.getCurrentNavigation()?.extras.state ?? this.location.getState();
-    const statePost = postFromRouterState(navigationState);
-    const postResult = toSignal(
-      toObservable(this.id).pipe(
-        filter((id): id is string => id !== undefined),
-        map(id => Number(id)),
-        distinctUntilChanged(),
-        switchMap(id => {
-          if (!Number.isSafeInteger(id) || id <= 0) {
-            return of({ type: 'invalid' as const });
-          }
-          if (statePost?.id === id) {
-            return of({ type: 'loaded' as const, post: statePost });
-          }
-          return this.postService.getPost(id).pipe(
-            map(post => ({ type: 'loaded' as const, post })),
-            catchError((error: unknown) => {
-              console.error('Failed to load post for editing', error);
-              return of({ type: 'error' as const });
-            })
-          );
-        })
-      ),
-      { initialValue: null }
-    );
 
     effect(() => {
-      const result = postResult();
+      const result = this.postResult();
       if (!result) {
         return;
       }
