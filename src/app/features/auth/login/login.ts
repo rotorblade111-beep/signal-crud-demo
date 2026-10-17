@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormField, form, required, validate } from '@angular/forms/signals';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 
 interface LoginFormModel {
@@ -52,7 +54,7 @@ export class LoginComponent {
     this.loginModel.update(model => ({ ...model, password }));
   }
 
-  logIn(event?: Event): void {
+  async logIn(event?: Event): Promise<void> {
     event?.preventDefault();
     this.submitted.set(true);
     this.usernameError.set(null);
@@ -61,16 +63,20 @@ export class LoginComponent {
     if (!this.loginForm().valid()) {
       return;
     }
-    if (!this.auth.logIn(this.username, this.password)) {
-      this.usernameError.set('The username or password is incorrect.');
-      this.passwordError.set('The username or password is incorrect.');
-      return;
+    try {
+      await firstValueFrom(this.auth.logIn(this.username, this.password));
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      const destination = returnUrl?.startsWith('/') && !returnUrl.startsWith('//')
+        ? returnUrl
+        : '/home';
+      void this.router.navigateByUrl(destination);
+    } catch (error: unknown) {
+      console.error('Failed to log in', error);
+      const message = error instanceof HttpErrorResponse && error.status === 401
+        ? 'The username or password is incorrect.'
+        : 'Could not log in. Please try again.';
+      this.usernameError.set(message);
+      this.passwordError.set(message);
     }
-
-    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-    const destination = returnUrl?.startsWith('/') && !returnUrl.startsWith('//')
-      ? returnUrl
-      : '/home';
-    void this.router.navigateByUrl(destination);
   }
 }

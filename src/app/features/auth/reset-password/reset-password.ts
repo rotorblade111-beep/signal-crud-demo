@@ -1,8 +1,9 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { FormField, form, required, validate } from '@angular/forms/signals';
+import { FormField, form, minLength, required, validate } from '@angular/forms/signals';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Subject, switchMap, timer } from 'rxjs';
+import { firstValueFrom, Subject, switchMap, timer } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 
 interface ResetPasswordFormModel {
@@ -38,6 +39,7 @@ export class ResetPasswordComponent {
       return undefined;
     });
     required(path.newPassword, { message: 'Password is required.' });
+    minLength(path.newPassword, 8, { message: 'Password must be at least 8 characters.' });
     required(path.repeatedPassword, { message: 'Please re-type your password.' });
   });
   submitted = signal(false);
@@ -84,7 +86,7 @@ export class ResetPasswordComponent {
     this.resetModel.update(model => ({ ...model, repeatedPassword }));
   }
 
-  resetPassword(event?: Event): void {
+  async resetPassword(event?: Event): Promise<void> {
     event?.preventDefault();
     this.submitted.set(true);
     this.emailError.set(null);
@@ -97,12 +99,17 @@ export class ResetPasswordComponent {
       this.passwordError.set('Passwords do not match.');
       return;
     }
-    if (!this.auth.resetPassword(this.email, this.newPassword)) {
-      this.emailError.set('No account was found for that email address.');
-      return;
+    try {
+      await firstValueFrom(this.auth.resetPassword(this.email, this.newPassword));
+      this.successMessage.set('Password reset. You can now log in with your new password.');
+      this.redirectRequests.next();
+    } catch (error: unknown) {
+      console.error('Failed to reset password', error);
+      if (error instanceof HttpErrorResponse && error.status === 404) {
+        this.emailError.set('No account was found for that email address.');
+      } else {
+        this.passwordError.set('Could not reset your password. Please try again.');
+      }
     }
-
-    this.successMessage.set('Password reset. You can now log in with your new password.');
-    this.redirectRequests.next();
   }
 }

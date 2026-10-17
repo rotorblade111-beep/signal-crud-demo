@@ -1,16 +1,27 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
-import { AuthService } from '../../../core/auth/auth.service';
+import { AuthService, AuthUser } from '../../../core/auth/auth.service';
 import { LoginComponent } from './login';
 
 describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
   let auth: AuthService;
+  let httpTesting: HttpTestingController;
+  const authUrl = 'http://localhost:5093/auth';
+  const user: AuthUser = {
+    id: 1,
+    email: 'member@example.com',
+    dateOfBirth: '2000-01-01'
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LoginComponent],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([{ path: 'home', component: LoginComponent }]),
         {
           provide: ActivatedRoute,
@@ -19,22 +30,32 @@ describe('LoginComponent', () => {
       ]
     }).compileComponents();
     auth = TestBed.inject(AuthService);
-    auth.signUp({ email: 'member@example.com', password: 'correct', dateOfBirth: '2000-01-01' });
-    auth.logOut();
+    httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(LoginComponent);
     fixture.detectChanges();
+    auth.currentUser.set(user);
+    auth.logOut();
   });
+
+  afterEach(() => httpTesting.verify());
 
   it('authenticates users and reports invalid credentials', async () => {
     const component = fixture.componentInstance;
     const router = TestBed.inject(Router);
     component.username = 'member@example.com';
     component.password = 'incorrect';
-    component.logIn();
+    const invalidLogin = component.logIn();
+    httpTesting.expectOne(`${authUrl}/login`).flush(
+      { title: 'Invalid credentials' },
+      { status: 401, statusText: 'Unauthorized' }
+    );
+    await invalidLogin;
     expect(component.passwordError()).toContain('incorrect');
 
     component.password = 'correct';
-    component.logIn();
+    const successfulLogin = component.logIn();
+    httpTesting.expectOne(`${authUrl}/login`).flush(user);
+    await successfulLogin;
     await fixture.whenStable();
     expect(auth.currentUser()?.email).toBe('member@example.com');
     expect(router.url).toBe('/home');
@@ -71,7 +92,7 @@ describe('LoginComponent', () => {
     expect(auth.currentUser()).toBeNull();
   });
 
-  it('shows an email format error after blur and a credentials error under password', () => {
+  it('shows an email format error after blur and a credentials error under password', async () => {
     const component = fixture.componentInstance;
     const username = fixture.nativeElement.querySelector('#login-username') as HTMLInputElement;
     username.value = 'not-an-email';
@@ -84,7 +105,12 @@ describe('LoginComponent', () => {
 
     component.username = 'member@example.com';
     component.password = 'incorrect';
-    component.logIn();
+    const login = component.logIn();
+    httpTesting.expectOne(`${authUrl}/login`).flush(
+      { title: 'Invalid credentials' },
+      { status: 401, statusText: 'Unauthorized' }
+    );
+    await login;
     fixture.detectChanges();
     expect(component.passwordError()).toContain('incorrect');
   });
@@ -112,5 +138,19 @@ describe('LoginComponent', () => {
   it('links to the standalone password reset page', () => {
     const resetLink = fixture.nativeElement.querySelector('a[routerLink="/reset-password"]') as HTMLAnchorElement;
     expect(resetLink.textContent).toContain('Forgot your password?');
+  });
+
+  it('shows an explicit error if the login API is unavailable', async () => {
+    const component = fixture.componentInstance;
+    component.username = 'member@example.com';
+    component.password = 'correct';
+    const login = component.logIn();
+    httpTesting.expectOne(`${authUrl}/login`).flush(
+      { title: 'Unavailable' },
+      { status: 500, statusText: 'Server Error' }
+    );
+    await login;
+
+    expect(component.passwordError()).toContain('Could not log in');
   });
 });

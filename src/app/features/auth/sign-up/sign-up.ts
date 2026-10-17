@@ -1,6 +1,8 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { FormField, form, required, validate } from '@angular/forms/signals';
+import { FormField, form, minLength, required, validate } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 
 interface SignUpFormModel {
@@ -41,6 +43,7 @@ export class SignUpComponent {
       return undefined;
     });
     required(path.password, { message: 'Password is required.' });
+    minLength(path.password, 8, { message: 'Password must be at least 8 characters.' });
     required(path.repeatedPassword, { message: 'Please re-type your password.' });
     required(path.year, { message: 'Year of birth is required.' });
     required(path.month, { message: 'Month of birth is required.' });
@@ -49,6 +52,7 @@ export class SignUpComponent {
   submitted = signal(false);
   emailError = signal<string | null>(null);
   repeatedPasswordError = signal<string | null>(null);
+  isSubmitting = signal(false);
   dateOfBirthError = signal<string | null>(null);
   months = [
     { value: 1, name: 'January' }, { value: 2, name: 'February' },
@@ -173,7 +177,7 @@ export class SignUpComponent {
     );
   }
 
-  signUp(event?: Event): void {
+  async signUp(event?: Event): Promise<void> {
     event?.preventDefault();
     this.submitted.set(true);
     this.emailError.set(null);
@@ -201,17 +205,24 @@ export class SignUpComponent {
       return;
     }
 
-    const result = this.auth.signUp({
-      email: this.email,
-      password: this.password,
-      dateOfBirth: `${this.year}-${this.month.padStart(2, '0')}-${this.day.padStart(2, '0')}`
-    });
-    if (!result.success) {
-      this.emailError.set('An account with this email already exists.');
-      return;
+    this.isSubmitting.set(true);
+    try {
+      await firstValueFrom(this.auth.signUp({
+        email: this.email,
+        password: this.password,
+        dateOfBirth: `${this.year}-${this.month.padStart(2, '0')}-${this.day.padStart(2, '0')}`
+      }));
+      void this.router.navigateByUrl('/home');
+    } catch (error: unknown) {
+      console.error('Failed to create account', error);
+      if (error instanceof HttpErrorResponse && error.status === 409) {
+        this.emailError.set('An account with this email already exists.');
+      } else {
+        this.emailError.set('Could not create your account. Please try again.');
+      }
+    } finally {
+      this.isSubmitting.set(false);
     }
-
-    void this.router.navigateByUrl('/home');
   }
 
   private updateDateOfBirthError(): void {

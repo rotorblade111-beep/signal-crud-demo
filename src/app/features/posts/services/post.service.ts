@@ -9,7 +9,7 @@ import { Post } from '../models/post.model';
 })
 export class PostService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+  private apiUrl = 'http://localhost:5093/posts';
 
   // 1. Declarative fetch converted automatically to a signal via toSignal()
   // This triggers automatically upon service creation without manual .subscribe() or guard flags.
@@ -53,7 +53,7 @@ export class PostService {
     );
   }
 
-  createPost(newPost: Post): Observable<Post> {
+  createPost(newPost: Omit<Post, 'id'>): Observable<Post> {
     return this.http.post<Post>(this.apiUrl, newPost).pipe(
       tap((createdPost) => {
         console.log('Post created:', createdPost);

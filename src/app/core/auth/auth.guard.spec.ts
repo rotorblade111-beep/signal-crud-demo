@@ -31,9 +31,9 @@ describe('authGuard', () => {
   });
 
   it('allows a signed-in user to navigate to protected post routes', async () => {
-    TestBed.inject(AuthService).signUp({
+    TestBed.inject(AuthService).currentUser.set({
+      id: 1,
       email: 'user@example.com',
-      password: 'password',
       dateOfBirth: '2000-01-01'
     });
     const router = TestBed.inject(Router);

@@ -1,6 +1,14 @@
-import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 
 export interface AuthUser {
+  id: number;
+  email: string;
+  dateOfBirth: string;
+}
+
+export interface SignUpRequest {
   email: string;
   password: string;
   dateOfBirth: string;
@@ -8,43 +16,24 @@ export interface AuthUser {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private users: AuthUser[] = [];
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = 'http://localhost:5093/auth';
   readonly currentUser = signal<AuthUser | null>(null);
 
-  signUp(user: AuthUser): { success: true } | { success: false; reason: 'exists' } {
-    const email = user.email.trim().toLocaleLowerCase();
-    if (this.users.some(existing => existing.email === email)) {
-      return { success: false, reason: 'exists' };
-    }
-
-    const registeredUser = { ...user, email };
-    this.users.push(registeredUser);
-    this.currentUser.set(registeredUser);
-    return { success: true };
-  }
-
-  logIn(username: string, password: string): boolean {
-    const email = username.trim().toLocaleLowerCase();
-    const user = this.users.find(candidate =>
-      candidate.email === email && candidate.password === password
+  signUp(user: SignUpRequest): Observable<AuthUser> {
+    return this.http.post<AuthUser>(`${this.apiUrl}/sign-up`, user).pipe(
+      tap(authUser => this.currentUser.set(authUser))
     );
-    if (!user) {
-      return false;
-    }
-
-    this.currentUser.set(user);
-    return true;
   }
 
-  resetPassword(email: string, newPassword: string): boolean {
-    const normalizedEmail = email.trim().toLocaleLowerCase();
-    const user = this.users.find(candidate => candidate.email === normalizedEmail);
-    if (!user) {
-      return false;
-    }
+  logIn(username: string, password: string): Observable<AuthUser> {
+    return this.http.post<AuthUser>(`${this.apiUrl}/login`, { username, password }).pipe(
+      tap(authUser => this.currentUser.set(authUser))
+    );
+  }
 
-    user.password = newPassword;
-    return true;
+  resetPassword(email: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/reset-password`, { email, newPassword });
   }
 
   logOut(): void {

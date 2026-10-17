@@ -15,7 +15,7 @@ import { PostInputModel } from '../post-input/post-input';
 export class AddPostComponent {
   private postService = inject(PostService);
   private router = inject(Router);
-  private createRequests = new Subject<{ id: number; title: string; body: string }>();
+  private createRequests = new Subject<{ title: string; body: string }>();
 
   postModel = signal<PostInputModel>({ title: '', body: '' });
   postForm = form(this.postModel, path => [
@@ -82,7 +82,6 @@ export class AddPostComponent {
     this.submitError.set(null);
 
     this.createRequests.next({
-      id: Date.now(),
       title: this.postModel().title,
       body: this.postModel().body
     });

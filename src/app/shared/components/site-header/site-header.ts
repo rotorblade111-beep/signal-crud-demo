@@ -29,6 +29,6 @@ export class SiteHeaderComponent {
 
   private isAuthenticationUrl(url: string): boolean {
     const path = url.split(/[?#]/, 1)[0];
-    return path === '/login' || path === '/sign-up';
+    return path === '/login' || path === '/sign-up' || path === '/reset-password';
   }
 }

@@ -23,7 +23,7 @@ describe('PostListComponent', () => {
     httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(PostListComponent);
     component = fixture.componentInstance;
-    httpTesting.expectOne('https://jsonplaceholder.typicode.com/posts').flush(posts);
+    httpTesting.expectOne('http://localhost:5093/posts').flush(posts);
     await fixture.whenStable();
   });
 
@@ -124,7 +124,7 @@ describe('PostListComponent', () => {
 
   it('executes deletion and updates the displayed post list', async () => {
     component.removePost(posts[0].id);
-    const request = httpTesting.expectOne('https://jsonplaceholder.typicode.com/posts/1');
+    const request = httpTesting.expectOne('http://localhost:5093/posts/1');
     expect(request.request.method).toBe('DELETE');
     request.flush({});
     await fixture.whenStable();
@@ -138,7 +138,7 @@ describe('PostListComponent', () => {
 
   it('reports deletion failures and leaves the post in the list', async () => {
     component.removePost(posts[0].id);
-    httpTesting.expectOne('https://jsonplaceholder.typicode.com/posts/1').flush(
+    httpTesting.expectOne('http://localhost:5093/posts/1').flush(
       { message: 'Unavailable' },
       { status: 500, statusText: 'Server Error' }
     );

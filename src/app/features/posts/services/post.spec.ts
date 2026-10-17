@@ -8,7 +8,7 @@ import { PostService } from './post.service';
 describe('PostService', () => {
   let service: PostService;
   let httpTesting: HttpTestingController;
-  const apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+  const apiUrl = 'http://localhost:5093/posts';
   const initialPost: Post = {
     id: 1,
     title: 'Original title',
@@ -64,10 +64,11 @@ describe('PostService', () => {
 
   it('creates and prepends a post containing both title and body', async () => {
     await flushInitialPosts();
-    service.createPost(initialPost).subscribe();
+    const newPost = { title: initialPost.title, body: initialPost.body };
+    service.createPost(newPost).subscribe();
     const request = httpTesting.expectOne(apiUrl);
     expect(request.request.method).toBe('POST');
-    expect(request.request.body).toEqual(initialPost);
+    expect(request.request.body).toEqual(newPost);
     request.flush(initialPost);
 
     expect(service.posts()).toEqual([initialPost]);

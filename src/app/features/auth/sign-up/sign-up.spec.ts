@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -5,15 +7,24 @@ import { SignUpComponent } from './sign-up';
 
 describe('SignUpComponent', () => {
   let fixture: ComponentFixture<SignUpComponent>;
+  let httpTesting: HttpTestingController;
+  const authUrl = 'http://localhost:5093/auth';
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SignUpComponent],
-      providers: [provideRouter([{ path: 'home', component: SignUpComponent }])]
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([{ path: 'home', component: SignUpComponent }])
+      ]
     }).compileComponents();
+    httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(SignUpComponent);
     fixture.detectChanges();
   });
+
+  afterEach(() => httpTesting.verify());
 
   it('calculates days per month including leap years and clears an invalid selected day', () => {
     const component = fixture.componentInstance;
@@ -242,17 +253,48 @@ describe('SignUpComponent', () => {
     const component = fixture.componentInstance;
     const router = TestBed.inject(Router);
     component.email = 'valid@example.com';
-    component.password = 'secret';
-    component.repeatedPassword = 'secret';
+    component.password = 'secure-secret';
+    component.repeatedPassword = 'secure-secret';
     component.updateMonth('2');
     component.day = '29';
     component.updateYear('2024');
 
-    component.signUp();
+    const signUp = component.signUp();
+    const request = httpTesting.expectOne(`${authUrl}/sign-up`);
+    expect(request.request.body).toEqual({
+      email: 'valid@example.com',
+      password: 'secure-secret',
+      dateOfBirth: '2024-02-29'
+    });
+    request.flush({ id: 5, email: 'valid@example.com', dateOfBirth: '2024-02-29' }, {
+      status: 201,
+      statusText: 'Created'
+    });
+    await signUp;
     await fixture.whenStable();
 
     expect(TestBed.inject(AuthService).currentUser()?.dateOfBirth).toBe('2024-02-29');
     expect(router.url).toBe('/home');
+  });
+
+  it('shows a duplicate account error returned by the backend', async () => {
+    const component = fixture.componentInstance;
+    component.email = 'valid@example.com';
+    component.password = 'secure-secret';
+    component.repeatedPassword = 'secure-secret';
+    component.updateYear('2002');
+    component.updateMonth('4');
+    component.day = '1';
+
+    const signUp = component.signUp();
+    httpTesting.expectOne(`${authUrl}/sign-up`).flush(
+      { title: 'Account already exists' },
+      { status: 409, statusText: 'Conflict' }
+    );
+    await signUp;
+
+    expect(component.emailError()).toContain('already exists');
+    expect(TestBed.inject(AuthService).currentUser()).toBeNull();
   });
 
   it('rejects mismatched passwords and invalid dates', () => {

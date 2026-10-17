@@ -5,7 +5,7 @@ import { provideRouter, Router } from '@angular/router';
 import { AddPostComponent } from './add-post';
 import { PostListComponent } from '../post-list/post-list';
 
-const apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+const apiUrl = 'http://localhost:5093/posts';
 
 describe('AddPostComponent', () => {
   let fixture: ComponentFixture<AddPostComponent>;

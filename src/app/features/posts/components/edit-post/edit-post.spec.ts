@@ -7,7 +7,7 @@ import { EditPostComponent } from './edit-post';
 import { PostListComponent } from '../post-list/post-list';
 import { Post } from '../../models/post.model';
 
-const apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+const apiUrl = 'http://localhost:5093/posts';
 const post: Post = {
   id: 7,
   title: 'Original title',
