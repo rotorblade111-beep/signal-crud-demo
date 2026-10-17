@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, startWith } from 'rxjs';
+import { firstValueFrom, filter, map, startWith } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
@@ -22,9 +22,13 @@ export class SiteHeaderComponent {
     { initialValue: this.isAuthenticationUrl(this.router.url) }
   );
 
-  logOut(): void {
-    this.auth.logOut();
-    void this.router.navigateByUrl('/login');
+  async logOut(): Promise<void> {
+    try {
+      await firstValueFrom(this.auth.logOut());
+      void this.router.navigateByUrl('/login');
+    } catch (error: unknown) {
+      console.error('Failed to log out', error);
+    }
   }
 
   private isAuthenticationUrl(url: string): boolean {

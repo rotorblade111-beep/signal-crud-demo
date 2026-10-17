@@ -29,7 +29,8 @@ describe('ResetPasswordComponent', () => {
       email: 'member@example.com',
       dateOfBirth: '2000-01-01'
     }, { status: 201, statusText: 'Created' });
-    auth.logOut();
+    auth.logOut().subscribe();
+    httpTesting.expectOne(`${authUrl}/logout`).flush(null);
     fixture = TestBed.createComponent(ResetPasswordComponent);
     fixture.detectChanges();
   });

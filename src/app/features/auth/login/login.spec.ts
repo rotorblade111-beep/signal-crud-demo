@@ -33,8 +33,6 @@ describe('LoginComponent', () => {
     httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(LoginComponent);
     fixture.detectChanges();
-    auth.currentUser.set(user);
-    auth.logOut();
   });
 
   afterEach(() => httpTesting.verify());
