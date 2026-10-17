@@ -31,11 +31,11 @@
             placeholder="you@example.com" />
           @if (signUpForm.email().touched() || submitted()) {
             @for (error of signUpForm.email().errors(); track error.kind) {
-              <span class="text-xs font-normal text-red-700">{{ error.message }}</span>
+              <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
             }
           }
           @if (emailError(); as error) {
-            <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
+            <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700" role="alert">{{ error }}</span>
           }
         </label>
 
@@ -51,7 +51,7 @@
             placeholder="Enter a password" />
           @if (signUpForm.password().touched() || submitted()) {
             @for (error of signUpForm.password().errors(); track error.kind) {
-            <span class="text-xs font-normal text-red-700">{{ error.message }}</span>
+            <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
             }
           }
         </label>
@@ -69,12 +69,12 @@
             placeholder="Enter your password again" />
           @if (signUpForm.repeatedPassword().touched() || submitted()) {
             @for (error of signUpForm.repeatedPassword().errors(); track error.kind) {
-              <span class="text-xs font-normal text-red-700">{{ error.message }}</span>
+              <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
             }
           }
           
           @if (repeatedPasswordError(); as error) {
-            <span class="text-xs font-normal text-red-700" role="alert">{{ error }}</span>
+            <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700" role="alert">{{ error }}</span>
           }
 
         </label>
@@ -102,16 +102,16 @@
             </select>
           </div>
           @if (shouldShowDateOfBirthFieldError(signUpForm.year().touched(), year) && signUpForm.year().getError('required')) {
-            <p class="mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.year().getError('required')?.message}}</p>
+            <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.year().getError('required')?.message}}</p>
           }
           @if (shouldShowDateOfBirthFieldError(signUpForm.month().touched(), month) && signUpForm.month().getError('required')) {
-            <p class="mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.month().getError('required')?.message}}</p>
+            <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.month().getError('required')?.message}}</p>
           }
           @if (shouldShowDayRequiredError(signUpForm.day().touched()) && signUpForm.day().getError('required')) {
-            <p class="mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.day().getError('required')?.message}}</p>
+            <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{signUpForm.day().getError('required')?.message}}</p>
           }
           @if (shouldShowDateOfBirthError()) {
-            <p class="mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ dateOfBirthError() }}</p>
+            <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ dateOfBirthError() }}</p>
           }
         </fieldset>
 

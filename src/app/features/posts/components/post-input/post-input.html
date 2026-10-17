@@ -8,7 +8,7 @@
     [formField]="fields().title"
     placeholder="Enter post title..." />
   @if ((fields().title().touched() || submitted()) && fields().title().getError('required')) {
-    <span class="text-xs font-normal text-red-700">{{ fields().title().getError('required')?.message }}</span>
+    <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ fields().title().getError('required')?.message }}</span>
   }
 </label>
 <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
@@ -21,6 +21,6 @@
     placeholder="Enter post body..."
     rows="6"></textarea>
   @if ((fields().body().touched() || submitted()) && fields().body().getError('required')) {
-    <span class="text-xs font-normal text-red-700">{{ fields().body().getError('required')?.message }}</span>
+    <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ fields().body().getError('required')?.message }}</span>
   }
 </label>
