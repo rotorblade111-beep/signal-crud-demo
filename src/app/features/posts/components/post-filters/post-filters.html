@@ -1,0 +1,56 @@
+<section class="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-4" role="search" aria-label="Filter posts">
+  <legend class="mb-2 text-sm font-semibold text-slate-700"> Search by Title or Body </legend>
+  <div class="grid gap-3 sm:grid-cols-2">
+    <input
+      type="search"
+      class="box-border w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-[0.95rem] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+      aria-label="Search post titles"
+      placeholder="Search titles..."
+      [value]="filters().title"
+      (input)="updateTextFilter('title', $any($event.target).value)" />
+    <input
+      type="search"
+      class="box-border w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-[0.95rem] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+      aria-label="Search post bodies"
+      placeholder="Search post bodies..."
+      [value]="filters().body"
+      (input)="updateTextFilter('body', $any($event.target).value)" />
+  </div>
+
+  <fieldset class="mt-4 border-0 p-0">
+    <legend class="mb-2 text-sm font-semibold text-slate-700"> Search by Date Creation</legend>
+    <div class="mb-2 flex justify-end">
+      @if (filters().createdFrom || filters().createdTo) {
+        <button
+          type="button"
+          class="cursor-pointer border-0 bg-transparent p-0 text-xs font-medium text-blue-700 hover:text-blue-900"
+          (click)="clearDateFilter()">
+          Clear date
+        </button>
+      }
+    </div>
+    <div class="grid gap-3 sm:grid-cols-2">
+      <label class="grid gap-1 text-xs font-medium text-slate-600">
+        <span>From</span>
+        <input
+          type="date"
+          class="box-border w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+          aria-label="Created from date"
+          [max]="filters().createdTo || null"
+          [value]="filters().createdFrom"
+          (input)="updateDateFilter('createdFrom', $any($event.target).value)" />
+      </label>
+      <label class="grid gap-1 text-xs font-medium text-slate-600">
+        <span>To</span>
+        <input
+          type="date"
+          class="box-border w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
+          aria-label="Created to date"
+          [min]="filters().createdFrom || null"
+          [value]="filters().createdTo"
+          (input)="updateDateFilter('createdTo', $any($event.target).value)" />
+      </label>
+    </div>
+    <p class="mb-0 mt-2 text-xs text-slate-500">Choose one date to match that day, or both dates for a range.</p>
+  </fieldset>
+</section>

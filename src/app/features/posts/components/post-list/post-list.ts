@@ -2,6 +2,7 @@ import { Component, effect, inject, computed, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
+import { PostFilters, PostFiltersComponent } from '../post-filters/post-filters';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Post } from '../../models/post.model';
 import { Subject, catchError, map, mergeMap, of } from 'rxjs';
@@ -10,7 +11,7 @@ import { Subject, catchError, map, mergeMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-post-list',
-  imports: [RouterLink, PostItemComponent],
+  imports: [RouterLink, PostFiltersComponent, PostItemComponent],
   templateUrl: './post-list.html',
 })
 export class PostListComponent  {
@@ -18,8 +19,7 @@ export class PostListComponent  {
   postService = inject(PostService);
   private router = inject(Router);
   private deleteRequests = new Subject<number>();
-  titleSearch = signal('');
-  bodySearch = signal('');
+  filters = signal<PostFilters>({ title: '', body: '', createdFrom: '', createdTo: '' });
   currentPage = signal(1);
   deleteError = signal<string | null>(null);
 
@@ -42,12 +42,14 @@ export class PostListComponent  {
 
   postCount = computed(() => this.postList().length);
   filteredPosts = computed(() => {
-    const titleQuery = this.titleSearch().trim().toLocaleLowerCase();
-    const bodyQuery = this.bodySearch().trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+    const { title, body, createdFrom, createdTo } = this.filters();
+    const titleQuery = title.trim().toLocaleLowerCase();
+    const bodyQuery = body.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 
     return this.postList().filter(post =>
       post.title.toLocaleLowerCase().includes(titleQuery) &&
-      post.body.replace(/\s+/g, ' ').toLocaleLowerCase().includes(bodyQuery)
+      post.body.replace(/\s+/g, ' ').toLocaleLowerCase().includes(bodyQuery) &&
+      this.matchesCreatedDate(post.createdAt, createdFrom, createdTo)
     );
   });
   totalPages = computed(() => Math.ceil(this.filteredPosts().length / this.pageSize));
@@ -80,13 +82,8 @@ export class PostListComponent  {
     this.deleteRequests.next(id);
   }
 
-  setTitleSearch(value: string): void {
-    this.titleSearch.set(value);
-    this.currentPage.set(1);
-  }
-
-  setBodySearch(value: string): void {
-    this.bodySearch.set(value);
+  setFilters(filters: PostFilters): void {
+    this.filters.set(filters);
     this.currentPage.set(1);
   }
 
@@ -94,5 +91,26 @@ export class PostListComponent  {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
     }
+  }
+
+  private matchesCreatedDate(createdAt: string, createdFrom: string, createdTo: string): boolean {
+    if (!createdFrom && !createdTo) {
+      return true;
+    }
+
+    const created = new Date(createdAt);
+    if (Number.isNaN(created.getTime())) {
+      return false;
+    }
+    const createdDate = [
+      created.getFullYear(),
+      String(created.getMonth() + 1).padStart(2, '0'),
+      String(created.getDate()).padStart(2, '0')
+    ].join('-');
+
+    if (createdFrom && createdTo) {
+      return createdDate >= createdFrom && createdDate <= createdTo;
+    }
+    return createdDate === (createdFrom || createdTo);
   }
 }

@@ -35,18 +35,44 @@ describe('PostListComponent', () => {
   });
 
   it('filters by title and body independently and combines both criteria', async () => {
-    component.titleSearch.set('alpha');
+    component.setFilters({ ...component.filters(), title: 'alpha' });
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([posts[0]]);
 
-    component.titleSearch.set('');
-    component.bodySearch.set('BLUE OCEAN');
+    component.setFilters({ ...component.filters(), title: '', body: 'BLUE OCEAN' });
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([posts[1]]);
 
-    component.titleSearch.set('alpha');
+    component.setFilters({ ...component.filters(), title: 'alpha' });
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([]);
+  });
+
+  it('filters a single created date as an exact calendar day', async () => {
+    component.setFilters({ ...component.filters(), createdFrom: '2026-10-18' });
+    await fixture.whenStable();
+
+    expect(component.filteredPosts()).toEqual([posts[0]]);
+
+    component.setFilters({ ...component.filters(), createdFrom: '', createdTo: '2026-10-17' });
+    await fixture.whenStable();
+    expect(component.filteredPosts()).toEqual([posts[1]]);
+  });
+
+  it('filters an inclusive created-date range and combines it with text filters', async () => {
+    component.setFilters({
+      ...component.filters(),
+      title: 'headline',
+      createdFrom: '2026-10-17',
+      createdTo: '2026-10-18'
+    });
+    await fixture.whenStable();
+
+    expect(component.filteredPosts()).toEqual(posts);
+
+    component.setFilters({ ...component.filters(), title: 'alpha' });
+    await fixture.whenStable();
+    expect(component.filteredPosts()).toEqual([posts[0]]);
   });
 
   it('matches body searches across line breaks and repeated whitespace', async () => {
@@ -58,9 +84,10 @@ describe('PostListComponent', () => {
     };
     component.postService.posts.set([multilinePost]);
 
-    component.setBodySearch(
-      'suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto'
-    );
+    component.setFilters({
+      ...component.filters(),
+      body: 'suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto'
+    });
     await fixture.whenStable();
 
     expect(component.filteredPosts()).toEqual([multilinePost]);
@@ -102,7 +129,7 @@ describe('PostListComponent', () => {
     await fixture.whenStable();
     component.goToPage(8);
 
-    component.setBodySearch('needle');
+    component.setFilters({ ...component.filters(), body: 'needle' });
 
     expect(component.currentPage()).toBe(1);
     expect(component.totalPages()).toBe(1);

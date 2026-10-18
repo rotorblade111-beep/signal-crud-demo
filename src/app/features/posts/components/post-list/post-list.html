@@ -16,24 +16,9 @@
   @if (deleteError(); as error) {
     <p class="mb-4 mt-0 text-sm text-red-700" role="alert">{{ error }}</p>
   }
-  <h1 #hover class="text-xl font-semibold">Post List</h1>
+  <app-post-filters [filters]="filters()" (filtersChange)="setFilters($event)" />
+  <h1 #hover class="text-xl font-semibold mb-4">Post List</h1>
   @defer (on hover(hover)) {
-  <div class="mb-4 grid gap-3 sm:grid-cols-2" role="search" aria-label="Filter posts">
-    <input
-      type="search"
-      class="box-border w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-[0.95rem] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
-      aria-label="Search post titles"
-      placeholder="Search titles..."
-      [value]="titleSearch()"
-      (input)="setTitleSearch($any($event.target).value)" />
-    <input
-      type="search"
-      class="box-border w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-[0.95rem] outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
-      aria-label="Search post bodies"
-      placeholder="Search post bodies..."
-      [value]="bodySearch()"
-      (input)="setBodySearch($any($event.target).value)" />
-  </div>
   <!-- Post List -->
   <ul class="m-0 flex list-none flex-col gap-3 p-0">
     @for (post of paginatedPosts(); track post.id) {
@@ -63,7 +48,7 @@
         @if (postList().length === 0) {
           No posts available.
         } @else {
-          No posts match these search terms.
+          No posts match these filters.
         }
       </li>
     }
