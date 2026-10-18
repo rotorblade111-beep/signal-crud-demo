@@ -49,7 +49,11 @@ describe('PostListComponent', () => {
   });
 
   it('filters a single created date as an exact calendar day', async () => {
-    component.setFilters({ ...component.filters(), createdFrom: '2026-10-18' });
+    component.setFilters({
+      ...component.filters(),
+      createdFrom: '2026-10-18',
+      createdTo: '2026-10-18'
+    });
     await fixture.whenStable();
 
     expect(component.filteredPosts()).toEqual([posts[0]]);
@@ -57,6 +61,17 @@ describe('PostListComponent', () => {
     component.setFilters({ ...component.filters(), createdFrom: '', createdTo: '2026-10-17' });
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([posts[1]]);
+  });
+
+  it('returns no results for an invalid date range', async () => {
+    component.setFilters({
+      ...component.filters(),
+      createdFrom: '2026-10-19',
+      createdTo: '2026-10-18'
+    });
+    await fixture.whenStable();
+
+    expect(component.filteredPosts()).toEqual([]);
   });
 
   it('filters an inclusive created-date range and combines it with text filters', async () => {

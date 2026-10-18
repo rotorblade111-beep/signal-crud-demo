@@ -30,27 +30,41 @@
       }
     </div>
     <div class="grid gap-3 sm:grid-cols-2">
-      <label class="grid gap-1 text-xs font-medium text-slate-600">
-        <span>From</span>
+           <label class="grid gap-1 text-xs font-medium text-slate-600">
+        <span>Start date</span>
         <input
           type="date"
           class="box-border w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
-          aria-label="Created from date"
+          [class.!border-red-500]="dateRangeError()"
+          [class.!ring-4]="dateRangeError()"
+          [class.!ring-red-500/15]="dateRangeError()"
+          aria-label="Created start date"
+          [attr.aria-invalid]="dateRangeError() ? 'true' : null"
+          [attr.aria-describedby]="dateRangeError() ? 'created-date-range-error' : null"
           [max]="filters().createdTo || null"
           [value]="filters().createdFrom"
           (input)="updateDateFilter('createdFrom', $any($event.target).value)" />
       </label>
       <label class="grid gap-1 text-xs font-medium text-slate-600">
-        <span>To</span>
+        <span>End date</span>
         <input
           type="date"
           class="box-border w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
-          aria-label="Created to date"
+          [class.!border-red-500]="dateRangeError()"
+          [class.!ring-4]="dateRangeError()"
+          [class.!ring-red-500/15]="dateRangeError()"
+          aria-label="Created end date"
+          [attr.aria-invalid]="dateRangeError() ? 'true' : null"
+          [attr.aria-describedby]="dateRangeError() ? 'created-date-range-error' : null"
           [min]="filters().createdFrom || null"
           [value]="filters().createdTo"
           (input)="updateDateFilter('createdTo', $any($event.target).value)" />
       </label>
     </div>
-    <p class="mb-0 mt-2 text-xs text-slate-500">Choose one date to match that day, or both dates for a range.</p>
+    @if (dateRangeError(); as error) {
+      <p id="created-date-range-error" class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ error }}</p>
+    } @else {
+      <p class="mb-0 mt-2 text-xs text-slate-500">Choose the same date twice to find posts from one day, or set an end and start date for a range.</p>
+    }
   </fieldset>
 </section>
