@@ -12,7 +12,8 @@ describe('PostService', () => {
   const initialPost: Post = {
     id: 1,
     title: 'Original title',
-    body: 'Original body'
+    body: 'Original body',
+    createdAt: '2026-10-18T10:30:00+00:00'
   };
 
   beforeEach(() => {

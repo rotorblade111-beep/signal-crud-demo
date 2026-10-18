@@ -10,8 +10,8 @@ describe('PostListComponent', () => {
   let fixture: ComponentFixture<PostListComponent>;
   let httpTesting: HttpTestingController;
   const posts: Post[] = [
-    { id: 1, title: 'Alpha headline', body: 'Red apples in this body' },
-    { id: 2, title: 'Beta headline', body: 'Blue ocean in this body' }
+    { id: 1, title: 'Alpha headline', body: 'Red apples in this body', createdAt: '2026-10-18T10:30:00+00:00' },
+    { id: 2, title: 'Beta headline', body: 'Blue ocean in this body', createdAt: '2026-10-17T10:30:00+00:00' }
   ];
 
   beforeEach(async () => {
@@ -53,7 +53,8 @@ describe('PostListComponent', () => {
     const multilinePost: Post = {
       id: 3,
       title: 'Multiline post',
-      body: 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+      body: 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto',
+      createdAt: '2026-10-16T10:30:00+00:00'
     };
     component.postService.posts.set([multilinePost]);
 
@@ -69,7 +70,8 @@ describe('PostListComponent', () => {
     const hundredPosts = Array.from({ length: 100 }, (_, index) => ({
       id: index + 1,
       title: `Post ${index + 1}`,
-      body: `Body ${index + 1}`
+      body: `Body ${index + 1}`,
+      createdAt: '2026-10-18T10:30:00+00:00'
     }));
     component.postService.posts.set(hundredPosts);
     await fixture.whenStable();
@@ -93,7 +95,8 @@ describe('PostListComponent', () => {
     const hundredPosts = Array.from({ length: 100 }, (_, index) => ({
       id: index + 1,
       title: `Post ${index + 1}`,
-      body: index === 75 ? 'needle in body' : `Body ${index + 1}`
+      body: index === 75 ? 'needle in body' : `Body ${index + 1}`,
+      createdAt: '2026-10-18T10:30:00+00:00'
     }));
     component.postService.posts.set(hundredPosts);
     await fixture.whenStable();
@@ -110,7 +113,8 @@ describe('PostListComponent', () => {
     const hundredPosts = Array.from({ length: 100 }, (_, index) => ({
       id: index + 1,
       title: `Post ${index + 1}`,
-      body: `Body ${index + 1}`
+      body: `Body ${index + 1}`,
+      createdAt: '2026-10-18T10:30:00+00:00'
     }));
     component.postService.posts.set(hundredPosts);
     await fixture.whenStable();

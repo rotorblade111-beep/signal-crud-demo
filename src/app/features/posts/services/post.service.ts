@@ -53,7 +53,7 @@ export class PostService {
     );
   }
 
-  createPost(newPost: Omit<Post, 'id'>): Observable<Post> {
+  createPost(newPost: Omit<Post, 'id' | 'createdAt'>): Observable<Post> {
     return this.http.post<Post>(this.apiUrl, newPost).pipe(
       tap((createdPost) => {
         console.log('Post created:', createdPost);

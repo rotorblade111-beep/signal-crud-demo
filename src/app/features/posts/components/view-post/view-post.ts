@@ -17,14 +17,16 @@ function postFromRouterState(state: unknown): ViewPostRouteData['post'] {
     !('id' in post) ||
     !('title' in post) ||
     !('body' in post) ||
+    !('createdAt' in post) ||
     typeof post.id !== 'number' ||
     typeof post.title !== 'string' ||
-    typeof post.body !== 'string'
+    typeof post.body !== 'string' ||
+    typeof post.createdAt !== 'string'
   ) {
     return null;
   }
 
-  return { id: post.id, title: post.title, body: post.body };
+  return { id: post.id, title: post.title, body: post.body, createdAt: post.createdAt };
 }
 
 @Component({

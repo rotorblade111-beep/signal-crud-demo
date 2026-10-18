@@ -7,6 +7,11 @@
         class="text-inherit no-underline hover:text-blue-700 hover:underline">
         <span class="mr-2 text-[0.85rem] font-normal text-slate-400">#{{ post().id }}</span>{{ titleDisplay() }}
       </a>
+      <time
+        [attr.datetime]="post().createdAt"
+        class="ml-2 text-xs font-normal text-slate-500">
+        {{ post().createdAt | date: 'mediumDate' }}
+      </time>
     </h2>
     <p class="mb-0 mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-600">{{ post().body }}</p>
   </div>

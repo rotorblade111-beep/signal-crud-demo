@@ -8,7 +8,8 @@ import { ViewPostComponent } from './view-post';
 const post: Post = {
   id: 7,
   title: 'A useful post title',
-  body: 'Post body content for search previews.'
+  body: 'Post body content for search previews.',
+  createdAt: '2026-10-18T10:30:00+00:00'
 };
 
 describe('ViewPostComponent', () => {

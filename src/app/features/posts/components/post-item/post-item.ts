@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, computed, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Post } from '../../models/post.model';
@@ -6,7 +7,7 @@ import { ConfirmationComponent } from '../../../../shared/components/confirmatio
 @Component({
   selector: 'app-post-item',
   standalone: true,
-  imports: [RouterLink, ConfirmationComponent],
+  imports: [DatePipe, RouterLink, ConfirmationComponent],
   templateUrl: './post-item.html'
 })
 export class PostItemComponent {

@@ -21,14 +21,16 @@ function postFromRouterState(state: unknown): Post | null {
     !('id' in post) ||
     !('title' in post) ||
     !('body' in post) ||
+    !('createdAt' in post) ||
     typeof post.id !== 'number' ||
     typeof post.title !== 'string' ||
-    typeof post.body !== 'string'
+    typeof post.body !== 'string' ||
+    typeof post.createdAt !== 'string'
   ) {
     return null;
   }
 
-  return { id: post.id, title: post.title, body: post.body };
+  return { id: post.id, title: post.title, body: post.body, createdAt: post.createdAt };
 }
 
 type PostResult =
@@ -46,7 +48,7 @@ export class EditPostComponent {
   private router = inject(Router);
   private location = inject(Location);
   private postService = inject(PostService);
-  private saveRequests = new Subject<Post>();
+  private saveRequests = new Subject<Pick<Post, 'id' | 'title' | 'body'>>();
 
   post = signal<Post | null>(null);
   postModel = signal<PostInputModel>({ title: '', body: '' });

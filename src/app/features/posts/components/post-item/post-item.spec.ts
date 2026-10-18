@@ -10,7 +10,8 @@ describe('PostItemComponent', () => {
   const post: Post = {
     id: 1,
     title: 'A post title',
-    body: 'A post body'
+    body: 'A post body',
+    createdAt: '2026-10-18T10:30:00+00:00'
   };
 
   beforeEach(async () => {
@@ -28,6 +29,13 @@ describe('PostItemComponent', () => {
   it('renders the post title and body', () => {
     expect(fixture.nativeElement.textContent).toContain('A post title');
     expect(fixture.nativeElement.textContent).toContain('A post body');
+  });
+
+  it('shows the post creation date beside the title', () => {
+    const date = fixture.nativeElement.querySelector('time') as HTMLTimeElement;
+
+    expect(date.getAttribute('datetime')).toBe(post.createdAt);
+    expect(date.textContent.trim()).toBe('Oct 18, 2026');
   });
 
   it('passes the full post in router state when opening the detail page', () => {

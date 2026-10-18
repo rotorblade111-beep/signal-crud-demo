@@ -11,7 +11,8 @@ const apiUrl = 'http://localhost:5093/posts';
 const post: Post = {
   id: 7,
   title: 'Original title',
-  body: 'Original body stays unchanged'
+  body: 'Original body stays unchanged',
+  createdAt: '2026-10-18T10:30:00+00:00'
 };
 
 describe('EditPostComponent', () => {
