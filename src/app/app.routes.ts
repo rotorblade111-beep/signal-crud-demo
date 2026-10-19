@@ -1,56 +1,10 @@
-import { inject } from '@angular/core';
-import { ResolveFn, Routes } from '@angular/router';
-import { catchError, map, of } from 'rxjs';
+import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
-import { Post } from './features/posts/models/post.model';
-import { PostService } from './features/posts/services/post.service';
-
-export interface RouteSeoData {
-  title: string;
-  description: string;
-  type: string;
-}
-
-export interface ViewPostRouteData extends RouteSeoData {
-  post: Post | null;
-  errorMessage: string | null;
-}
+import { viewPostResolver } from './core/resolvers/view-post.resolver';
 
 const siteDescription = 'Browse and manage posts in the Signal CRUD Demo.';
 
-const viewPostResolver: ResolveFn<ViewPostRouteData> = route => {
-  const id = Number(route.paramMap.get('id'));
-  if (!Number.isSafeInteger(id) || id <= 0) {
-    return of({
-      title: 'Post unavailable | Posthub',
-      description: 'The requested post could not be found.',
-      type: 'article',
-      post: null,
-      errorMessage: 'The requested post ID is invalid.'
-    });
-  }
 
-  return inject(PostService).getPost(id).pipe(
-    map(post => ({
-      title: `${post.title} | Posthub`,
-      description: post.body.replace(/\s+/g, ' ').trim().slice(0, 160)
-        || `Read post ${post.id} in Posthub.`,
-      type: 'article',
-      post,
-      errorMessage: null
-    })),
-    catchError((error: unknown) => {
-      console.error('Failed to resolve post metadata', error);
-      return of({
-        title: 'Post unavailable | Posthub',
-        description: 'The requested post could not be loaded.',
-        type: 'article',
-        post: null,
-        errorMessage: 'Could not load this post. Please return to the post list.'
-      });
-    })
-  );
-};
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -91,7 +45,7 @@ export const routes: Routes = [
     path: 'view-post/:id',
     loadComponent: () => import('./features/posts/components/view-post/view-post').then(m => m.ViewPostComponent),
     canActivate: [authGuard],
-    resolve: { seo: viewPostResolver }
+    resolve: { seo: viewPostResolver },
   },
   { path: '**', redirectTo: '/home' },
 ];
