@@ -15,6 +15,7 @@ export interface PostFilters {
 export class PostFiltersComponent {
   filters = input.required<PostFilters>();
   filtersChange = output<PostFilters>();
+  search = output<void>();
   dateRangeError = computed(() => {
     const { createdFrom, createdTo } = this.filters();
     return createdFrom && createdTo && createdFrom > createdTo
@@ -32,5 +33,11 @@ export class PostFiltersComponent {
 
   clearDateFilter(): void {
     this.filtersChange.emit({ ...this.filters(), createdFrom: '', createdTo: '' });
+  }
+
+  searchPosts(): void {
+    if (!this.dateRangeError()) {
+      this.search.emit();
+    }
   }
 }

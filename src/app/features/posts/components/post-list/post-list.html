@@ -16,7 +16,10 @@
   @if (deleteError(); as error) {
     <p class="mb-4 mt-0 text-sm text-red-700" role="alert">{{ error }}</p>
   }
-  <app-post-filters [filters]="filters()" (filtersChange)="setFilters($event)" />
+  <app-post-filters
+    [filters]="filterDraft()"
+    (filtersChange)="setFilterDraft($event)"
+    (search)="applyFilters()" />
   <h1 #hover class="text-xl font-semibold mb-4">Post List</h1>
   @defer (on hover(hover)) {
   <!-- Post List -->

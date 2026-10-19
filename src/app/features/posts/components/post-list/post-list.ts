@@ -19,6 +19,7 @@ export class PostListComponent  {
   postService = inject(PostService);
   private router = inject(Router);
   private deleteRequests = new Subject<number>();
+  filterDraft = signal<PostFilters>({ title: '', body: '', createdFrom: '', createdTo: '' });
   filters = signal<PostFilters>({ title: '', body: '', createdFrom: '', createdTo: '' });
   currentPage = signal(1);
   deleteError = signal<string | null>(null);
@@ -82,8 +83,12 @@ export class PostListComponent  {
     this.deleteRequests.next(id);
   }
 
-  setFilters(filters: PostFilters): void {
-    this.filters.set(filters);
+  setFilterDraft(filters: PostFilters): void {
+    this.filterDraft.set(filters);
+  }
+
+  applyFilters(): void {
+    this.filters.set(this.filterDraft());
     this.currentPage.set(1);
   }
 

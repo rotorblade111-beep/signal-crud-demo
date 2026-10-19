@@ -32,6 +32,18 @@ describe('PostFiltersComponent', () => {
     expect(filtersChange).toHaveBeenNthCalledWith(2, { ...filters, body: 'signals' });
   });
 
+  it('applies filters only when Search is clicked', () => {
+    const search = vi.fn();
+    component.search.subscribe(search);
+    component.updateTextFilter('title', 'angular');
+
+    expect(search).not.toHaveBeenCalled();
+
+    fixture.nativeElement.querySelector('button[type="button"]:last-child').click();
+
+    expect(search).toHaveBeenCalledOnce();
+  });
+
   it('provides two date pickers and explains how to select a single date or range', () => {
     const end = fixture.nativeElement.querySelector(
       'input[aria-label="Created end date"]'
@@ -49,7 +61,9 @@ describe('PostFiltersComponent', () => {
 
   it('reports a range error instead of silently changing an invalid date', () => {
     const filtersChange = vi.fn();
+    const search = vi.fn();
     component.filtersChange.subscribe(filtersChange);
+    component.search.subscribe(search);
     fixture.componentRef.setInput('filters', {
       ...filters,
       createdFrom: '2026-10-20',
@@ -70,6 +84,9 @@ describe('PostFiltersComponent', () => {
     expect(fixture.nativeElement.textContent).toContain(component.dateRangeError());
     expect(start.getAttribute('aria-invalid')).toBe('true');
     expect(end.getAttribute('aria-invalid')).toBe('true');
+
+    fixture.nativeElement.querySelector('button[type="button"]:last-child').click();
+    expect(search).not.toHaveBeenCalled();
 
     component.updateDateFilter('createdFrom', '2026-10-25');
 

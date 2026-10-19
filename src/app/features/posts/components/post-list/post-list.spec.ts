@@ -35,57 +35,78 @@ describe('PostListComponent', () => {
   });
 
   it('filters by title and body independently and combines both criteria', async () => {
-    component.setFilters({ ...component.filters(), title: 'alpha' });
+    component.setFilterDraft({ ...component.filterDraft(), title: 'alpha' });
+    component.applyFilters();
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([posts[0]]);
 
-    component.setFilters({ ...component.filters(), title: '', body: 'BLUE OCEAN' });
+    component.setFilterDraft({ ...component.filterDraft(), title: '', body: 'BLUE OCEAN' });
+    component.applyFilters();
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([posts[1]]);
 
-    component.setFilters({ ...component.filters(), title: 'alpha' });
+    component.setFilterDraft({ ...component.filterDraft(), title: 'alpha' });
+    component.applyFilters();
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([]);
   });
 
+  it('does not change results until the search action is applied', async () => {
+    component.setFilterDraft({ ...component.filterDraft(), title: 'alpha' });
+    await fixture.whenStable();
+
+    expect(component.filters().title).toBe('');
+    expect(component.filteredPosts()).toEqual(posts);
+
+    component.applyFilters();
+
+    expect(component.filters().title).toBe('alpha');
+    expect(component.filteredPosts()).toEqual([posts[0]]);
+  });
+
   it('filters a single created date as an exact calendar day', async () => {
-    component.setFilters({
-      ...component.filters(),
+    component.setFilterDraft({
+      ...component.filterDraft(),
       createdFrom: '2026-10-18',
       createdTo: '2026-10-18'
     });
+    component.applyFilters();
     await fixture.whenStable();
 
     expect(component.filteredPosts()).toEqual([posts[0]]);
 
-    component.setFilters({ ...component.filters(), createdFrom: '', createdTo: '2026-10-17' });
+    component.setFilterDraft({ ...component.filterDraft(), createdFrom: '', createdTo: '2026-10-17' });
+    component.applyFilters();
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([posts[1]]);
   });
 
   it('returns no results for an invalid date range', async () => {
-    component.setFilters({
-      ...component.filters(),
+    component.setFilterDraft({
+      ...component.filterDraft(),
       createdFrom: '2026-10-19',
       createdTo: '2026-10-18'
     });
+    component.applyFilters();
     await fixture.whenStable();
 
     expect(component.filteredPosts()).toEqual([]);
   });
 
   it('filters an inclusive created-date range and combines it with text filters', async () => {
-    component.setFilters({
-      ...component.filters(),
+    component.setFilterDraft({
+      ...component.filterDraft(),
       title: 'headline',
       createdFrom: '2026-10-17',
       createdTo: '2026-10-18'
     });
+    component.applyFilters();
     await fixture.whenStable();
 
     expect(component.filteredPosts()).toEqual(posts);
 
-    component.setFilters({ ...component.filters(), title: 'alpha' });
+    component.setFilterDraft({ ...component.filterDraft(), title: 'alpha' });
+    component.applyFilters();
     await fixture.whenStable();
     expect(component.filteredPosts()).toEqual([posts[0]]);
   });
@@ -99,10 +120,11 @@ describe('PostListComponent', () => {
     };
     component.postService.posts.set([multilinePost]);
 
-    component.setFilters({
-      ...component.filters(),
+    component.setFilterDraft({
+      ...component.filterDraft(),
       body: 'suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto'
     });
+    component.applyFilters();
     await fixture.whenStable();
 
     expect(component.filteredPosts()).toEqual([multilinePost]);
@@ -144,7 +166,8 @@ describe('PostListComponent', () => {
     await fixture.whenStable();
     component.goToPage(8);
 
-    component.setFilters({ ...component.filters(), body: 'needle' });
+    component.setFilterDraft({ ...component.filterDraft(), body: 'needle' });
+    component.applyFilters();
 
     expect(component.currentPage()).toBe(1);
     expect(component.totalPages()).toBe(1);
