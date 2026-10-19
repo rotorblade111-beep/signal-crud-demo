@@ -3,7 +3,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import { ViewPostRouteData } from '../../../../app.routes';
+import { ViewPostRouteData } from '../../../../core/models/seo.model';
 
 function postFromRouterState(state: unknown): ViewPostRouteData['post'] {
   if (!state || typeof state !== 'object' || !('post' in state)) {

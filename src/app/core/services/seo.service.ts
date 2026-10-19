@@ -3,7 +3,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
-import { RouteSeoData } from '../../app.routes'; // Adjust path to match your project structure
+import { RouteSeoData } from '../models/seo.model'; 
 
 @Injectable({
   providedIn: 'root',

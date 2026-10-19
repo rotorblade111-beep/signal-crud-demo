@@ -4,8 +4,6 @@ import { viewPostResolver } from './core/resolvers/view-post.resolver';
 
 const siteDescription = 'Browse and manage posts in the Signal CRUD Demo.';
 
-
-
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
