@@ -29,7 +29,7 @@ export class PostListComponent  {
       mergeMap(id => this.postService.deletePost(id).pipe(
         map(() => ({ success: true as const })),
         catchError((error: unknown) => {
-          console.error(`Failed to delete post ${id}`, error);
+          this.deleteError.set('Could not delete the post. Please try again.');
           return of({ success: false as const });
         })
       ))
@@ -62,17 +62,6 @@ export class PostListComponent  {
     const start = (this.displayedPage() - 1) * this.pageSize;
     return this.filteredPosts().slice(start, start + this.pageSize);
   });
-
-  constructor() {
-    effect(() => {
-      const result = this.deleteResult();
-      if (result) {
-        this.deleteError.set(
-          result.success ? null : 'Could not delete the post. Please try again.'
-        );
-      }
-    });
-  }
 
   editPost(post: Post): void {
     void this.router.navigate(['/edit-post', post.id], { state: { post } });
