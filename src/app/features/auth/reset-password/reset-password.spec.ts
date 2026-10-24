@@ -25,9 +25,13 @@ describe('ResetPasswordComponent', () => {
       dateOfBirth: '2000-01-01'
     }).subscribe();
     httpTesting.expectOne(`${authUrl}/sign-up`).flush({
-      id: 3,
-      email: 'member@example.com',
-      dateOfBirth: '2000-01-01'
+      user: {
+        id: 3,
+        email: 'member@example.com',
+        dateOfBirth: '2000-01-01'
+      },
+      accessToken: 'signed-access-token',
+      accessTokenExpiresAt: '2026-10-18T10:15:00+00:00'
     }, { status: 201, statusText: 'Created' });
     auth.logOut().subscribe();
     httpTesting.expectOne(`${authUrl}/logout`).flush(null);

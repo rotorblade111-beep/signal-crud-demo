@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
-import { AuthService, AuthUser } from '../../../core/auth/auth.service';
+import { AuthService, AuthTokenResponse, AuthUser } from '../../../core/auth/auth.service';
 import { LoginComponent } from './login';
 
 describe('LoginComponent', () => {
@@ -14,6 +14,11 @@ describe('LoginComponent', () => {
     id: 1,
     email: 'member@example.com',
     dateOfBirth: '2000-01-01'
+  };
+  const tokens: AuthTokenResponse = {
+    user,
+    accessToken: 'signed-access-token',
+    accessTokenExpiresAt: '2026-10-18T10:15:00+00:00'
   };
 
   beforeEach(async () => {
@@ -52,7 +57,7 @@ describe('LoginComponent', () => {
 
     component.password = 'correct';
     const successfulLogin = component.logIn();
-    httpTesting.expectOne(`${authUrl}/login`).flush(user);
+    httpTesting.expectOne(`${authUrl}/login`).flush(tokens);
     await successfulLogin;
     await fixture.whenStable();
     expect(auth.currentUser()?.email).toBe('member@example.com');

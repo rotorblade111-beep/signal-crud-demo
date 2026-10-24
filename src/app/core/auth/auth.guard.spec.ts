@@ -40,7 +40,7 @@ describe('authGuard', () => {
     );
     expect(guardResult).toBeInstanceOf(Observable);
     const resolvedGuard = firstValueFrom(guardResult as Observable<boolean | UrlTree>);
-    httpTesting.expectOne('http://localhost:5093/auth/session').flush(
+    httpTesting.expectOne('http://localhost:5093/auth/refresh').flush(
       { title: 'Unauthorized' },
       { status: 401, statusText: 'Unauthorized' }
     );
@@ -60,6 +60,6 @@ describe('authGuard', () => {
       authGuard({} as ActivatedRouteSnapshot, { url: '/view-post/12' } as RouterStateSnapshot)
     );
     expect(result).toBe(true);
-    httpTesting.expectNone('http://localhost:5093/auth/session');
+    httpTesting.expectNone('http://localhost:5093/auth/refresh');
   });
 });

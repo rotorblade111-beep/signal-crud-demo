@@ -2,13 +2,23 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
-import { AuthService } from '../../../core/auth/auth.service';
+import { AuthService, AuthUser } from '../../../core/auth/auth.service';
 import { SignUpComponent } from './sign-up';
 
 describe('SignUpComponent', () => {
   let fixture: ComponentFixture<SignUpComponent>;
   let httpTesting: HttpTestingController;
   const authUrl = 'http://localhost:5093/auth';
+  const user: AuthUser = {
+    id: 5,
+    email: 'valid@example.com',
+    dateOfBirth: '2024-02-29'
+  };
+  const tokens = {
+    user,
+    accessToken: 'signed-access-token',
+    accessTokenExpiresAt: '2026-10-18T10:15:00+00:00'
+  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -266,7 +276,7 @@ describe('SignUpComponent', () => {
       password: 'secure-secret',
       dateOfBirth: '2024-02-29'
     });
-    request.flush({ id: 5, email: 'valid@example.com', dateOfBirth: '2024-02-29' }, {
+    request.flush(tokens, {
       status: 201,
       statusText: 'Created'
     });
