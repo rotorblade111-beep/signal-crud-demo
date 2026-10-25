@@ -58,13 +58,18 @@
   </ul>
   @if (totalPages() > 1) {
     <nav class="mt-5 flex flex-wrap items-center justify-center gap-2" aria-label="Post list pages">
-      <button
-        type="button"
-        class="cursor-pointer rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-        [disabled]="displayedPage() === 1"
-        (click)="goToPage(displayedPage() - 1)">
-        Previous
-      </button>
+      <app-tooltip
+        [text]="previousTooltipText()"
+        [disabled]="!isPreviousDisabled()"
+        position="top">
+        <button
+          type="button"
+          class="cursor-pointer rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+          [disabled]="isPreviousDisabled()"
+          (click)="goToPage(displayedPage() - 1)">
+          Previous
+        </button>
+      </app-tooltip>
       @for (page of pageNumbers(); track page) {
         <button
           type="button"
@@ -79,13 +84,18 @@
           {{ page }}
         </button>
       }
-      <button
-        type="button"
-        class="cursor-pointer rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-        [disabled]="displayedPage() === totalPages()"
-        (click)="goToPage(displayedPage() + 1)">
-        Next
-      </button>
+      <app-tooltip
+        [text]="nextTooltipText()"
+        [disabled]="!isNextDisabled()"
+        position="top">
+        <button
+          type="button"
+          class="cursor-pointer rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+          [disabled]="isNextDisabled()"
+          (click)="goToPage(displayedPage() + 1)">
+          Next
+        </button>
+      </app-tooltip>
     </nav>
   }
 

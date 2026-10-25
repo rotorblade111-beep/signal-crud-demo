@@ -228,4 +228,89 @@ describe('PostListComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['/edit-post', 2], { state: { post: posts[1] } });
   });
 
+  it('displays tooltip on the disabled Previous button on page 1 and on the disabled Next button on the last page', async () => {
+    const originalIntersectionObserver = globalThis.IntersectionObserver;
+    if (!globalThis.IntersectionObserver) {
+      globalThis.IntersectionObserver = class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      } as unknown as typeof IntersectionObserver;
+    }
+
+    const thirtyPosts = Array.from({ length: 30 }, (_, index) => ({
+      id: index + 1,
+      title: `Post ${index + 1}`,
+      body: `Body ${index + 1}`,
+      createdAt: '2026-10-18T10:30:00+00:00'
+    }));
+    component.postService.posts.set(thirtyPosts);
+    await fixture.whenStable();
+    const hoverHeading = fixture.nativeElement.querySelector('h1');
+    hoverHeading?.dispatchEvent(new MouseEvent('mouseenter'));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(component.totalPages()).toBe(3);
+    expect(component.displayedPage()).toBe(1);
+    expect(component.isPreviousDisabled()).toBe(true);
+    expect(component.isNextDisabled()).toBe(false);
+
+    const tooltips = fixture.nativeElement.querySelectorAll('app-tooltip');
+    expect(tooltips.length).toBe(2);
+
+    const prevTooltip = tooltips[0];
+    const nextTooltip = tooltips[1];
+
+    prevTooltip.dispatchEvent(new MouseEvent('mouseenter'));
+    fixture.detectChanges();
+
+    let prevTooltipEl = prevTooltip.querySelector('[role="tooltip"]');
+    expect(prevTooltipEl).not.toBeNull();
+    expect(prevTooltipEl?.textContent).toContain(
+      'No previous pages to paginate to due to the page number being invalid'
+    );
+
+    nextTooltip.dispatchEvent(new MouseEvent('mouseenter'));
+    fixture.detectChanges();
+    let nextTooltipEl = nextTooltip.querySelector('[role="tooltip"]');
+    expect(nextTooltipEl).toBeNull();
+
+    prevTooltip.dispatchEvent(new MouseEvent('mouseleave'));
+    component.goToPage(2);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.displayedPage()).toBe(2);
+    expect(component.isPreviousDisabled()).toBe(false);
+    expect(component.isNextDisabled()).toBe(false);
+
+    prevTooltip.dispatchEvent(new MouseEvent('mouseenter'));
+    nextTooltip.dispatchEvent(new MouseEvent('mouseenter'));
+    fixture.detectChanges();
+
+    expect(prevTooltip.querySelector('[role="tooltip"]')).toBeNull();
+    expect(nextTooltip.querySelector('[role="tooltip"]')).toBeNull();
+
+    prevTooltip.dispatchEvent(new MouseEvent('mouseleave'));
+    nextTooltip.dispatchEvent(new MouseEvent('mouseleave'));
+    component.goToPage(3);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.displayedPage()).toBe(3);
+    expect(component.isPreviousDisabled()).toBe(false);
+    expect(component.isNextDisabled()).toBe(true);
+
+    nextTooltip.dispatchEvent(new MouseEvent('mouseenter'));
+    fixture.detectChanges();
+
+    nextTooltipEl = nextTooltip.querySelector('[role="tooltip"]');
+    expect(nextTooltipEl).not.toBeNull();
+    expect(nextTooltipEl?.textContent).toContain(
+      'No next pages to paginate to due to the page number being invalid'
+    );
+    globalThis.IntersectionObserver = originalIntersectionObserver;
+  });
+
 });

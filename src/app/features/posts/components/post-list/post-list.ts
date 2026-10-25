@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
 import { PostFilters, PostFiltersComponent } from '../post-filters/post-filters';
+import { TooltipComponent } from '../../../../shared/components/tooltip/tooltip';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Post } from '../../models/post.model';
 import { Subject, catchError, map, mergeMap, of } from 'rxjs';
@@ -11,7 +12,7 @@ import { Subject, catchError, map, mergeMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-post-list',
-  imports: [RouterLink, PostFiltersComponent, PostItemComponent],
+  imports: [RouterLink, PostFiltersComponent, PostItemComponent, TooltipComponent],
   templateUrl: './post-list.html',
 })
 export class PostListComponent  {
@@ -62,6 +63,19 @@ export class PostListComponent  {
     const start = (this.displayedPage() - 1) * this.pageSize;
     return this.filteredPosts().slice(start, start + this.pageSize);
   });
+
+  isPreviousDisabled = computed(() => this.displayedPage() <= 1);
+  isNextDisabled = computed(() => this.displayedPage() >= this.totalPages());
+  previousTooltipText = computed(() =>
+    this.isPreviousDisabled()
+      ? 'No previous pages to paginate to due to the page number being invalid'
+      : ''
+  );
+  nextTooltipText = computed(() =>
+    this.isNextDisabled()
+      ? 'No next pages to paginate to due to the page number being invalid'
+      : ''
+  );
 
   editPost(post: Post): void {
     void this.router.navigate(['/edit-post', post.id], { state: { post } });

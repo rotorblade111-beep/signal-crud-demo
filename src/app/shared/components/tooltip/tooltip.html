@@ -1,0 +1,13 @@
+<ng-content />
+
+@if (isOpen()) {
+  <div
+    role="tooltip"
+    [id]="tooltipId"
+    [attr.aria-hidden]="!isOpen()"
+    [class]="tooltipClasses()">
+    {{ text() }}
+    <span [class]="arrowClasses()" aria-hidden="true"></span>
+  </div>
+}
+
