@@ -37,6 +37,17 @@ export class PostService {
   // loadPosts() method is no longer needed! 
   // toSignal() handles initialization and subscription lifecycle automatically.
 
+  getPaginatedPosts(offset: number, limit: number): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.apiUrl}?offset=${offset}&limit=${limit}`);
+  }
+
+  getPosts(offset?: number, limit?: number): Observable<Post[]> {
+    if (offset !== undefined && limit !== undefined) {
+      return this.getPaginatedPosts(offset, limit);
+    }
+    return this.http.get<Post[]>(this.apiUrl);
+  }
+
   getPost(id: number): Observable<Post> {
     const cachedPost = this.posts().find(post => post.id === id);
     if (cachedPost) {
