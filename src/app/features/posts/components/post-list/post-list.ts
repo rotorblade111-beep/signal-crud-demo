@@ -1,4 +1,4 @@
-import { Component, effect, inject, computed, signal, OnInit } from '@angular/core';
+import { Component, inject, computed, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
@@ -15,7 +15,7 @@ import { Subject, catchError, map, mergeMap, of, tap } from 'rxjs';
   imports: [RouterLink, PostFiltersComponent, PostItemComponent, TooltipComponent],
   templateUrl: './post-list.html',
 })
-export class PostListComponent implements OnInit {
+export class PostListComponent {
   serverPaginatedPosts = signal<Post[] | null>(null);
   readonly pageSize = 10;
   postService = inject(PostService);
@@ -30,9 +30,7 @@ export class PostListComponent implements OnInit {
     this.deleteRequests.pipe(
       mergeMap(id => this.postService.deletePost(id).pipe(
         tap(() => {
-          if (!this.isTestEnvironment()) {
             this.loadPaginatedPosts();
-          }
         }),
         map(() => ({ success: true as const })),
         catchError((error: unknown) => {
@@ -110,23 +108,6 @@ export class PostListComponent implements OnInit {
   applyFilters(): void {
     this.filters.set(this.filterDraft());
     this.currentPage.set(1);
-    if (!this.isTestEnvironment()) {
-      this.loadPaginatedPosts(1);
-    }
-  }
-
-  private isTestEnvironment(): boolean {
-    return (
-      typeof (globalThis as any).__vitest_worker__ !== 'undefined' ||
-      typeof (globalThis as any).vi !== 'undefined' ||
-      typeof (globalThis as any).describe !== 'undefined'
-    );
-  }
-
-  ngOnInit(): void {
-    if (!this.isTestEnvironment()) {
-      this.loadPaginatedPosts(1);
-    }
   }
 
   loadPaginatedPosts(page: number = this.displayedPage()): void {
@@ -144,9 +125,7 @@ export class PostListComponent implements OnInit {
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      if (!this.isTestEnvironment()) {
-        this.loadPaginatedPosts(page);
-      }
+      this.loadPaginatedPosts(page); 
     }
   }
 
