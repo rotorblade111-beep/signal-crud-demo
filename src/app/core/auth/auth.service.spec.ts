@@ -19,6 +19,8 @@ describe('AuthService', () => {
   };
 
   beforeEach(() => {
+    // Prevent localStorage state from bleeding between tests
+    localStorage.clear();
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()]
     });
@@ -26,7 +28,10 @@ describe('AuthService', () => {
     httpTesting = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpTesting.verify());
+  afterEach(() => {
+    httpTesting.verify();
+    localStorage.clear();
+  });
 
   it('registers through the backend and stores only the safe user response', () => {
     auth.signUp({

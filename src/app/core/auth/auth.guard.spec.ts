@@ -14,6 +14,7 @@ describe('authGuard', () => {
   let httpTesting: HttpTestingController;
 
   beforeEach(() => {
+    localStorage.clear();
     TestBed.configureTestingModule({
       providers: [
         { provide: PLATFORM_ID, useValue: 'browser' },
@@ -31,7 +32,10 @@ describe('authGuard', () => {
     httpTesting = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => httpTesting.verify());
+  afterEach(() => {
+    httpTesting.verify();
+    localStorage.clear();
+  });
 
   it('redirects unauthenticated requests to login with the requested destination', async () => {
     const router = TestBed.inject(Router);
@@ -51,11 +55,15 @@ describe('authGuard', () => {
   });
 
   it('allows a signed-in user to navigate to protected post routes', async () => {
-    TestBed.inject(AuthService).currentUser.set({
+    const auth = TestBed.inject(AuthService);
+    // Simulate a session already restored from localStorage (both signals populated)
+    auth.currentUser.set({
       id: 1,
       email: 'user@example.com',
       dateOfBirth: '2000-01-01'
     });
+    auth.accessToken.set('valid-access-token');
+
     const result = TestBed.runInInjectionContext(() =>
       authGuard({} as ActivatedRouteSnapshot, { url: '/view-post/12' } as RouterStateSnapshot)
     );
