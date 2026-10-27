@@ -57,6 +57,7 @@
     }
   </ul>
   @if (totalPages() > 1) {
+    @defer (on viewport) {
     <nav class="mt-5 flex flex-wrap items-center justify-center gap-2" aria-label="Post list pages">
       <app-tooltip
         [text]="previousTooltipText()"
@@ -97,6 +98,13 @@
         </button>
       </app-tooltip>
     </nav>
+    }
+    @placeholder {
+      <div>
+        <span class="inline-block h-[18px] w-[18px] shrink-0 box-border animate-spin rounded-full border-2 border-slate-300 border-t-blue-600 motion-reduce:animate-none" aria-hidden="true"></span>
+        <span>Loading post...</span>
+      </div> 
+    }
   }
 
   } @placeholder {

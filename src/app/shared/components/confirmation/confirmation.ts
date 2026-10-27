@@ -1,4 +1,10 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input } from '@angular/core';
+
+export interface Buttons {
+  name: string;
+  cssClass?: string;
+  action?: () => void;
+}
 
 @Component({
   selector: 'app-confirmation',
@@ -7,6 +13,5 @@ import { Component, input, output } from '@angular/core';
 })
 export class ConfirmationComponent {
   message = input.required<string>();
-  confirmed = output<void>();
-  cancelled = output<void>();
+  buttons = input.required<Buttons[]>();
 }

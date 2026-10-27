@@ -1,4 +1,4 @@
-import { Component, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed, signal, OnDestroy, AfterViewInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
@@ -15,7 +15,15 @@ import { Subject, catchError, map, mergeMap, of, tap } from 'rxjs';
   imports: [RouterLink, PostFiltersComponent, PostItemComponent, TooltipComponent],
   templateUrl: './post-list.html',
 })
-export class PostListComponent {
+export class PostListComponent implements OnDestroy, AfterViewInit {
+  private timerId: any;
+  handleTimeout(): void {
+    for(let i = 1; i < 11; i++) {
+    this.postService.getPaginatedPosts(i,10).subscribe((res) => {
+      console.log('Initial paginated posts:', res);
+      });
+    }
+  }
   serverPaginatedPosts = signal<Post[] | null>(null);
   readonly pageSize = 10;
   postService = inject(PostService);
@@ -91,6 +99,16 @@ export class PostListComponent {
       ? 'No next pages to paginate to due to the page number being invalid'
       : ''
   );
+
+  ngAfterViewInit(): void {
+   this.timerId = setTimeout(() => {
+    this.handleTimeout();
+    }, 90000);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.timerId);
+  }
 
   editPost(post: Post): void {
     void this.router.navigate(['/edit-post', post.id], { state: { post } });

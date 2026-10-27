@@ -8,18 +8,14 @@
       {{ message() }}
     </p>
     <div class="mt-6 flex justify-end gap-3">
-      <button
-        type="button"
-        class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700"
-        (click)="confirmed.emit()">
-        Yes
-      </button>
-      <button
-        type="button"
-        class="cursor-pointer rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200"
-        (click)="cancelled.emit()">
-        No
-      </button>
+      @for (button of buttons(); track button.name) {
+        <button
+          type="button"
+          [class]="button.cssClass"
+          (click)="button.action?.()">
+          {{ button.name }}
+        </button>
+      }
     </div>
   </section>
 </div>
