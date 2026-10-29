@@ -1,0 +1,21 @@
+@if (snackbarService.snackbar(); as data) {
+  <div 
+    class="fixed bottom-4 right-4 z-50 flex flex-col min-w-[280px] rounded-xl shadow-xl text-white text-sm font-medium overflow-hidden transition-all duration-300"
+    [class.bg-emerald-600]="data.type === 'success'"
+    [class.bg-rose-600]="data.type === 'error'">
+    
+    <!-- Snackbar Message Body -->
+    <div class="px-4 py-3 flex items-center justify-between">
+      <span>{{ data.message }}</span>
+    </div>
+
+    <!-- Animated Progress Bar at the Bottom -->
+    <div class="h-1 w-full bg-black/20">
+      <div 
+        class="h-full bg-white/80 animate-progress-bar"
+        [style.animation-duration.ms]="data.duration">
+      </div>
+    </div>
+
+  </div>
+}
