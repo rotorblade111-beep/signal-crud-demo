@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { PostItemComponent } from '../post-item/post-item';
 import { PostFilters, PostFiltersComponent } from '../post-filters/post-filters';
-import { TooltipComponent } from '../../../../shared/components/tooltip/tooltip';
+import { PostPaginationComponent } from '../post-pagination/post-pagination';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Post } from '../../models/post.model';
 import { Subject, catchError, map, mergeMap, of, tap } from 'rxjs';
@@ -12,7 +12,7 @@ import { Subject, catchError, map, mergeMap, of, tap } from 'rxjs';
 
 @Component({
   selector: 'app-post-list',
-  imports: [RouterLink, PostFiltersComponent, PostItemComponent, TooltipComponent],
+  imports: [RouterLink, PostFiltersComponent, PostItemComponent, PostPaginationComponent],
   templateUrl: './post-list.html',
 })
 export class PostListComponent implements OnDestroy, AfterViewInit {
@@ -68,9 +68,6 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
   });
   totalPages = computed(() => Math.ceil(this.filteredPosts().length / this.pageSize));
   displayedPage = computed(() => Math.min(this.currentPage(), Math.max(this.totalPages(), 1)));
-  pageNumbers = computed(() =>
-    Array.from({ length: this.totalPages() }, (_, index) => index + 1)
-  );
   hasActiveFilters = computed(() => {
     const { title, body, createdFrom, createdTo } = this.filters();
     return !!(title.trim() || body.trim() || createdFrom || createdTo);
@@ -86,19 +83,6 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
     const start = (this.displayedPage() - 1) * this.pageSize;
     return this.filteredPosts().slice(start, start + this.pageSize);
   });
-
-  isPreviousDisabled = computed(() => this.displayedPage() <= 1);
-  isNextDisabled = computed(() => this.displayedPage() >= this.totalPages());
-  previousTooltipText = computed(() =>
-    this.isPreviousDisabled()
-      ? 'No previous pages to paginate to due to the page number being invalid'
-      : ''
-  );
-  nextTooltipText = computed(() =>
-    this.isNextDisabled()
-      ? 'No next pages to paginate to due to the page number being invalid'
-      : ''
-  );
 
   ngAfterViewInit(): void {
    this.timerId = setTimeout(() => {
@@ -140,11 +124,9 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
     });
   }
 
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-      this.loadPaginatedPosts(page); 
-    }
+  handlePageChange(page: number): void {
+    this.currentPage.set(page);
+    this.loadPaginatedPosts(page);
   }
 
   private matchesCreatedDate(createdAt: string, createdFrom: string, createdTo: string): boolean {

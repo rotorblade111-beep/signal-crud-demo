@@ -10,7 +10,7 @@ export const apiStatusInterceptor: HttpInterceptorFn = (req, next) => {
     tap({
       next: () => {
         // Customize success messaging based on the action
-        const actionText = req.method === 'GET' ? 'Data Loaded successfully' : 'Request completed Successfully';
+        const actionText = req.method === 'POST' ? 'Data Saved successfully' : req.method === 'PUT' ? 'Data Updated successfully' : req.method === 'DELETE' ? 'Data Deleted successfully': null;
         snackbar.show(`Success: ${req.method} ${actionText}`, 'success');
       },
       error: (error) => {

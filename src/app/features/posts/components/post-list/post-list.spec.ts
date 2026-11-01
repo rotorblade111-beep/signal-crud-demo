@@ -145,12 +145,12 @@ describe('PostListComponent', () => {
     expect(component.paginatedPosts()[0]).toEqual(hundredPosts[0]);
     expect(component.paginatedPosts()[9]).toEqual(hundredPosts[9]);
 
-    component.goToPage(2);
+    component.currentPage.set(2);
     expect(component.currentPage()).toBe(2);
     expect(component.paginatedPosts()).toHaveLength(10);
     expect(component.paginatedPosts()[0]).toEqual(hundredPosts[10]);
 
-    component.goToPage(10);
+    component.currentPage.set(10);
     expect(component.paginatedPosts()[0]).toEqual(hundredPosts[90]);
     expect(component.paginatedPosts()[9]).toEqual(hundredPosts[99]);
   });
@@ -164,7 +164,7 @@ describe('PostListComponent', () => {
     }));
     component.postService.posts.set(hundredPosts);
     await fixture.whenStable();
-    component.goToPage(8);
+    component.currentPage.set(8);
 
     component.setFilterDraft({ ...component.filterDraft(), body: 'needle' });
     component.applyFilters();
@@ -183,7 +183,7 @@ describe('PostListComponent', () => {
     }));
     component.postService.posts.set(hundredPosts);
     await fixture.whenStable();
-    component.goToPage(10);
+    component.currentPage.set(10);
     component.postService.posts.set(hundredPosts.slice(0, 85));
     await fixture.whenStable();
 
@@ -196,6 +196,7 @@ describe('PostListComponent', () => {
     const request = httpTesting.expectOne('http://localhost:5093/posts/1');
     expect(request.request.method).toBe('DELETE');
     request.flush({});
+    httpTesting.expectOne('http://localhost:5093/posts?offset=0&limit=10').flush([posts[1]]);
     await fixture.whenStable();
 
     expect(component.postService.posts()).toEqual([posts[1]]);
@@ -228,16 +229,7 @@ describe('PostListComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['/edit-post', 2], { state: { post: posts[1] } });
   });
 
-  it('displays tooltip on the disabled Previous button on page 1 and on the disabled Next button on the last page', async () => {
-    const originalIntersectionObserver = globalThis.IntersectionObserver;
-    if (!globalThis.IntersectionObserver) {
-      globalThis.IntersectionObserver = class {
-        observe() {}
-        unobserve() {}
-        disconnect() {}
-      } as unknown as typeof IntersectionObserver;
-    }
-
+  it('keeps the displayed page in range as the current page changes', async () => {
     const thirtyPosts = Array.from({ length: 30 }, (_, index) => ({
       id: index + 1,
       title: `Post ${index + 1}`,
@@ -246,71 +238,30 @@ describe('PostListComponent', () => {
     }));
     component.postService.posts.set(thirtyPosts);
     await fixture.whenStable();
-    const hoverHeading = fixture.nativeElement.querySelector('h1');
-    hoverHeading?.dispatchEvent(new MouseEvent('mouseenter'));
-    fixture.detectChanges();
-    await fixture.whenStable();
-
     expect(component.totalPages()).toBe(3);
     expect(component.displayedPage()).toBe(1);
-    expect(component.isPreviousDisabled()).toBe(true);
-    expect(component.isNextDisabled()).toBe(false);
-
-    const tooltips = fixture.nativeElement.querySelectorAll('app-tooltip');
-    expect(tooltips.length).toBe(2);
-
-    const prevTooltip = tooltips[0];
-    const nextTooltip = tooltips[1];
-
-    prevTooltip.dispatchEvent(new MouseEvent('mouseenter'));
-    fixture.detectChanges();
-
-    let prevTooltipEl = prevTooltip.querySelector('[role="tooltip"]');
-    expect(prevTooltipEl).not.toBeNull();
-    expect(prevTooltipEl?.textContent).toContain(
-      'No previous pages to paginate to due to the page number being invalid'
-    );
-
-    nextTooltip.dispatchEvent(new MouseEvent('mouseenter'));
-    fixture.detectChanges();
-    let nextTooltipEl = nextTooltip.querySelector('[role="tooltip"]');
-    expect(nextTooltipEl).toBeNull();
-
-    prevTooltip.dispatchEvent(new MouseEvent('mouseleave'));
-    component.goToPage(2);
+    component.currentPage.set(2);
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(component.displayedPage()).toBe(2);
-    expect(component.isPreviousDisabled()).toBe(false);
-    expect(component.isNextDisabled()).toBe(false);
-
-    prevTooltip.dispatchEvent(new MouseEvent('mouseenter'));
-    nextTooltip.dispatchEvent(new MouseEvent('mouseenter'));
-    fixture.detectChanges();
-
-    expect(prevTooltip.querySelector('[role="tooltip"]')).toBeNull();
-    expect(nextTooltip.querySelector('[role="tooltip"]')).toBeNull();
-
-    prevTooltip.dispatchEvent(new MouseEvent('mouseleave'));
-    nextTooltip.dispatchEvent(new MouseEvent('mouseleave'));
-    component.goToPage(3);
+    component.currentPage.set(3);
     await fixture.whenStable();
     fixture.detectChanges();
 
     expect(component.displayedPage()).toBe(3);
-    expect(component.isPreviousDisabled()).toBe(false);
-    expect(component.isNextDisabled()).toBe(true);
+  });
 
-    nextTooltip.dispatchEvent(new MouseEvent('mouseenter'));
-    fixture.detectChanges();
+  it('loads the selected server page when the pagination component emits a page change', async () => {
+    component.handlePageChange(2);
 
-    nextTooltipEl = nextTooltip.querySelector('[role="tooltip"]');
-    expect(nextTooltipEl).not.toBeNull();
-    expect(nextTooltipEl?.textContent).toContain(
-      'No next pages to paginate to due to the page number being invalid'
-    );
-    globalThis.IntersectionObserver = originalIntersectionObserver;
+    const request = httpTesting.expectOne('http://localhost:5093/posts?offset=10&limit=10');
+    expect(request.request.method).toBe('GET');
+    request.flush(posts);
+    await fixture.whenStable();
+
+    expect(component.currentPage()).toBe(2);
+    expect(component.serverPaginatedPosts()).toEqual(posts);
   });
 
 });

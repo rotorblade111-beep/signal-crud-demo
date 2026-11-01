@@ -58,46 +58,10 @@
   </ul>
   @if (totalPages() > 1) {
     @defer (on viewport) {
-    <nav class="mt-5 flex flex-wrap items-center justify-center gap-2" aria-label="Post list pages">
-      <app-tooltip
-        [text]="previousTooltipText()"
-        [disabled]="!isPreviousDisabled()"
-        position="top">
-        <button
-          type="button"
-          class="cursor-pointer rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-          [disabled]="isPreviousDisabled()"
-          (click)="goToPage(displayedPage() - 1)">
-          Previous
-        </button>
-      </app-tooltip>
-      @for (page of pageNumbers(); track page) {
-        <button
-          type="button"
-          class="cursor-pointer rounded-lg px-3 py-2 text-sm font-semibold transition-colors"
-          [class.bg-blue-600]="page === displayedPage()"
-          [class.text-white]="page === displayedPage()"
-          [class.bg-slate-100]="page !== displayedPage()"
-          [class.text-slate-700]="page !== displayedPage()"
-          [attr.aria-current]="page === displayedPage() ? 'page' : null"
-          [attr.aria-label]="'Page ' + page"
-          (click)="goToPage(page)">
-          {{ page }}
-        </button>
-      }
-      <app-tooltip
-        [text]="nextTooltipText()"
-        [disabled]="!isNextDisabled()"
-        position="top">
-        <button
-          type="button"
-          class="cursor-pointer rounded-lg bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-          [disabled]="isNextDisabled()"
-          (click)="goToPage(displayedPage() + 1)">
-          Next
-        </button>
-      </app-tooltip>
-    </nav>
+      <app-post-pagination
+        [currentPage]="displayedPage()"
+        [totalPages]="totalPages()"
+        (pageChange)="handlePageChange($event)" />
     }
     @placeholder {
       <div>
