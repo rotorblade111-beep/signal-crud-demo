@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { By } from '@angular/platform-browser';
+import { provideRouter, Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/auth/auth.service';
 import { SiteHeaderComponent } from './site-header';
 
 @Component({ template: '' })
@@ -13,10 +16,12 @@ describe('SiteHeaderComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SiteHeaderComponent],
       providers: [
+        provideHttpClient(),
         provideRouter([
           { path: 'login', component: TestPageComponent },
           { path: 'sign-up', component: TestPageComponent },
-          { path: 'home', component: TestPageComponent }
+          { path: 'home', component: TestPageComponent },
+          { path: 'personal/:userId', component: TestPageComponent }
         ])
       ]
     }).compileComponents();
@@ -42,5 +47,18 @@ describe('SiteHeaderComponent', () => {
     fixture.detectChanges();
 
     expect(fixture.nativeElement.textContent).toContain('Sign UP/Login');
+  });
+
+  it('links authenticated users to their personalized feed', () => {
+    TestBed.inject(AuthService).currentUser.set({
+      id: 7,
+      email: 'author@example.com',
+      dateOfBirth: '2000-01-01'
+    });
+    fixture.detectChanges();
+    const link = fixture.debugElement.queryAll(By.directive(RouterLink))
+      .find(element => element.nativeElement.textContent.includes('Personalized Feed'));
+
+    expect(link?.nativeElement.getAttribute('href')).toBe('/personal/7');
   });
 });

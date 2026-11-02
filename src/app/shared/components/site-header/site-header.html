@@ -13,6 +13,11 @@
     <nav aria-label="Main navigation" class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium">
       @if (auth.currentUser()) {
         <a routerLink="/home" class="text-slate-700 no-underline transition-colors hover:text-blue-700">Home</a>
+        <a
+          [routerLink]="['/personal', auth.currentUser()!.id]"
+          class="text-slate-700 no-underline transition-colors hover:text-blue-700">
+          Personalized Feed
+        </a>
       }
       <a href="#" (click)="$event.preventDefault()" class="text-slate-700 no-underline transition-colors hover:text-blue-700">FAQ</a>
       <a href="#" (click)="$event.preventDefault()" class="text-slate-700 no-underline transition-colors hover:text-blue-700">Contact</a>

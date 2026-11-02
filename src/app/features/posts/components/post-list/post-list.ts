@@ -36,21 +36,30 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
   filters = signal<PostFilters>({ title: '', body: '', createdFrom: '', createdTo: '' });
   currentPage = signal(1);
   deleteError = signal<string | null>(null);
-  selectedUserId = computed(() => {
-    const routeUserId = this.userId();
-    if (routeUserId !== undefined) {
-      const parsedUserId = Number(routeUserId);
-      if (Number.isSafeInteger(parsedUserId) && parsedUserId > 0) {
-        return parsedUserId;
-      }
+  isPersonalFeed = computed(() => this.userId() !== undefined);
+  isPersonalFeedAuthorized = computed(() => {
+    if (!this.isPersonalFeed()) {
+      return true;
     }
-    return this.authService.currentUser()?.id ?? null;
+
+    const userId = Number(this.userId());
+    return Number.isSafeInteger(userId) &&
+      userId > 0 &&
+      userId === this.authService.currentUser()?.id;
+  });
+  isContentNotFound = computed(() => this.isPersonalFeed() && !this.isPersonalFeedAuthorized());
+  selectedUserId = computed(() => {
+    return this.isPersonalFeedAuthorized() && this.isPersonalFeed()
+      ? Number(this.userId())
+      : null;
   });
 
   private loadSelectedUserPosts = effect(() => {
     this.currentPage.set(1);
     this.serverPaginatedPosts.set(null);
-    this.postService.loadPosts(this.selectedUserId());
+    if (!this.isContentNotFound()) {
+      this.postService.loadPosts(this.selectedUserId());
+    }
   });
 
   private deleteResult = toSignal(

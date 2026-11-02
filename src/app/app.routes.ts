@@ -28,10 +28,10 @@ export const routes: Routes = [
     data: { seo: { title: 'Posts | Posthub', description: siteDescription, type: 'website' } }
   },
   {
-    path: 'home/:userId',
+    path: 'personal/:userId',
     loadComponent: () => import('./features/posts/components/post-list/post-list').then(m => m.PostListComponent),
     canActivate: [authGuard],
-    data: { seo: { title: 'User posts | Posthub', description: siteDescription, type: 'website' } }
+    data: { seo: { title: 'Personalized feed | Posthub', description: siteDescription, type: 'website' } }
   },
   {
     path: 'add-post',

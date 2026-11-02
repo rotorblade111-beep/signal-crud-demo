@@ -36,9 +36,16 @@ describe('PostListComponent', () => {
     expect(component.postService.posts()).toEqual(posts);
   });
 
-  it('loads the signed-in user posts by default and supports a user-specific route', async () => {
+  it('shows all posts on home and restricts the personalized feed to the authenticated user', async () => {
     const auth = TestBed.inject(AuthService);
     auth.currentUser.set({ id: 7, email: 'author@example.com', dateOfBirth: '2000-01-01' });
+    fixture.detectChanges();
+
+    expect(component.selectedUserId()).toBeNull();
+    expect(component.isContentNotFound()).toBe(false);
+    expect(component.postList()).toEqual(posts);
+
+    fixture.componentRef.setInput('userId', '7');
     fixture.detectChanges();
     const ownPosts = [{ ...posts[0], userId: 7, authorEmail: 'author@example.com' }];
     httpTesting.expectOne('http://localhost:5093/posts?userId=7').flush(ownPosts);
@@ -51,11 +58,10 @@ describe('PostListComponent', () => {
 
     fixture.componentRef.setInput('userId', '9');
     fixture.detectChanges();
-    const requestedPosts = [{ ...posts[1], userId: 9, authorEmail: 'reader@example.com' }];
-    httpTesting.expectOne('http://localhost:5093/posts?userId=9').flush(requestedPosts);
-    await fixture.whenStable();
-    expect(component.selectedUserId()).toBe(9);
-    expect(component.postList()).toEqual(requestedPosts);
+    expect(component.selectedUserId()).toBeNull();
+    expect(component.isContentNotFound()).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain('Content not Found');
+    httpTesting.expectNone('http://localhost:5093/posts?userId=9');
   });
 
   it('filters by title and body independently and combines both criteria', async () => {
@@ -289,6 +295,11 @@ describe('PostListComponent', () => {
   });
 
   it('includes the selected user ID when requesting a server-paginated page', async () => {
+    TestBed.inject(AuthService).currentUser.set({
+      id: 7,
+      email: 'author@example.com',
+      dateOfBirth: '2000-01-01'
+    });
     fixture.componentRef.setInput('userId', '7');
     fixture.detectChanges();
     httpTesting.expectOne('http://localhost:5093/posts?userId=7').flush(posts);

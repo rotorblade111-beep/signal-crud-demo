@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { HttpParams } from '@angular/common/http';
 import { Observable, of, Subject, distinctUntilChanged, startWith, switchMap, tap } from 'rxjs';
-import { AuthService } from '../../../core/auth/auth.service';
 import { Post } from '../models/post.model';
 
 @Injectable({
@@ -11,16 +10,15 @@ import { Post } from '../models/post.model';
 })
 export class PostService {
   private http = inject(HttpClient);
-  private auth = inject(AuthService);
   private apiUrl = 'http://localhost:5093/posts';
-  private activeUserId = this.auth.currentUser()?.id ?? null;
+  private activeUserId: number | null = null;
   private requestedUserIds = new Subject<number | null>();
 
   // 1. Declarative fetch converted automatically to a signal via toSignal()
   // This triggers automatically upon service creation without manual .subscribe() or guard flags.
   private fetchedPosts = toSignal(
     this.requestedUserIds.pipe(
-      startWith(this.auth.currentUser()?.id ?? null),
+      startWith(null),
       distinctUntilChanged(),
       switchMap(userId => this.getPosts(userId))
     ),
