@@ -12,11 +12,11 @@
         class="ml-2 text-xs font-normal text-slate-500">
         {{ post().createdAt | date: 'mediumDate' }}
       </time>
+      <p class="mb-0 mt-2 text-xs text-slate-500">
+      By {{ post().authorEmail || 'Unknown author' }}
+      </p>
     </h2>
     <p class="mb-0 mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-600">{{ post().body }}</p>
-    <p class="mb-0 mt-2 text-xs text-slate-500">
-      By {{ post().authorEmail || 'Unknown author' }}
-    </p>
   </div>
   @if (canManagePost()) {
     <div class="flex shrink-0 gap-2">

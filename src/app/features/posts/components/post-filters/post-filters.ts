@@ -1,6 +1,7 @@
 import { Component, computed, input, output } from '@angular/core';
 
 export interface PostFilters {
+  author: string;
   title: string;
   body: string;
   createdFrom: string;
@@ -23,7 +24,7 @@ export class PostFiltersComponent {
       : null;
   });
 
-  updateTextFilter(field: 'title' | 'body', value: string): void {
+  updateTextFilter(field: 'author' | 'title' | 'body', value: string): void {
     this.filtersChange.emit({ ...this.filters(), [field]: value });
   }
 

@@ -11,8 +11,8 @@ describe('PostListComponent', () => {
   let fixture: ComponentFixture<PostListComponent>;
   let httpTesting: HttpTestingController;
   const posts: Post[] = [
-    { id: 1, title: 'Alpha headline', body: 'Red apples in this body', createdAt: '2026-10-18T10:30:00+00:00' },
-    { id: 2, title: 'Beta headline', body: 'Blue ocean in this body', createdAt: '2026-10-17T10:30:00+00:00' }
+    { id: 1, title: 'Alpha headline', body: 'Red apples in this body', createdAt: '2026-10-18T10:30:00+00:00', authorEmail: 'alice@example.com' },
+    { id: 2, title: 'Beta headline', body: 'Blue ocean in this body', createdAt: '2026-10-17T10:30:00+00:00', authorEmail: 'bob@example.com' }
   ];
 
   beforeEach(async () => {
@@ -81,6 +81,35 @@ describe('PostListComponent', () => {
     expect(component.filteredPosts()).toEqual([]);
   });
 
+  it('filters posts by author case-insensitively and combines author with other filters', async () => {
+    component.setFilterDraft({ ...component.filterDraft(), author: 'ALICE@EXAMPLE' });
+    component.applyFilters();
+    await fixture.whenStable();
+    expect(component.filteredPosts()).toEqual([posts[0]]);
+
+    component.setFilterDraft({
+      ...component.filterDraft(),
+      author: 'bob',
+      title: 'alpha'
+    });
+    component.applyFilters();
+    await fixture.whenStable();
+    expect(component.filteredPosts()).toEqual([]);
+  });
+
+  it('does not apply author filtering until Search is clicked', async () => {
+    component.setFilterDraft({ ...component.filterDraft(), author: 'bob' });
+    await fixture.whenStable();
+
+    expect(component.filters().author).toBe('');
+    expect(component.filteredPosts()).toEqual(posts);
+
+    component.applyFilters();
+
+    expect(component.filters().author).toBe('bob');
+    expect(component.filteredPosts()).toEqual([posts[1]]);
+  });
+
   it('does not change results until the search action is applied', async () => {
     component.setFilterDraft({ ...component.filterDraft(), title: 'alpha' });
     await fixture.whenStable();
@@ -126,6 +155,7 @@ describe('PostListComponent', () => {
   it('filters an inclusive created-date range and combines it with text filters', async () => {
     component.setFilterDraft({
       ...component.filterDraft(),
+      author: 'alice',
       title: 'headline',
       createdFrom: '2026-10-17',
       createdTo: '2026-10-18'
@@ -133,7 +163,7 @@ describe('PostListComponent', () => {
     component.applyFilters();
     await fixture.whenStable();
 
-    expect(component.filteredPosts()).toEqual(posts);
+    expect(component.filteredPosts()).toEqual([posts[0]]);
 
     component.setFilterDraft({ ...component.filterDraft(), title: 'alpha' });
     component.applyFilters();

@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ConfirmationComponent, ConfirmationButton } from './confirmation';
+import { Buttons, ConfirmationComponent } from './confirmation';
 
 describe('ConfirmationComponent', () => {
   let fixture: ComponentFixture<ConfirmationComponent>;
 
-  const makeButtons = (onConfirm: () => void, onCancel: () => void): ConfirmationButton[] => [
-    { name: 'Cancel', type: 'secondary', action: onCancel },
-    { name: 'Delete', type: 'primary',   action: onConfirm }
+  const makeButtons = (onConfirm: () => void, onCancel: () => void): Buttons[] => [
+    { name: 'Cancel', action: onCancel },
+    { name: 'Delete', action: onConfirm }
   ];
 
   beforeEach(async () => {

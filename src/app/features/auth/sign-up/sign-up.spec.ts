@@ -21,6 +21,8 @@ describe('SignUpComponent', () => {
   };
 
   beforeEach(async () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('currentUser');
     await TestBed.configureTestingModule({
       imports: [SignUpComponent],
       providers: [

@@ -5,6 +5,7 @@ describe('PostFiltersComponent', () => {
   let fixture: ComponentFixture<PostFiltersComponent>;
   let component: PostFiltersComponent;
   const filters: PostFilters = {
+    author: '',
     title: '',
     body: '',
     createdFrom: '',
@@ -30,6 +31,42 @@ describe('PostFiltersComponent', () => {
 
     expect(filtersChange).toHaveBeenNthCalledWith(1, { ...filters, title: 'angular' });
     expect(filtersChange).toHaveBeenNthCalledWith(2, { ...filters, body: 'signals' });
+  });
+
+  it('emits author input without dropping other filters and applies it only on Search', () => {
+    const filtersChange = vi.fn();
+    const search = vi.fn();
+    component.filtersChange.subscribe(filtersChange);
+    component.search.subscribe(search);
+    const input = fixture.nativeElement.querySelector(
+      'input[aria-label="Search by Author Name"]'
+    ) as HTMLInputElement;
+    input.value = 'author@example.com';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect(filtersChange).toHaveBeenCalledWith({
+      ...filters,
+      author: 'author@example.com'
+    });
+    expect(search).not.toHaveBeenCalled();
+
+    fixture.nativeElement.querySelector('button').click();
+
+    expect(search).toHaveBeenCalledOnce();
+  });
+
+  it('binds the author search field to the filter draft', () => {
+    fixture.componentRef.setInput('filters', {
+      ...filters,
+      author: 'author@example.com'
+    });
+    fixture.detectChanges();
+
+    const input = fixture.nativeElement.querySelector(
+      'input[aria-label="Search by Author Name"]'
+    ) as HTMLInputElement;
+
+    expect(input.value).toBe('author@example.com');
   });
 
   it('applies filters only when Search is clicked', () => {

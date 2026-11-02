@@ -18,22 +18,22 @@ import { Subject, catchError, map, mergeMap, of, tap } from 'rxjs';
 })
 export class PostListComponent implements OnDestroy, AfterViewInit {
   userId = input<string>();
-  private timerId: any;
-  handleTimeout(): void {
-    for(let i = 1; i < 11; i++) {
-    this.postService.getPaginatedPosts(i,10,this.selectedUserId()).subscribe((res) => {
-      console.log('Initial paginated posts:', res);
-      });
-    }
-  }
-  serverPaginatedPosts = signal<Post[] | null>(null);
+  // private timerId: any;
+  // handleTimeout(): void {
+  //   for(let i = 1; i < 11; i++) {
+  //   this.postService.getPaginatedPosts(i,10,this.selectedUserId()).subscribe((res) => {
+  //     console.log('Initial paginated posts:', res);
+  //     });
+  //   }
+  // }
   readonly pageSize = 10;
   postService = inject(PostService);
   private authService = inject(AuthService);
   private router = inject(Router);
   private deleteRequests = new Subject<number>();
-  filterDraft = signal<PostFilters>({ title: '', body: '', createdFrom: '', createdTo: '' });
-  filters = signal<PostFilters>({ title: '', body: '', createdFrom: '', createdTo: '' });
+  serverPaginatedPosts = signal<Post[] | null>(null);
+  filterDraft = signal<PostFilters>({ author: '', title: '', body: '', createdFrom: '', createdTo: '' });
+  filters = signal<PostFilters>({ author: '', title: '', body: '', createdFrom: '', createdTo: '' });
   currentPage = signal(1);
   deleteError = signal<string | null>(null);
   isPersonalFeed = computed(() => this.userId() !== undefined);
@@ -84,11 +84,13 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
 
   postCount = computed(() => this.postList().length);
   filteredPosts = computed(() => {
-    const { title, body, createdFrom, createdTo } = this.filters();
+    const { author, title, body, createdFrom, createdTo } = this.filters();
+    const authorQuery = author.trim().toLocaleLowerCase();
     const titleQuery = title.trim().toLocaleLowerCase();
     const bodyQuery = body.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 
     return this.postList().filter(post =>
+      (post.authorEmail ?? 'Unknown author').toLocaleLowerCase().includes(authorQuery) &&
       post.title.toLocaleLowerCase().includes(titleQuery) &&
       post.body.replace(/\s+/g, ' ').toLocaleLowerCase().includes(bodyQuery) &&
       this.matchesCreatedDate(post.createdAt, createdFrom, createdTo)
@@ -97,8 +99,8 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
   totalPages = computed(() => Math.ceil(this.filteredPosts().length / this.pageSize));
   displayedPage = computed(() => Math.min(this.currentPage(), Math.max(this.totalPages(), 1)));
   hasActiveFilters = computed(() => {
-    const { title, body, createdFrom, createdTo } = this.filters();
-    return !!(title.trim() || body.trim() || createdFrom || createdTo);
+    const { author, title, body, createdFrom, createdTo } = this.filters();
+    return !!(author.trim() || title.trim() || body.trim() || createdFrom || createdTo);
   });
 
   paginatedPosts = computed(() => {
@@ -113,13 +115,13 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
   });
 
   ngAfterViewInit(): void {
-   this.timerId = setTimeout(() => {
-    this.handleTimeout();
-    }, 90000);
+  //  this.timerId = setTimeout(() => {
+  //   this.handleTimeout();
+  //   }, 90000);
   }
 
   ngOnDestroy(): void {
-    clearTimeout(this.timerId);
+    //clearTimeout(this.timerId);
   }
 
   editPost(post: Post): void {
