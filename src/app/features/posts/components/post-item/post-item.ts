@@ -1,8 +1,9 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Post } from '../../models/post.model';
 import { ConfirmationComponent, Buttons } from '../../../../shared/components/confirmation/confirmation';
+import { AuthService } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-post-item',
@@ -13,6 +14,7 @@ import { ConfirmationComponent, Buttons } from '../../../../shared/components/co
 export class PostItemComponent {
   // Required signal input from parent
   post = input.required<Post>();
+  private auth = inject(AuthService);
   edit = output<Post>();
   delete = output<number>();
   showDeleteConfirmation = signal(false);
@@ -21,6 +23,10 @@ export class PostItemComponent {
   titleDisplay = computed(() => {
     const title = this.post().title;
     return title;
+  });
+  canManagePost = computed(() => {
+    const post = this.post();
+    return post.userId != null && post.userId === this.auth.currentUser()?.id;
   });
 
   // Confirmation buttons defined in the component — actions fully encapsulated here

@@ -28,6 +28,12 @@ export const routes: Routes = [
     data: { seo: { title: 'Posts | Posthub', description: siteDescription, type: 'website' } }
   },
   {
+    path: 'home/:userId',
+    loadComponent: () => import('./features/posts/components/post-list/post-list').then(m => m.PostListComponent),
+    canActivate: [authGuard],
+    data: { seo: { title: 'User posts | Posthub', description: siteDescription, type: 'website' } }
+  },
+  {
     path: 'add-post',
     loadComponent: () => import('./features/posts/components/add-post/add-post').then(m => m.AddPostComponent),
     canActivate: [authGuard],

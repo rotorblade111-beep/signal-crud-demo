@@ -2,6 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { AuthService } from '../../../core/auth/auth.service';
 import { Post } from '../models/post.model';
 import { PostService } from './post.service';
 
@@ -20,6 +21,7 @@ describe('PostService', () => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()]
     });
+    TestBed.inject(AuthService).clearSession();
     service = TestBed.inject(PostService);
     httpTesting = TestBed.inject(HttpTestingController);
   });
@@ -44,6 +46,44 @@ describe('PostService', () => {
     expect(service.posts()).toEqual([initialPost]);
     expect(service.posts()).toEqual([initialPost]);
     httpTesting.expectNone(apiUrl);
+  });
+
+  it('fetches posts for the selected user and supports unfiltered all-post requests', async () => {
+    await flushInitialPosts([initialPost]);
+
+    service.loadPosts(42);
+    httpTesting.expectOne(`${apiUrl}?userId=42`).flush([initialPost]);
+    await TestBed.inject(ApplicationRef).whenStable();
+    expect(service.posts()).toEqual([initialPost]);
+
+    service.loadPosts(null);
+    httpTesting.expectOne(apiUrl).flush([initialPost]);
+    await TestBed.inject(ApplicationRef).whenStable();
+    expect(service.posts()).toEqual([initialPost]);
+  });
+
+  it('does not overwrite a local create while the initial post request is still in flight', async () => {
+    const createdPost: Post = {
+      ...initialPost,
+      id: 2,
+      title: 'Created during load'
+    };
+    service.createPost({ title: createdPost.title, body: createdPost.body }).subscribe();
+    httpTesting.expectOne(request => request.url === apiUrl && request.method === 'POST').flush(createdPost);
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    httpTesting.expectOne(request => request.url === apiUrl && request.method === 'GET').flush([initialPost]);
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    expect(service.posts()).toEqual([createdPost]);
+  });
+
+  it('includes the user ID in paginated requests when provided', () => {
+    httpTesting.expectOne(apiUrl).flush([]);
+    service.getPaginatedPosts(20, 10, 42).subscribe();
+    const request = httpTesting.expectOne(`${apiUrl}?offset=20&limit=10&userId=42`);
+    expect(request.request.method).toBe('GET');
+    request.flush([]);
   });
 
   it('loads a post by ID when it is not cached', async () => {

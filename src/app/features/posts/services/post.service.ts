@@ -1,7 +1,9 @@
-import { inject, Injectable, signal, computed, effect } from '@angular/core';
+import { inject, Injectable, signal, computed, effect, untracked } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Observable, of, tap } from 'rxjs';
+import { HttpParams } from '@angular/common/http';
+import { Observable, of, Subject, distinctUntilChanged, startWith, switchMap, tap } from 'rxjs';
+import { AuthService } from '../../../core/auth/auth.service';
 import { Post } from '../models/post.model';
 
 @Injectable({
@@ -9,12 +11,19 @@ import { Post } from '../models/post.model';
 })
 export class PostService {
   private http = inject(HttpClient);
+  private auth = inject(AuthService);
   private apiUrl = 'http://localhost:5093/posts';
+  private activeUserId = this.auth.currentUser()?.id ?? null;
+  private requestedUserIds = new Subject<number | null>();
 
   // 1. Declarative fetch converted automatically to a signal via toSignal()
   // This triggers automatically upon service creation without manual .subscribe() or guard flags.
   private fetchedPosts = toSignal(
-    this.http.get<Post[]>(this.apiUrl),
+    this.requestedUserIds.pipe(
+      startWith(this.auth.currentUser()?.id ?? null),
+      distinctUntilChanged(),
+      switchMap(userId => this.getPosts(userId))
+    ),
     { initialValue: [] }
   );
 
@@ -25,27 +34,35 @@ export class PostService {
   postCount = computed(() => this.posts().length);
 
   constructor() {
-    // Synchronize initial server-fetched posts into our local writable state signal
     effect(() => {
       const data = this.fetchedPosts();
-      if (data.length > 0 && this.posts().length === 0) {
+      if (data.length > 0 && untracked(() => this.posts().length === 0)) {
         this.posts.set(data);
       }
     });
   }
 
-  // loadPosts() method is no longer needed! 
-  // toSignal() handles initialization and subscription lifecycle automatically.
-
-  getPaginatedPosts(offset: number, limit: number): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.apiUrl}?offset=${offset}&limit=${limit}`);
+  loadPosts(userId: number | null): void {
+    if (this.activeUserId !== userId) {
+      this.activeUserId = userId;
+      this.posts.set([]);
+    }
+    this.requestedUserIds.next(userId);
   }
 
-  getPosts(offset?: number, limit?: number): Observable<Post[]> {
-    if (offset !== undefined && limit !== undefined) {
-      return this.getPaginatedPosts(offset, limit);
+  getPaginatedPosts(offset: number, limit: number, userId: number | null = null): Observable<Post[]> {
+    let params = new HttpParams().set('offset', offset).set('limit', limit);
+    if (userId !== null) {
+      params = params.set('userId', userId);
     }
-    return this.http.get<Post[]>(this.apiUrl);
+    return this.http.get<Post[]>(this.apiUrl, { params });
+  }
+
+  getPosts(userId: number | null = null): Observable<Post[]> {
+    const params = userId === null
+      ? undefined
+      : new HttpParams().set('userId', userId);
+    return this.http.get<Post[]>(this.apiUrl, { params });
   }
 
   getPost(id: number): Observable<Post> {

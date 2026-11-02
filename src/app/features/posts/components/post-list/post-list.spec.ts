@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { provideRouter, Router } from '@angular/router';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { PostListComponent } from './post-list';
 import { Post } from '../../models/post.model';
 
@@ -20,6 +21,7 @@ describe('PostListComponent', () => {
       providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])]
     }).compileComponents();
 
+    TestBed.inject(AuthService).clearSession();
     httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(PostListComponent);
     component = fixture.componentInstance;
@@ -32,6 +34,28 @@ describe('PostListComponent', () => {
   it('should create and load posts including their bodies', () => {
     expect(component).toBeTruthy();
     expect(component.postService.posts()).toEqual(posts);
+  });
+
+  it('loads the signed-in user posts by default and supports a user-specific route', async () => {
+    const auth = TestBed.inject(AuthService);
+    auth.currentUser.set({ id: 7, email: 'author@example.com', dateOfBirth: '2000-01-01' });
+    fixture.detectChanges();
+    const ownPosts = [{ ...posts[0], userId: 7, authorEmail: 'author@example.com' }];
+    httpTesting.expectOne('http://localhost:5093/posts?userId=7').flush(ownPosts);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(component.selectedUserId()).toBe(7);
+    expect(component.postService.posts()).toEqual(ownPosts);
+    expect(component.postList()).toEqual(ownPosts);
+
+    fixture.componentRef.setInput('userId', '9');
+    fixture.detectChanges();
+    const requestedPosts = [{ ...posts[1], userId: 9, authorEmail: 'reader@example.com' }];
+    httpTesting.expectOne('http://localhost:5093/posts?userId=9').flush(requestedPosts);
+    await fixture.whenStable();
+    expect(component.selectedUserId()).toBe(9);
+    expect(component.postList()).toEqual(requestedPosts);
   });
 
   it('filters by title and body independently and combines both criteria', async () => {
@@ -256,6 +280,24 @@ describe('PostListComponent', () => {
     component.handlePageChange(2);
 
     const request = httpTesting.expectOne('http://localhost:5093/posts?offset=10&limit=10');
+    expect(request.request.method).toBe('GET');
+    request.flush(posts);
+    await fixture.whenStable();
+
+    expect(component.currentPage()).toBe(2);
+    expect(component.serverPaginatedPosts()).toEqual(posts);
+  });
+
+  it('includes the selected user ID when requesting a server-paginated page', async () => {
+    fixture.componentRef.setInput('userId', '7');
+    fixture.detectChanges();
+    httpTesting.expectOne('http://localhost:5093/posts?userId=7').flush(posts);
+    await fixture.whenStable();
+    component.handlePageChange(2);
+
+    const request = httpTesting.expectOne(
+      'http://localhost:5093/posts?offset=10&limit=10&userId=7'
+    );
     expect(request.request.method).toBe('GET');
     request.flush(posts);
     await fixture.whenStable();

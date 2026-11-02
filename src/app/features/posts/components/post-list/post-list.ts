@@ -1,6 +1,7 @@
-import { Component, inject, computed, signal, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, inject, computed, signal, OnDestroy, AfterViewInit, input, effect } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
+import { AuthService } from '../../../../core/auth/auth.service';
 import { PostItemComponent } from '../post-item/post-item';
 import { PostFilters, PostFiltersComponent } from '../post-filters/post-filters';
 import { PostPaginationComponent } from '../post-pagination/post-pagination';
@@ -16,10 +17,11 @@ import { Subject, catchError, map, mergeMap, of, tap } from 'rxjs';
   templateUrl: './post-list.html',
 })
 export class PostListComponent implements OnDestroy, AfterViewInit {
+  userId = input<string>();
   private timerId: any;
   handleTimeout(): void {
     for(let i = 1; i < 11; i++) {
-    this.postService.getPaginatedPosts(i,10).subscribe((res) => {
+    this.postService.getPaginatedPosts(i,10,this.selectedUserId()).subscribe((res) => {
       console.log('Initial paginated posts:', res);
       });
     }
@@ -27,12 +29,29 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
   serverPaginatedPosts = signal<Post[] | null>(null);
   readonly pageSize = 10;
   postService = inject(PostService);
+  private authService = inject(AuthService);
   private router = inject(Router);
   private deleteRequests = new Subject<number>();
   filterDraft = signal<PostFilters>({ title: '', body: '', createdFrom: '', createdTo: '' });
   filters = signal<PostFilters>({ title: '', body: '', createdFrom: '', createdTo: '' });
   currentPage = signal(1);
   deleteError = signal<string | null>(null);
+  selectedUserId = computed(() => {
+    const routeUserId = this.userId();
+    if (routeUserId !== undefined) {
+      const parsedUserId = Number(routeUserId);
+      if (Number.isSafeInteger(parsedUserId) && parsedUserId > 0) {
+        return parsedUserId;
+      }
+    }
+    return this.authService.currentUser()?.id ?? null;
+  });
+
+  private loadSelectedUserPosts = effect(() => {
+    this.currentPage.set(1);
+    this.serverPaginatedPosts.set(null);
+    this.postService.loadPosts(this.selectedUserId());
+  });
 
   private deleteResult = toSignal(
     this.deleteRequests.pipe(
@@ -114,7 +133,7 @@ export class PostListComponent implements OnDestroy, AfterViewInit {
 
   loadPaginatedPosts(page: number = this.displayedPage()): void {
     const offset = (page - 1) * this.pageSize;
-    this.postService.getPaginatedPosts(offset, this.pageSize).subscribe({
+    this.postService.getPaginatedPosts(offset, this.pageSize, this.selectedUserId()).subscribe({
       next: (posts) => {
         this.serverPaginatedPosts.set(posts);
       },

@@ -3,4 +3,6 @@ export interface Post {
   title: string;
   body: string;
   createdAt: string;
+  userId?: number | null;
+  authorEmail?: string | null;
 }
