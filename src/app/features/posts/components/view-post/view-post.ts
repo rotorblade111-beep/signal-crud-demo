@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -26,7 +26,28 @@ function postFromRouterState(state: unknown): ViewPostRouteData['post'] {
     return null;
   }
 
-  return { id: post.id, title: post.title, body: post.body, createdAt: post.createdAt };
+  return {
+    id: post.id,
+    title: post.title,
+    body: post.body,
+    createdAt: post.createdAt,
+    authorEmail: 'authorEmail' in post &&
+      (typeof post.authorEmail === 'string' || post.authorEmail === null)
+      ? post.authorEmail
+      : null
+  };
+}
+
+function postListUrlFromRouterState(state: unknown): string {
+  if (!state || typeof state !== 'object' || !('returnUrl' in state)) {
+    return '/home';
+  }
+
+  const returnUrl = state.returnUrl;
+  return typeof returnUrl === 'string' &&
+    (returnUrl === '/home' || /^\/personal\/[1-9]\d*$/.test(returnUrl))
+    ? returnUrl
+    : '/home';
 }
 
 @Component({
@@ -40,6 +61,10 @@ export class ViewPostComponent {
   private router = inject(Router);
   private location = inject(Location);
   private statePost: ViewPostRouteData['post'] = null;
+  returnUrl = signal('/home');
+  returnLabel = computed(() =>
+    this.returnUrl().startsWith('/personal/') ? 'Return to Personalized Feed' : 'Return to Posts'
+  );
 
   post = signal<ViewPostRouteData['post']>(null);
   isLoading = signal(true);
@@ -52,6 +77,7 @@ export class ViewPostComponent {
   constructor() {
     const navigationState = this.router.getCurrentNavigation()?.extras.state ?? this.location.getState();
     this.statePost = postFromRouterState(navigationState);
+    this.returnUrl.set(postListUrlFromRouterState(navigationState));
 
     effect(() => {
       const id = Number(this.id());

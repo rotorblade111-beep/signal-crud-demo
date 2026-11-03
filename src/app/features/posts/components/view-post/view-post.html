@@ -11,6 +11,7 @@
     <article>
       <p class="mb-2 text-sm text-slate-500">Post #{{ currentPost.id }}</p>
       <h1 class="mb-4 mt-0 text-2xl font-bold text-slate-900">{{ currentPost.title }}</h1>
+      <p class="mb-4 mt-0 text-sm text-slate-500">By {{ currentPost.authorEmail || 'Unknown author' }}</p>
       <p class="whitespace-pre-wrap break-words leading-relaxed text-slate-700">{{ currentPost.body }}</p>
     </article>
   } @else {
@@ -19,8 +20,8 @@
   }
 
   <a
-    routerLink="/home"
+    [routerLink]="returnUrl()"
     class="mt-6 inline-block rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-700 no-underline transition-colors hover:bg-slate-200">
-    Return to posts
+    {{ returnLabel() }}
   </a>
 </main>

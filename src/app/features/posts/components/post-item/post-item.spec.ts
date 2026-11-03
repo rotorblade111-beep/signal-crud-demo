@@ -68,7 +68,7 @@ describe('PostItemComponent', () => {
   it('passes the full post in router state when opening the detail page', () => {
     const link = fixture.debugElement.query(By.directive(RouterLink)).injector.get(RouterLink);
 
-    expect(link.state).toEqual({ post });
+    expect(link.state).toEqual({ post, returnUrl: '/' });
   });
 
   it('only emits the delete event after confirmation', () => {

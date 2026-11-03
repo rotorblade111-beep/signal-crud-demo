@@ -49,8 +49,12 @@ describe('ViewPostComponent', () => {
   it('renders the post data resolved by the route', () => {
     expect(fixture.nativeElement.textContent).toContain(post.title);
     expect(fixture.nativeElement.textContent).toContain(post.body);
+    expect(fixture.nativeElement.textContent).toContain('By Unknown author');
     const homeLink = fixture.nativeElement.querySelector('a[routerLink="/home"]') as HTMLAnchorElement;
     expect(homeLink.textContent).toContain('Home');
+    const returnLink = fixture.nativeElement.querySelectorAll('a')[1] as HTMLAnchorElement;
+    expect(returnLink.getAttribute('href')).toBe('/home');
+    expect(returnLink.textContent).toContain('Return to Posts');
   });
 
   it('prefers the complete post supplied in router state', () => {
@@ -65,5 +69,21 @@ describe('ViewPostComponent', () => {
     expect(fixture.componentInstance.post()?.title).toBe('Post from router state');
     expect(fixture.componentInstance.errorMessage()).toBeNull();
     expect(fixture.nativeElement.textContent).toContain('Post from router state');
+  });
+
+  it('returns to the originating personalized feed and displays the author', () => {
+    fixture.destroy();
+    vi.spyOn(TestBed.inject(Location), 'getState').mockReturnValue({
+      post: { ...post, authorEmail: 'author@example.com' },
+      returnUrl: '/personal/7'
+    });
+    fixture = TestBed.createComponent(ViewPostComponent);
+    fixture.componentRef.setInput('id', String(post.id));
+    fixture.detectChanges();
+
+    const returnLink = fixture.nativeElement.querySelectorAll('a')[1] as HTMLAnchorElement;
+    expect(fixture.nativeElement.textContent).toContain('By author@example.com');
+    expect(returnLink.getAttribute('href')).toBe('/personal/7');
+    expect(returnLink.textContent).toContain('Return to Personalized Feed');
   });
 });

@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Post } from '../../models/post.model';
 import { ConfirmationComponent, Buttons } from '../../../../shared/components/confirmation/confirmation';
 import { AuthService } from '../../../../core/auth/auth.service';
@@ -15,6 +15,7 @@ export class PostItemComponent {
   // Required signal input from parent
   post = input.required<Post>();
   private auth = inject(AuthService);
+  private router = inject(Router);
   edit = output<Post>();
   delete = output<number>();
   showDeleteConfirmation = signal(false);
@@ -28,6 +29,10 @@ export class PostItemComponent {
     const post = this.post();
     return post.userId != null && post.userId === this.auth.currentUser()?.id;
   });
+  postRouteState = computed(() => ({
+    post: this.post(),
+    returnUrl: this.router.url
+  }));
 
   // Confirmation buttons defined in the component — actions fully encapsulated here
   confirmationButtons = computed<Buttons[]>(() => [
