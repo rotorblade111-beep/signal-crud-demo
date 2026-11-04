@@ -53,13 +53,12 @@
           [attr.aria-hidden]="!isMenuOpen()"
           [attr.inert]="!isMenuOpen() ? '' : null"
           (click)="$event.stopPropagation()">
-          <button
-            type="button"
-            class="w-full cursor-not-allowed rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-400"
-            aria-disabled="true"
-            disabled>
+          <a
+            routerLink="/profile"
+            class="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 no-underline transition-colors hover:bg-blue-50 hover:text-blue-700"
+            (click)="closeMenu()">
             Profile
-          </button>
+          </a>
           <div class="my-1 border-t border-slate-100"></div>
           <button
             type="button"

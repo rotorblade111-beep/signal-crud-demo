@@ -34,6 +34,12 @@ export const routes: Routes = [
     data: { seo: { title: 'Personalized feed | Posthub', description: siteDescription, type: 'website' } }
   },
   {
+    path: 'profile',
+    loadComponent: () => import('./features/profile/profile').then(m => m.ProfileComponent),
+    canActivate: [authGuard],
+    data: { seo: { title: 'Profile | Posthub', description: 'Manage your Posthub profile.', type: 'website' } }
+  },
+  {
     path: 'add-post',
     loadComponent: () => import('./features/posts/components/add-post/add-post').then(m => m.AddPostComponent),
     canActivate: [authGuard],

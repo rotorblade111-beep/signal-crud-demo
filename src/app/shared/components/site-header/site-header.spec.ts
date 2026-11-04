@@ -24,7 +24,8 @@ describe('SiteHeaderComponent', () => {
           { path: 'login', component: TestPageComponent },
           { path: 'sign-up', component: TestPageComponent },
           { path: 'home', component: TestPageComponent },
-          { path: 'personal/:userId', component: TestPageComponent }
+          { path: 'personal/:userId', component: TestPageComponent },
+          { path: 'profile', component: TestPageComponent }
         ])
       ]
     }).compileComponents();
@@ -72,7 +73,7 @@ describe('SiteHeaderComponent', () => {
     expect(link?.nativeElement.getAttribute('href')).toBe('/personal/7');
   });
 
-  it('opens the animated account menu with a placeholder profile action', () => {
+  it('opens the animated account menu with a profile link', () => {
     TestBed.inject(AuthService).currentUser.set({
       id: 7,
       email: 'author@example.com',
@@ -93,13 +94,30 @@ describe('SiteHeaderComponent', () => {
     expect(menu.classList).not.toContain('opacity-0');
     expect(menu.textContent).toContain('Profile');
     expect(menu.textContent).toContain('Logout');
-    expect((menu.querySelector('button[disabled]') as HTMLButtonElement).textContent).toContain('Profile');
+    expect((menu.querySelector('a[routerLink="/profile"]') as HTMLAnchorElement).textContent).toContain('Profile');
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     fixture.detectChanges();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
     expect(menu.getAttribute('aria-hidden')).toBe('true');
     expect(menu.hasAttribute('inert')).toBe(true);
+  });
+
+  it('navigates to Profile from the drawer and closes the menu', async () => {
+    TestBed.inject(AuthService).currentUser.set({
+      id: 7,
+      email: 'author@example.com',
+      dateOfBirth: '2000-01-01'
+    });
+    fixture.detectChanges();
+    fixture.nativeElement.querySelector('button[aria-label="Open account menu"]').click();
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('#account-menu a[routerLink="/profile"]') as HTMLAnchorElement).click();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(TestBed.inject(Router).url).toBe('/profile');
+    expect(fixture.componentInstance.isMenuOpen()).toBe(false);
   });
 
   it('logs out from the drawer, clears the session, and navigates to login', async () => {

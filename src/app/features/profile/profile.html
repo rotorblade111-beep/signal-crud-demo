@@ -1,0 +1,169 @@
+<main class="mx-auto my-8 min-h-[70vh] w-[90vw] rounded-2xl bg-white p-4 font-sans text-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.06)] sm:p-6 lg:my-10 lg:p-8">
+  <header class="mb-6">
+    <p class="mb-1 text-sm font-semibold uppercase tracking-widest text-[#5865f2]">Your account</p>
+    <h1 class="mb-0 mt-0 text-2xl font-bold text-slate-900 sm:text-3xl">Profile</h1>
+    <p class="mb-0 mt-2 text-sm text-slate-500">Manage your personal information and account settings.</p>
+  </header>
+
+  <div class="grid gap-6 lg:grid-cols-[3fr_7fr]">
+    <aside class="relative">
+      <button
+        type="button"
+        class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm font-semibold text-slate-700 lg:hidden"
+        aria-controls="profile-menu"
+        [attr.aria-expanded]="mobileMenuOpen()"
+        (click)="toggleMobileMenu()">
+        <span>{{ activeTab() === 'personal' ? 'Personal Information' : 'Account Settings' }}</span>
+        <svg class="h-4 w-4 transition-transform" [class.rotate-180]="mobileMenuOpen()" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="m5 7.5 5 5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <nav
+        id="profile-menu"
+        aria-label="Profile sections"
+        class="absolute left-0 right-0 top-full z-10 hidden flex-col gap-1 rounded-xl border border-slate-200 bg-white p-2 shadow-lg lg:static lg:mt-0 lg:flex lg:border-0 lg:bg-slate-50 lg:p-3 lg:shadow-none"
+        [style.display]="mobileMenuOpen() ? 'flex' : null">
+        <button
+          type="button"
+          class="rounded-lg px-4 py-3 text-left text-sm font-semibold transition-colors"
+          [class.bg-blue-600]="activeTab() === 'personal'"
+          [class.text-white]="activeTab() === 'personal'"
+          [class.text-slate-600]="activeTab() !== 'personal'"
+          [class.hover:bg-slate-100]="activeTab() !== 'personal'"
+          [attr.aria-current]="activeTab() === 'personal' ? 'page' : null"
+          (click)="selectTab('personal')">
+          Personal Information
+        </button>
+        <button
+          type="button"
+          class="rounded-lg px-4 py-3 text-left text-sm font-semibold transition-colors"
+          [class.bg-blue-600]="activeTab() === 'account'"
+          [class.text-white]="activeTab() === 'account'"
+          [class.text-slate-600]="activeTab() !== 'account'"
+          [class.hover:bg-slate-100]="activeTab() !== 'account'"
+          [attr.aria-current]="activeTab() === 'account' ? 'page' : null"
+          (click)="selectTab('account')">
+          Account Settings
+        </button>
+      </nav>
+    </aside>
+
+    <section class="min-w-0 rounded-xl border border-slate-200 p-4 sm:p-6">
+      <div [hidden]="activeTab() !== 'personal'">
+        <div>
+          <h2 class="mb-1 mt-0 text-xl font-bold text-slate-900">Personal Information</h2>
+          <p class="mb-6 mt-0 text-sm text-slate-500">Your changes are shown here but aren’t saved yet.</p>
+
+          <form class="grid gap-4 sm:grid-cols-2" novalidate>
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+              First Name <span class="font-normal text-slate-400">(optional)</span>
+              <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [formField]="profileForm.firstName" autocomplete="given-name" />
+            </label>
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+              Last Name <span class="font-normal text-slate-400">(optional)</span>
+              <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [formField]="profileForm.lastName" autocomplete="family-name" />
+            </label>
+
+            <fieldset class="m-0 border-0 p-0 sm:col-span-2">
+              <legend class="mb-1.5 text-sm font-semibold text-slate-700">Date of Birth</legend>
+              <div class="grid grid-cols-3 gap-2">
+                <select aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.year().touched() || submitted()) && profileForm.year().invalid()" [formField]="profileForm.year" (change)="updateYear($any($event.target).value)">
+                  <option value="">Year</option>
+                  @for (year of years; track year) { <option [value]="year">{{ year }}</option> }
+                </select>
+                <select aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.month().touched() || submitted()) && profileForm.month().invalid()" [formField]="profileForm.month" (change)="updateMonth($any($event.target).value)">
+                  <option value="">Month</option>
+                  @for (month of months; track month.value) { <option [value]="month.value">{{ month.name }}</option> }
+                </select>
+                <select aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.day().touched() || submitted()) && profileForm.day().invalid()" [formField]="profileForm.day" (focus)="onDayAttempt()">
+                  <option value="">Day</option>
+                  @for (day of days(); track day) { <option [value]="day">{{ day }}</option> }
+                </select>
+              </div>
+              @if ((profileForm.year().touched() || submitted()) && profileForm.year().invalid()) {
+                <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{ profileForm.year().errors()[0].message }}</p>
+              }
+              @if ((profileForm.month().touched() || submitted()) && profileForm.month().invalid()) {
+                <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{ profileForm.month().errors()[0].message }}</p>
+              }
+              @if ((profileForm.day().touched() || submitted()) && profileForm.day().invalid()) {
+                <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{ profileForm.day().errors()[0].message }}</p>
+              }
+              @if (dateOfBirthError(); as error) {
+                <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700" role="alert">{{ error }}</p>
+              }
+            </fieldset>
+
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 sm:col-span-2">
+              Address <span class="font-normal text-slate-400">(optional)</span>
+              <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [formField]="profileForm.address" autocomplete="street-address" placeholder="Street address" />
+            </label>
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700 sm:col-span-2">
+              Country <span class="font-normal text-slate-400">(optional)</span>
+              <select class="rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [formField]="profileForm.country">
+                <option value="">Select a country</option>
+                @for (country of countries; track country) { <option [value]="country">{{ country }}</option> }
+              </select>
+            </label>
+          </form>
+        </div>
+      </div>
+      <div [hidden]="activeTab() !== 'account'">
+        <div>
+          <h2 class="mb-1 mt-0 text-xl font-bold text-slate-900">Account Settings</h2>
+          <p class="mb-6 mt-0 text-sm text-slate-500">Account updates aren’t connected yet; values won’t be saved.</p>
+
+          <div class="flex flex-col gap-4">
+            <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+              Email
+              <input
+                class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
+                [class.!border-red-500]="(profileForm.email().touched() || submitted()) && profileForm.email().invalid()"
+                type="email"
+                [formField]="profileForm.email"
+                autocomplete="email"
+                placeholder="you@example.com" />
+              @if (profileForm.email().touched() || submitted()) {
+                @for (error of profileForm.email().errors(); track error.kind) {
+                  <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
+                }
+              }
+            </label>
+
+            <div class="mt-4 border-t border-slate-200 pt-5">
+              <h3 class="mb-1 mt-0 text-base font-semibold text-slate-900">Change password</h3>
+              <p class="mb-4 mt-0 text-sm text-slate-500">Password changes will be available when account updates are connected.</p>
+            </div>
+            <form class="flex flex-col gap-4" novalidate (submit)="validatePasswordForm($event)">
+              <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+                New password
+                <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="((profileForm.newPassword().touched() || submitted()) && profileForm.newPassword().invalid())" type="password" [formField]="profileForm.newPassword" autocomplete="new-password" />
+                @if (profileForm.newPassword().touched() || submitted()) {
+                  @for (error of profileForm.newPassword().errors(); track error.kind) {
+                    <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
+                  }
+                }
+              </label>
+              <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
+                Re-type new password
+                <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="((profileForm.repeatedPassword().touched() || submitted()) && (profileForm.repeatedPassword().invalid() || passwordMismatch()))" type="password" [formField]="profileForm.repeatedPassword" autocomplete="new-password" />
+                @if (profileForm.repeatedPassword().touched() || submitted()) {
+                  @for (error of profileForm.repeatedPassword().errors(); track error.kind) {
+                    <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
+                  }
+                }
+                @if (passwordMismatch()) {
+                  <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700" role="alert">Passwords do not match.</span>
+                }
+              </label>
+              @if (passwordNotice(); as notice) {
+                <p class="mb-0 mt-0 text-sm text-blue-700" role="status">{{ notice }}</p>
+              }
+              <button type="submit" class="self-start cursor-pointer rounded-lg bg-[#5865f2] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4752c4]">Validate password</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
