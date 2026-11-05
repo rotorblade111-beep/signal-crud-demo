@@ -117,6 +117,13 @@ export class AuthService {
     }
   }
 
+  updateCurrentUser(user: AuthUser): void {
+    this.currentUser.set(user);
+    if (this.isBrowser) {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+  }
+
   private setSession(response: AuthTokenResponse): void {
     this.currentUser.set(response.user);
     this.accessToken.set(response.accessToken);

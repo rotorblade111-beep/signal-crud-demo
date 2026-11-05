@@ -1,0 +1,5 @@
+[  422124ms] [ERROR] Access to fetch at 'http://localhost:5093/auth/logout' from origin 'http://localhost:4300' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://localhost:4300/profile:0
+[  422124ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:5093/auth/logout:0
+[  422125ms] [ERROR] Failed to log out HttpErrorResponse @ http://localhost:4300/@vite/client:298
+[  422131ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:4300/chunk-TS5A2CMY.js:0
+[  422133ms] [ERROR] ERROR TypeError: Failed to fetch dynamically imported module: http://localhost:4300/chunk-TS5A2CMY.js @ http://localhost:4300/@vite/client:298

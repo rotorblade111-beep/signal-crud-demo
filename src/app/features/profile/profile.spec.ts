@@ -2,11 +2,21 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthService } from '../../core/auth/auth.service';
+import { ProfileResponse } from './services/profile.service';
 import { ProfileComponent } from './profile';
 
 describe('ProfileComponent', () => {
   let fixture: ComponentFixture<ProfileComponent>;
   let httpTesting: HttpTestingController;
+  const profile: ProfileResponse = {
+    id: 7,
+    email: 'member@example.com',
+    dateOfBirth: '2000-02-29',
+    firstName: 'Taylor',
+    lastName: 'Member',
+    address: '10 Main Street',
+    country: 'Canada'
+  };
 
   beforeEach(async () => {
     localStorage.removeItem('accessToken');
@@ -25,6 +35,9 @@ describe('ProfileComponent', () => {
     httpTesting = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(ProfileComponent);
     fixture.detectChanges();
+    httpTesting.expectOne('http://localhost:5093/profile').flush(profile);
+    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   afterEach(() => {
@@ -32,14 +45,16 @@ describe('ProfileComponent', () => {
     fixture.destroy();
   });
 
-  it('prefills the email and sign-up-style date of birth from the authenticated user', () => {
+  it('loads personal details, email, and date of birth from the API', () => {
     const year = fixture.nativeElement.querySelector('select[aria-label="Year"]') as HTMLSelectElement;
     const month = fixture.nativeElement.querySelector('select[aria-label="Month"]') as HTMLSelectElement;
     const day = fixture.nativeElement.querySelector('select[aria-label="Day"]') as HTMLSelectElement;
+    const firstName = fixture.nativeElement.querySelector('input[autocomplete="given-name"]') as HTMLInputElement;
 
     expect(year.value).toBe('2000');
     expect(month.value).toBe('2');
     expect(day.value).toBe('29');
+    expect(firstName.value).toBe('Taylor');
     expect(fixture.componentInstance.days()).toHaveLength(29);
 
     fixture.componentInstance.selectTab('account');
@@ -75,11 +90,11 @@ describe('ProfileComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('Change password');
   });
 
-  it('keeps unsaved field values when switching between profile sections', () => {
+  it('preserves form values when switching between profile sections', () => {
     const firstName = fixture.nativeElement.querySelector(
       'input[autocomplete="given-name"]'
     ) as HTMLInputElement;
-    firstName.value = 'Taylor';
+    firstName.value = 'Jordan';
     firstName.dispatchEvent(new Event('input', { bubbles: true }));
     fixture.detectChanges();
 
@@ -88,11 +103,74 @@ describe('ProfileComponent', () => {
     fixture.componentInstance.selectTab('personal');
     fixture.detectChanges();
 
-    expect(firstName.value).toBe('Taylor');
-    expect(fixture.componentInstance.profileModel().firstName).toBe('Taylor');
+    expect(firstName.value).toBe('Jordan');
+    expect(fixture.componentInstance.profileModel().firstName).toBe('Jordan');
   });
 
-  it('validates email and matching new passwords without making API calls', () => {
+  it('updates and saves personal information through the profile API', async () => {
+    const component = fixture.componentInstance;
+    component.profileModel.update(model => ({
+      ...model,
+      firstName: 'Updated',
+      lastName: 'Name',
+      address: '42 New Road',
+      country: 'France'
+    }));
+
+    const saving = component.savePersonalInformation(new Event('submit'));
+    const request = httpTesting.expectOne(
+      'http://localhost:5093/profile/personal-information'
+    );
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({
+      firstName: 'Updated',
+      lastName: 'Name',
+      dateOfBirth: '2000-02-29',
+      address: '42 New Road',
+      country: 'France'
+    });
+    request.flush({
+      ...profile,
+      firstName: 'Updated',
+      lastName: 'Name',
+      address: '42 New Road',
+      country: 'France'
+    });
+    await saving;
+
+    expect(component.personalSuccess()).toBe('Personal information updated.');
+    expect(component.personalError()).toBeNull();
+    expect(TestBed.inject(AuthService).currentUser()?.dateOfBirth).toBe('2000-02-29');
+  });
+
+  it('saves email, refreshes the local account summary, and reports duplicate email errors', async () => {
+    const component = fixture.componentInstance;
+    component.selectTab('account');
+    fixture.detectChanges();
+    component.profileModel.update(model => ({ ...model, email: 'bob@example.com' }));
+
+    const duplicateEmail = component.saveEmail(new Event('submit'));
+    httpTesting.expectOne('http://localhost:5093/profile/email').flush(
+      { title: 'Email already in use' },
+      { status: 409, statusText: 'Conflict' }
+    );
+    await duplicateEmail;
+    expect(component.emailError()).toBe('An account with this email already exists.');
+
+    component.profileModel.update(model => ({ ...model, email: 'updated@example.com' }));
+    const updateEmail = component.saveEmail(new Event('submit'));
+    httpTesting.expectOne('http://localhost:5093/profile/email').flush({
+      ...profile,
+      email: 'updated@example.com'
+    });
+    await updateEmail;
+
+    expect(component.emailSuccess()).toBe('Email address updated.');
+    expect(TestBed.inject(AuthService).currentUser()?.email).toBe('updated@example.com');
+    expect(localStorage.getItem('currentUser')).toContain('updated@example.com');
+  });
+
+  it('validates invalid email and mismatched passwords without sending requests', async () => {
     const component = fixture.componentInstance;
     component.selectTab('account');
     fixture.detectChanges();
@@ -106,17 +184,18 @@ describe('ProfileComponent', () => {
 
     expect(component.passwordMismatch()).toBe(true);
 
-    component.validatePasswordForm(new Event('submit'));
+    await component.saveEmail(new Event('submit'));
+    await component.changePassword(new Event('submit'));
     fixture.detectChanges();
 
     expect(component.profileForm.email().invalid()).toBe(true);
     expect(fixture.nativeElement.textContent).toContain('Enter a valid email address.');
-    expect(fixture.nativeElement.textContent).toContain('Passwords do not match.');
+    expect(component.passwordError()).toBe('Passwords do not match.');
     expect(component.passwordNotice()).toBeNull();
-    httpTesting.expectNone(() => true);
+    httpTesting.expectNone(request => request.url !== 'http://localhost:5093/profile');
   });
 
-  it('reports pending backend support when the validated password entries match', () => {
+  it('changes the password through the authenticated API and clears the password fields', async () => {
     const component = fixture.componentInstance;
     component.selectTab('account');
     fixture.detectChanges();
@@ -126,12 +205,15 @@ describe('ProfileComponent', () => {
       repeatedPassword: 'new-password'
     }));
 
-    component.validatePasswordForm(new Event('submit'));
-    fixture.detectChanges();
+    const changing = component.changePassword(new Event('submit'));
+    const request = httpTesting.expectOne('http://localhost:5093/profile/password');
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({ newPassword: 'new-password' });
+    request.flush(null);
+    await changing;
 
-    expect(component.passwordMismatch()).toBe(false);
-    expect(component.passwordNotice()).toContain('available when account updates are connected');
-    expect(fixture.nativeElement.textContent).toContain(component.passwordNotice());
-    httpTesting.expectNone(() => true);
+    expect(component.passwordNotice()).toBe('Password updated.');
+    expect(component.profileModel().newPassword).toBe('');
+    expect(component.profileModel().repeatedPassword).toBe('');
   });
 });

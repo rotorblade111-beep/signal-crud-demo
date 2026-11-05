@@ -5,6 +5,11 @@
     <p class="mb-0 mt-2 text-sm text-slate-500">Manage your personal information and account settings.</p>
   </header>
 
+  @if (isLoading()) {
+    <p class="py-12 text-center text-slate-500" role="status">Loading your profile...</p>
+  } @else if (loadError(); as error) {
+    <p class="py-8 text-center text-red-700" role="alert">{{ error }}</p>
+  } @else {
   <div class="grid gap-6 lg:grid-cols-[3fr_7fr]">
     <aside class="relative">
       <button
@@ -52,9 +57,9 @@
       <div [hidden]="activeTab() !== 'personal'">
         <div>
           <h2 class="mb-1 mt-0 text-xl font-bold text-slate-900">Personal Information</h2>
-          <p class="mb-6 mt-0 text-sm text-slate-500">Your changes are shown here but aren’t saved yet.</p>
+          <p class="mb-6 mt-0 text-sm text-slate-500">Update your personal details.</p>
 
-          <form class="grid gap-4 sm:grid-cols-2" novalidate>
+          <form class="grid gap-4 sm:grid-cols-2" novalidate (submit)="savePersonalInformation($event)">
             <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
               First Name <span class="font-normal text-slate-400">(optional)</span>
               <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [formField]="profileForm.firstName" autocomplete="given-name" />
@@ -67,26 +72,26 @@
             <fieldset class="m-0 border-0 p-0 sm:col-span-2">
               <legend class="mb-1.5 text-sm font-semibold text-slate-700">Date of Birth</legend>
               <div class="grid grid-cols-3 gap-2">
-                <select aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.year().touched() || submitted()) && profileForm.year().invalid()" [formField]="profileForm.year" (change)="updateYear($any($event.target).value)">
+                <select aria-label="Year" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.year().touched() || personalSubmitted()) && profileForm.year().invalid()" [formField]="profileForm.year" (change)="updateYear($any($event.target).value)">
                   <option value="">Year</option>
                   @for (year of years; track year) { <option [value]="year">{{ year }}</option> }
                 </select>
-                <select aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.month().touched() || submitted()) && profileForm.month().invalid()" [formField]="profileForm.month" (change)="updateMonth($any($event.target).value)">
+                <select aria-label="Month" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.month().touched() || personalSubmitted()) && profileForm.month().invalid()" [formField]="profileForm.month" (change)="updateMonth($any($event.target).value)">
                   <option value="">Month</option>
                   @for (month of months; track month.value) { <option [value]="month.value">{{ month.name }}</option> }
                 </select>
-                <select aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.day().touched() || submitted()) && profileForm.day().invalid()" [formField]="profileForm.day" (focus)="onDayAttempt()">
+                <select aria-label="Day" class="min-w-0 rounded-lg border border-slate-300 bg-white px-2.5 py-2.5 text-sm outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="(profileForm.day().touched() || personalSubmitted()) && profileForm.day().invalid()" [formField]="profileForm.day" (focus)="onDayAttempt()">
                   <option value="">Day</option>
                   @for (day of days(); track day) { <option [value]="day">{{ day }}</option> }
                 </select>
               </div>
-              @if ((profileForm.year().touched() || submitted()) && profileForm.year().invalid()) {
+              @if ((profileForm.year().touched() || personalSubmitted()) && profileForm.year().invalid()) {
                 <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{ profileForm.year().errors()[0].message }}</p>
               }
-              @if ((profileForm.month().touched() || submitted()) && profileForm.month().invalid()) {
+              @if ((profileForm.month().touched() || personalSubmitted()) && profileForm.month().invalid()) {
                 <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{ profileForm.month().errors()[0].message }}</p>
               }
-              @if ((profileForm.day().touched() || submitted()) && profileForm.day().invalid()) {
+              @if ((profileForm.day().touched() || personalSubmitted()) && profileForm.day().invalid()) {
                 <p class="animate-validation-error motion-reduce:animate-none mb-0 mt-2 text-sm font-normal text-red-700">{{ profileForm.day().errors()[0].message }}</p>
               }
               @if (dateOfBirthError(); as error) {
@@ -105,40 +110,59 @@
                 @for (country of countries; track country) { <option [value]="country">{{ country }}</option> }
               </select>
             </label>
+            @if (personalError(); as error) {
+              <p class="animate-validation-error motion-reduce:animate-none mb-0 text-sm text-red-700 sm:col-span-2" role="alert">{{ error }}</p>
+            }
+            @if (personalSuccess(); as message) {
+              <p class="mb-0 text-sm text-emerald-700 sm:col-span-2" role="status">{{ message }}</p>
+            }
+            <button type="submit" class="w-fit cursor-pointer rounded-lg bg-[#5865f2] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:cursor-not-allowed disabled:opacity-60 sm:col-span-2" [disabled]="isSavingPersonal()">
+              {{ isSavingPersonal() ? 'Saving...' : 'Save Personal Information' }}
+            </button>
           </form>
         </div>
       </div>
       <div [hidden]="activeTab() !== 'account'">
         <div>
           <h2 class="mb-1 mt-0 text-xl font-bold text-slate-900">Account Settings</h2>
-          <p class="mb-6 mt-0 text-sm text-slate-500">Account updates aren’t connected yet; values won’t be saved.</p>
+          <p class="mb-6 mt-0 text-sm text-slate-500">Update your email address and password.</p>
 
-          <div class="flex flex-col gap-4">
+          <form class="flex flex-col gap-4" novalidate (submit)="saveEmail($event)">
             <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
               Email
               <input
                 class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15"
-                [class.!border-red-500]="(profileForm.email().touched() || submitted()) && profileForm.email().invalid()"
+                [class.!border-red-500]="((profileForm.email().touched() || accountSubmitted()) && profileForm.email().invalid()) || emailError()"
                 type="email"
                 [formField]="profileForm.email"
                 autocomplete="email"
                 placeholder="you@example.com" />
-              @if (profileForm.email().touched() || submitted()) {
+              @if (profileForm.email().touched() || accountSubmitted()) {
                 @for (error of profileForm.email().errors(); track error.kind) {
                   <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
                 }
               }
             </label>
+            @if (emailError(); as error) {
+              <p class="animate-validation-error motion-reduce:animate-none mb-0 text-sm text-red-700" role="alert">{{ error }}</p>
+            }
+            @if (emailSuccess(); as message) {
+              <p class="mb-0 text-sm text-emerald-700" role="status">{{ message }}</p>
+            }
+            <button type="submit" class="self-start cursor-pointer rounded-lg bg-[#5865f2] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:cursor-not-allowed disabled:opacity-60" [disabled]="isSavingEmail()">
+              {{ isSavingEmail() ? 'Saving...' : 'Save Email' }}
+            </button>
+          </form>
 
-            <div class="mt-4 border-t border-slate-200 pt-5">
+          <div class="mt-6 border-t border-slate-200 pt-5">
               <h3 class="mb-1 mt-0 text-base font-semibold text-slate-900">Change password</h3>
-              <p class="mb-4 mt-0 text-sm text-slate-500">Password changes will be available when account updates are connected.</p>
-            </div>
-            <form class="flex flex-col gap-4" novalidate (submit)="validatePasswordForm($event)">
+              <p class="mb-4 mt-0 text-sm text-slate-500">Choose a new password with at least 8 characters.</p>
+          </div>
+          <form class="flex flex-col gap-4" novalidate (submit)="changePassword($event)">
               <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
                 New password
-                <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="((profileForm.newPassword().touched() || submitted()) && profileForm.newPassword().invalid())" type="password" [formField]="profileForm.newPassword" autocomplete="new-password" />
-                @if (profileForm.newPassword().touched() || submitted()) {
+                <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="((profileForm.newPassword().touched() || passwordSubmitted()) && profileForm.newPassword().invalid())" type="password" [formField]="profileForm.newPassword" autocomplete="new-password" />
+                @if (profileForm.newPassword().touched() || passwordSubmitted()) {
                   @for (error of profileForm.newPassword().errors(); track error.kind) {
                     <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
                   }
@@ -146,24 +170,24 @@
               </label>
               <label class="flex flex-col gap-1.5 text-sm font-semibold text-slate-700">
                 Re-type new password
-                <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="((profileForm.repeatedPassword().touched() || submitted()) && (profileForm.repeatedPassword().invalid() || passwordMismatch()))" type="password" [formField]="profileForm.repeatedPassword" autocomplete="new-password" />
-                @if (profileForm.repeatedPassword().touched() || submitted()) {
+                <input class="rounded-lg border border-slate-300 px-3.5 py-2.5 font-normal outline-none transition-shadow focus:border-[#5865f2] focus:ring-4 focus:ring-[#5865f2]/15" [class.!border-red-500]="((profileForm.repeatedPassword().touched() || passwordSubmitted()) && (profileForm.repeatedPassword().invalid() || passwordMismatch())) || passwordError()" type="password" [formField]="profileForm.repeatedPassword" autocomplete="new-password" />
+                @if (profileForm.repeatedPassword().touched() || passwordSubmitted()) {
                   @for (error of profileForm.repeatedPassword().errors(); track error.kind) {
                     <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700">{{ error.message }}</span>
                   }
                 }
-                @if (passwordMismatch()) {
-                  <span class="animate-validation-error motion-reduce:animate-none text-xs font-normal text-red-700" role="alert">Passwords do not match.</span>
+                </label>
+                @if (passwordError(); as error) {
+                  <p class="animate-validation-error motion-reduce:animate-none mb-0 text-sm text-red-700" role="alert">{{ error }}</p>
                 }
-              </label>
-              @if (passwordNotice(); as notice) {
-                <p class="mb-0 mt-0 text-sm text-blue-700" role="status">{{ notice }}</p>
-              }
-              <button type="submit" class="self-start cursor-pointer rounded-lg bg-[#5865f2] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4752c4]">Validate password</button>
-            </form>
-          </div>
+                @if (passwordNotice(); as notice) {
+                  <p class="mb-0 mt-0 text-sm text-emerald-700" role="status">{{ notice }}</p>
+                }
+                <button type="submit" class="self-start cursor-pointer rounded-lg bg-[#5865f2] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4752c4] disabled:cursor-not-allowed disabled:opacity-60" [disabled]="isChangingPassword()">{{ isChangingPassword() ? 'Updating...' : 'Update Password' }}</button>
+          </form>
         </div>
       </div>
     </section>
   </div>
+  }
 </main>
